@@ -1,0 +1,41 @@
+name: gymbo
+description: "Gymbo — a local-first personal gym workout tracker with Epley-based load recommendations."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # State management
+  flutter_riverpod: ^2.6.1
+
+  # Routing
+  go_router: ^14.6.0
+
+  # Local database (SQLite via Drift)
+  drift: ^2.21.0
+  sqlite3_flutter_libs: ^0.5.26
+  path_provider: ^2.1.4
+  path: ^1.9.0
+
+  # Local key/value (active profile selection + settings)
+  shared_preferences: ^2.3.3
+
+  # Helpers
+  uuid: ^4.5.1
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  drift_dev: ^2.21.0
+  build_runner: ^2.4.13
+
+flutter:
+  uses-material-design: true

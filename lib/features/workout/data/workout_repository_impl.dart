@@ -1,0 +1,449 @@
+import 'package:drift/drift.dart';
+import 'package:uuid/uuid.dart';
+
+import '../../../core/enums.dart';
+import '../../../data/db/app_database.dart';
+import '../domain/auto_end.dart';
+import '../domain/workout_exercise.dart';
+import '../domain/workout_repository.dart';
+import '../domain/workout_session.dart';
+import '../domain/workout_set.dart';
+import '../domain/workout_summary.dart';
+
+class WorkoutRepositoryImpl implements WorkoutRepository {
+  WorkoutRepositoryImpl(this._db);
+
+  final AppDatabase _db;
+  static const _uuid = Uuid();
+
+  // ----------------------------- Mappers -----------------------------
+
+  WorkoutSession _mapSession(WorkoutSessionRow r) => WorkoutSession(
+        id: r.id,
+        userProfileId: r.userProfileId,
+        dayType: r.dayType,
+        startedAt: r.startedAt,
+        endedAt: r.endedAt,
+        lastActivityAt: r.lastActivityAt,
+        status: r.status,
+        notes: r.notes,
+        createdAt: r.createdAt,
+        updatedAt: r.updatedAt,
+      );
+
+  WorkoutExercise _mapExercise(WorkoutExerciseRow r) => WorkoutExercise(
+        id: r.id,
+        sessionId: r.sessionId,
+        exerciseId: r.exerciseId,
+        orderIndex: r.orderIndex,
+        startedAt: r.startedAt,
+        endedAt: r.endedAt,
+        notes: r.notes,
+      );
+
+  WorkoutSet _mapSet(WorkoutSetRow r) => WorkoutSet(
+        id: r.id,
+        workoutExerciseId: r.workoutExerciseId,
+        setNumber: r.setNumber,
+        weightKg: r.weightKg,
+        reps: r.reps,
+        rpe: r.rpe,
+        rir: r.rir,
+        isWarmup: r.isWarmup,
+        isFailure: r.isFailure,
+        estimatedOneRepMaxKg: r.estimatedOneRepMaxKg,
+        createdAt: r.createdAt,
+        updatedAt: r.updatedAt,
+        notes: r.notes,
+      );
+
+  // ----------------------------- Sessions -----------------------------
+
+  @override
+  Future<WorkoutSession> startSession({
+    required String userProfileId,
+    required DayType dayType,
+  }) async {
+    final now = DateTime.now();
+    final session = WorkoutSession(
+      id: _uuid.v4(),
+      userProfileId: userProfileId,
+      dayType: dayType,
+      startedAt: now,
+      lastActivityAt: now,
+      status: WorkoutSessionStatus.active,
+      createdAt: now,
+      updatedAt: now,
+    );
+    await _db.into(_db.workoutSessions).insert(
+          WorkoutSessionsCompanion.insert(
+            id: session.id,
+            userProfileId: session.userProfileId,
+            dayType: session.dayType,
+            startedAt: session.startedAt,
+            lastActivityAt: session.lastActivityAt,
+            status: session.status,
+            createdAt: session.createdAt,
+            updatedAt: session.updatedAt,
+          ),
+        );
+    return session;
+  }
+
+  @override
+  Future<WorkoutSession?> getActiveSession(String userProfileId) async {
+    final row = await (_db.select(_db.workoutSessions)
+          ..where((t) =>
+              t.userProfileId.equals(userProfileId) &
+              t.status.isIn([
+                WorkoutSessionStatus.active.name,
+                WorkoutSessionStatus.resting.name,
+                WorkoutSessionStatus.paused.name,
+              ]))
+          ..orderBy([
+            (t) => OrderingTerm(
+                expression: t.startedAt, mode: OrderingMode.desc)
+          ])
+          ..limit(1))
+        .getSingleOrNull();
+    return row == null ? null : _mapSession(row);
+  }
+
+  @override
+  Future<WorkoutSession?> getSession(String sessionId) async {
+    final row = await (_db.select(_db.workoutSessions)
+          ..where((t) => t.id.equals(sessionId)))
+        .getSingleOrNull();
+    return row == null ? null : _mapSession(row);
+  }
+
+  @override
+  Future<void> updateActivity(String sessionId, [DateTime? at]) async {
+    final now = at ?? DateTime.now();
+    await (_db.update(_db.workoutSessions)
+          ..where((t) => t.id.equals(sessionId)))
+        .write(WorkoutSessionsCompanion(
+      lastActivityAt: Value(now),
+      updatedAt: Value(now),
+    ));
+  }
+
+  @override
+  Future<void> setStatus(
+      String sessionId, WorkoutSessionStatus status) async {
+    await (_db.update(_db.workoutSessions)
+          ..where((t) => t.id.equals(sessionId)))
+        .write(WorkoutSessionsCompanion(
+      status: Value(status),
+      updatedAt: Value(DateTime.now()),
+    ));
+  }
+
+  @override
+  Future<WorkoutSession> endSession(String sessionId) async {
+    final now = DateTime.now();
+    await (_db.update(_db.workoutSessions)
+          ..where((t) => t.id.equals(sessionId)))
+        .write(WorkoutSessionsCompanion(
+      endedAt: Value(now),
+      lastActivityAt: Value(now),
+      status: const Value(WorkoutSessionStatus.completed),
+      updatedAt: Value(now),
+    ));
+    return (await getSession(sessionId))!;
+  }
+
+  @override
+  Future<int> autoEndInactiveSessions({required int timeoutMinutes}) async {
+    final open = await (_db.select(_db.workoutSessions)
+          ..where((t) => t.status.isIn([
+                WorkoutSessionStatus.active.name,
+                WorkoutSessionStatus.resting.name,
+                WorkoutSessionStatus.paused.name,
+              ])))
+        .get();
+
+    final now = DateTime.now();
+    var count = 0;
+    for (final s in open) {
+      if (AutoEnd.shouldAutoEnd(
+        lastActivityAt: s.lastActivityAt,
+        now: now,
+        timeoutMinutes: timeoutMinutes,
+      )) {
+        final deadline = AutoEnd.endTimestamp(
+          lastActivityAt: s.lastActivityAt,
+          timeoutMinutes: timeoutMinutes,
+        );
+        await (_db.update(_db.workoutSessions)
+              ..where((t) => t.id.equals(s.id)))
+            .write(WorkoutSessionsCompanion(
+          endedAt: Value(deadline),
+          status: const Value(WorkoutSessionStatus.autoCompleted),
+          updatedAt: Value(now),
+        ));
+        count++;
+      }
+    }
+    return count;
+  }
+
+  // ----------------------------- Exercises -----------------------------
+
+  @override
+  Future<WorkoutExercise> ensureExercise(
+      String sessionId, String exerciseId) async {
+    final existing = await (_db.select(_db.workoutExercises)
+          ..where((t) =>
+              t.sessionId.equals(sessionId) &
+              t.exerciseId.equals(exerciseId)))
+        .getSingleOrNull();
+    if (existing != null) return _mapExercise(existing);
+
+    final current = await getSessionExercises(sessionId);
+    final now = DateTime.now();
+    final we = WorkoutExercise(
+      id: _uuid.v4(),
+      sessionId: sessionId,
+      exerciseId: exerciseId,
+      orderIndex: current.length,
+      startedAt: now,
+    );
+    await _db.into(_db.workoutExercises).insert(
+          WorkoutExercisesCompanion.insert(
+            id: we.id,
+            sessionId: we.sessionId,
+            exerciseId: we.exerciseId,
+            orderIndex: we.orderIndex,
+            startedAt: Value(we.startedAt),
+          ),
+        );
+    return we;
+  }
+
+  @override
+  Future<List<WorkoutExercise>> getSessionExercises(String sessionId) async {
+    final rows = await (_db.select(_db.workoutExercises)
+          ..where((t) => t.sessionId.equals(sessionId))
+          ..orderBy([(t) => OrderingTerm(expression: t.orderIndex)]))
+        .get();
+    return rows.map(_mapExercise).toList();
+  }
+
+  // ----------------------------- Sets -----------------------------
+
+  @override
+  Future<WorkoutSet> logSet(WorkoutSet set) async {
+    await _db.into(_db.workoutSets).insert(
+          WorkoutSetsCompanion.insert(
+            id: set.id,
+            workoutExerciseId: set.workoutExerciseId,
+            setNumber: set.setNumber,
+            weightKg: set.weightKg,
+            reps: set.reps,
+            rpe: Value(set.rpe),
+            rir: Value(set.rir),
+            isWarmup: Value(set.isWarmup),
+            isFailure: Value(set.isFailure),
+            estimatedOneRepMaxKg: Value(set.estimatedOneRepMaxKg),
+            createdAt: set.createdAt,
+            updatedAt: set.updatedAt,
+            notes: Value(set.notes),
+          ),
+        );
+    return set;
+  }
+
+  @override
+  Future<void> updateSet(WorkoutSet set) async {
+    await (_db.update(_db.workoutSets)..where((t) => t.id.equals(set.id)))
+        .write(WorkoutSetsCompanion(
+      weightKg: Value(set.weightKg),
+      reps: Value(set.reps),
+      rpe: Value(set.rpe),
+      rir: Value(set.rir),
+      isWarmup: Value(set.isWarmup),
+      isFailure: Value(set.isFailure),
+      estimatedOneRepMaxKg: Value(set.estimatedOneRepMaxKg),
+      updatedAt: Value(DateTime.now()),
+      notes: Value(set.notes),
+    ));
+  }
+
+  @override
+  Future<void> deleteSet(String setId) async {
+    await (_db.delete(_db.workoutSets)..where((t) => t.id.equals(setId))).go();
+  }
+
+  @override
+  Future<List<WorkoutSet>> getSets(String workoutExerciseId) async {
+    final rows = await (_db.select(_db.workoutSets)
+          ..where((t) => t.workoutExerciseId.equals(workoutExerciseId))
+          ..orderBy([(t) => OrderingTerm(expression: t.setNumber)]))
+        .get();
+    return rows.map(_mapSet).toList();
+  }
+
+  // ----------------------------- Summary -----------------------------
+
+  @override
+  Future<WorkoutSummary> getSummary(String sessionId) async {
+    final session = await getSession(sessionId);
+    if (session == null) {
+      throw StateError('Session $sessionId not found');
+    }
+    final workoutExercises = await getSessionExercises(sessionId);
+
+    final exerciseSummaries = <ExerciseSummary>[];
+    for (final we in workoutExercises) {
+      final sets = await getSets(we.id);
+      if (sets.isEmpty) continue;
+
+      final name = await _exerciseName(we.exerciseId);
+      final working = sets.where((s) => !s.isWarmup).toList();
+      double best = 0;
+      for (final s in working) {
+        final e = s.estimatedOneRepMaxKg ?? 0;
+        if (e > best) best = e;
+      }
+
+      final allTimeBest = await _allTimeBestBefore(
+        userProfileId: session.userProfileId,
+        exerciseId: we.exerciseId,
+        before: session.startedAt,
+      );
+      final isPr = best > 0 && best > allTimeBest;
+
+      exerciseSummaries.add(ExerciseSummary(
+        workoutExerciseId: we.id,
+        exerciseId: we.exerciseId,
+        exerciseName: name,
+        sets: sets,
+        bestEstimatedOneRepMaxKg: best,
+        isPersonalRecord: isPr,
+      ));
+    }
+
+    return WorkoutSummary(session: session, exercises: exerciseSummaries);
+  }
+
+  Future<String> _exerciseName(String exerciseId) async {
+    final row = await (_db.select(_db.exercises)
+          ..where((t) => t.id.equals(exerciseId)))
+        .getSingleOrNull();
+    return row?.name ?? 'Exercise';
+  }
+
+  /// Best estimated 1RM for an exercise across sessions started before [before].
+  Future<double> _allTimeBestBefore({
+    required String userProfileId,
+    required String exerciseId,
+    required DateTime before,
+  }) async {
+    final query = _db.select(_db.workoutSets).join([
+      innerJoin(
+        _db.workoutExercises,
+        _db.workoutExercises.id.equalsExp(_db.workoutSets.workoutExerciseId),
+      ),
+      innerJoin(
+        _db.workoutSessions,
+        _db.workoutSessions.id.equalsExp(_db.workoutExercises.sessionId),
+      ),
+    ])
+      ..where(_db.workoutExercises.exerciseId.equals(exerciseId) &
+          _db.workoutSessions.userProfileId.equals(userProfileId) &
+          _db.workoutSessions.startedAt.isSmallerThanValue(before) &
+          _db.workoutSets.isWarmup.equals(false));
+
+    final rows = await query.get();
+    double best = 0;
+    for (final r in rows) {
+      final e = r.readTable(_db.workoutSets).estimatedOneRepMaxKg ?? 0;
+      if (e > best) best = e;
+    }
+    return best;
+  }
+
+  // ----------------------------- History -----------------------------
+
+  @override
+  Future<List<WorkoutSession>> listHistory(String userProfileId) async {
+    final rows = await (_db.select(_db.workoutSessions)
+          ..where((t) =>
+              t.userProfileId.equals(userProfileId) &
+              t.status.isIn([
+                WorkoutSessionStatus.completed.name,
+                WorkoutSessionStatus.autoCompleted.name,
+                WorkoutSessionStatus.abandoned.name,
+              ]))
+          ..orderBy([
+            (t) => OrderingTerm(
+                expression: t.startedAt, mode: OrderingMode.desc)
+          ]))
+        .get();
+    return rows.map(_mapSession).toList();
+  }
+
+  @override
+  Future<WorkoutSession?> lastFinishedSession(String userProfileId) async {
+    final history = await listHistory(userProfileId);
+    return history.isEmpty ? null : history.first;
+  }
+
+  @override
+  Future<List<ExerciseProgressPoint>> getExerciseProgress({
+    required String userProfileId,
+    required String exerciseId,
+  }) async {
+    final query = _db.select(_db.workoutSets).join([
+      innerJoin(
+        _db.workoutExercises,
+        _db.workoutExercises.id.equalsExp(_db.workoutSets.workoutExerciseId),
+      ),
+      innerJoin(
+        _db.workoutSessions,
+        _db.workoutSessions.id.equalsExp(_db.workoutExercises.sessionId),
+      ),
+    ])
+      ..where(_db.workoutExercises.exerciseId.equals(exerciseId) &
+          _db.workoutSessions.userProfileId.equals(userProfileId) &
+          _db.workoutSets.isWarmup.equals(false));
+
+    final rows = await query.get();
+
+    // Group by session start date (day granularity).
+    final byDay = <DateTime, List<WorkoutSet>>{};
+    for (final r in rows) {
+      final started = r.readTable(_db.workoutSessions).startedAt;
+      final day = DateTime(started.year, started.month, started.day);
+      byDay.putIfAbsent(day, () => []).add(_mapSet(r.readTable(_db.workoutSets)));
+    }
+
+    final points = <ExerciseProgressPoint>[];
+    byDay.forEach((day, sets) {
+      double bestE1rm = 0;
+      double topWeight = 0;
+      int topReps = 0;
+      double volume = 0;
+      for (final s in sets) {
+        volume += s.volume;
+        final e = s.estimatedOneRepMaxKg ?? 0;
+        if (e > bestE1rm) bestE1rm = e;
+        if (s.weightKg > topWeight) {
+          topWeight = s.weightKg;
+          topReps = s.reps;
+        }
+      }
+      points.add(ExerciseProgressPoint(
+        date: day,
+        bestEstimatedOneRepMaxKg: bestE1rm,
+        topWeightKg: topWeight,
+        topWeightReps: topReps,
+        totalVolume: volume,
+      ));
+    });
+
+    points.sort((a, b) => a.date.compareTo(b.date));
+    return points;
+  }
+}
