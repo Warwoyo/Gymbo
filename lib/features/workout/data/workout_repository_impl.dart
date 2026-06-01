@@ -3,7 +3,9 @@ import 'package:uuid/uuid.dart';
 
 import '../../../core/enums.dart';
 import '../../../data/db/app_database.dart';
+import '../../recommendations/domain/evidence_recommendation_engine.dart';
 import '../domain/auto_end.dart';
+import '../domain/persisted_rest_timer.dart';
 import '../domain/workout_exercise.dart';
 import '../domain/workout_repository.dart';
 import '../domain/workout_session.dart';
@@ -52,6 +54,10 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
         isWarmup: r.isWarmup,
         isFailure: r.isFailure,
         estimatedOneRepMaxKg: r.estimatedOneRepMaxKg,
+        restBeforeSetSeconds: r.restBeforeSetSeconds,
+        restAfterSetSeconds: r.restAfterSetSeconds,
+        startedAt: r.startedAt,
+        completedAt: r.completedAt,
         createdAt: r.createdAt,
         updatedAt: r.updatedAt,
         notes: r.notes,
@@ -230,6 +236,13 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
     return rows.map(_mapExercise).toList();
   }
 
+  @override
+  Future<void> endWorkoutExercise(String workoutExerciseId) async {
+    await (_db.update(_db.workoutExercises)
+          ..where((t) => t.id.equals(workoutExerciseId)))
+        .write(WorkoutExercisesCompanion(endedAt: Value(DateTime.now())));
+  }
+
   // ----------------------------- Sets -----------------------------
 
   @override
@@ -246,6 +259,10 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
             isWarmup: Value(set.isWarmup),
             isFailure: Value(set.isFailure),
             estimatedOneRepMaxKg: Value(set.estimatedOneRepMaxKg),
+            restBeforeSetSeconds: Value(set.restBeforeSetSeconds),
+            restAfterSetSeconds: Value(set.restAfterSetSeconds),
+            startedAt: Value(set.startedAt),
+            completedAt: Value(set.completedAt),
             createdAt: set.createdAt,
             updatedAt: set.updatedAt,
             notes: Value(set.notes),
@@ -314,6 +331,10 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
       );
       final isPr = best > 0 && best > allTimeBest;
 
+      final trend = EvidenceRecommendationEngine.trendOf(working
+          .map((s) => LoggedSetInput(weightKg: s.weightKg, reps: s.reps))
+          .toList());
+
       exerciseSummaries.add(ExerciseSummary(
         workoutExerciseId: we.id,
         exerciseId: we.exerciseId,
@@ -321,6 +342,7 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
         sets: sets,
         bestEstimatedOneRepMaxKg: best,
         isPersonalRecord: isPr,
+        trend: trend,
       ));
     }
 
@@ -445,5 +467,54 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
 
     points.sort((a, b) => a.date.compareTo(b.date));
     return points;
+  }
+
+  // ----------------------------- Rest timer -----------------------------
+
+  @override
+  Future<void> saveRestTimer(PersistedRestTimer t) async {
+    await _db.into(_db.restTimerStates).insertOnConflictUpdate(
+          RestTimerStatesCompanion.insert(
+            sessionId: t.sessionId,
+            exerciseId: Value(t.exerciseId),
+            afterSetId: Value(t.afterSetId),
+            startedAt: t.startedAt,
+            endsAt: t.endsAt,
+            totalSeconds: t.totalSeconds,
+            isRunning: Value(t.isRunning),
+            isPaused: Value(t.isPaused),
+            pausedAt: Value(t.pausedAt),
+            accumulatedPausedSeconds: Value(t.accumulatedPausedSeconds),
+            allowSilentNotification: Value(t.allowSilentNotification),
+          ),
+        );
+  }
+
+  @override
+  Future<PersistedRestTimer?> getRestTimer(String sessionId) async {
+    final r = await (_db.select(_db.restTimerStates)
+          ..where((t) => t.sessionId.equals(sessionId)))
+        .getSingleOrNull();
+    if (r == null) return null;
+    return PersistedRestTimer(
+      sessionId: r.sessionId,
+      exerciseId: r.exerciseId,
+      afterSetId: r.afterSetId,
+      startedAt: r.startedAt,
+      endsAt: r.endsAt,
+      totalSeconds: r.totalSeconds,
+      isRunning: r.isRunning,
+      isPaused: r.isPaused,
+      pausedAt: r.pausedAt,
+      accumulatedPausedSeconds: r.accumulatedPausedSeconds,
+      allowSilentNotification: r.allowSilentNotification,
+    );
+  }
+
+  @override
+  Future<void> clearRestTimer(String sessionId) async {
+    await (_db.delete(_db.restTimerStates)
+          ..where((t) => t.sessionId.equals(sessionId)))
+        .go();
   }
 }

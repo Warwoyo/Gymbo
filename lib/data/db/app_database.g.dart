@@ -71,6 +71,80 @@ class $UserProfilesTable extends UserProfiles
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'CHECK ("rest_timer_enabled" IN (0, 1))'),
       defaultValue: const Constant(true));
+  @override
+  late final GeneratedColumnWithTypeConverter<RecommendationStyle?, String>
+      recommendationStyle = GeneratedColumn<String>(
+              'recommendation_style', aliasedName, true,
+              type: DriftSqlType.string, requiredDuringInsert: false)
+          .withConverter<RecommendationStyle?>(
+              $UserProfilesTable.$converterrecommendationStylen);
+  static const VerificationMeta _autoEndTimeoutMinutesMeta =
+      const VerificationMeta('autoEndTimeoutMinutes');
+  @override
+  late final GeneratedColumn<int> autoEndTimeoutMinutes = GeneratedColumn<int>(
+      'auto_end_timeout_minutes', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _restNotificationsEnabledMeta =
+      const VerificationMeta('restNotificationsEnabled');
+  @override
+  late final GeneratedColumn<bool> restNotificationsEnabled =
+      GeneratedColumn<bool>(
+          'rest_notifications_enabled', aliasedName, true,
+          type: DriftSqlType.bool,
+          requiredDuringInsert: false,
+          defaultConstraints: GeneratedColumn.constraintIsAlways(
+              'CHECK ("rest_notifications_enabled" IN (0, 1))'));
+  static const VerificationMeta _soundEnabledMeta =
+      const VerificationMeta('soundEnabled');
+  @override
+  late final GeneratedColumn<bool> soundEnabled = GeneratedColumn<bool>(
+      'sound_enabled', aliasedName, true,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("sound_enabled" IN (0, 1))'));
+  static const VerificationMeta _vibrationEnabledMeta =
+      const VerificationMeta('vibrationEnabled');
+  @override
+  late final GeneratedColumn<bool> vibrationEnabled = GeneratedColumn<bool>(
+      'vibration_enabled', aliasedName, true,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("vibration_enabled" IN (0, 1))'));
+  static const VerificationMeta _defaultAddRestSecondsMeta =
+      const VerificationMeta('defaultAddRestSeconds');
+  @override
+  late final GeneratedColumn<int> defaultAddRestSeconds = GeneratedColumn<int>(
+      'default_add_rest_seconds', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _showRpeRirMeta =
+      const VerificationMeta('showRpeRir');
+  @override
+  late final GeneratedColumn<bool> showRpeRir = GeneratedColumn<bool>(
+      'show_rpe_rir', aliasedName, true,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("show_rpe_rir" IN (0, 1))'));
+  static const VerificationMeta _dumbbellIncrementKgMeta =
+      const VerificationMeta('dumbbellIncrementKg');
+  @override
+  late final GeneratedColumn<double> dumbbellIncrementKg =
+      GeneratedColumn<double>('dumbbell_increment_kg', aliasedName, true,
+          type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _barbellIncrementKgMeta =
+      const VerificationMeta('barbellIncrementKg');
+  @override
+  late final GeneratedColumn<double> barbellIncrementKg =
+      GeneratedColumn<double>('barbell_increment_kg', aliasedName, true,
+          type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _machineIncrementKgMeta =
+      const VerificationMeta('machineIncrementKg');
+  @override
+  late final GeneratedColumn<double> machineIncrementKg =
+      GeneratedColumn<double>('machine_increment_kg', aliasedName, true,
+          type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -95,6 +169,16 @@ class $UserProfilesTable extends UserProfiles
         primaryGoal,
         preferredWeightIncrementKg,
         restTimerEnabled,
+        recommendationStyle,
+        autoEndTimeoutMinutes,
+        restNotificationsEnabled,
+        soundEnabled,
+        vibrationEnabled,
+        defaultAddRestSeconds,
+        showRpeRir,
+        dumbbellIncrementKg,
+        barbellIncrementKg,
+        machineIncrementKg,
         createdAt,
         updatedAt
       ];
@@ -152,6 +236,61 @@ class $UserProfilesTable extends UserProfiles
           restTimerEnabled.isAcceptableOrUnknown(
               data['rest_timer_enabled']!, _restTimerEnabledMeta));
     }
+    if (data.containsKey('auto_end_timeout_minutes')) {
+      context.handle(
+          _autoEndTimeoutMinutesMeta,
+          autoEndTimeoutMinutes.isAcceptableOrUnknown(
+              data['auto_end_timeout_minutes']!, _autoEndTimeoutMinutesMeta));
+    }
+    if (data.containsKey('rest_notifications_enabled')) {
+      context.handle(
+          _restNotificationsEnabledMeta,
+          restNotificationsEnabled.isAcceptableOrUnknown(
+              data['rest_notifications_enabled']!,
+              _restNotificationsEnabledMeta));
+    }
+    if (data.containsKey('sound_enabled')) {
+      context.handle(
+          _soundEnabledMeta,
+          soundEnabled.isAcceptableOrUnknown(
+              data['sound_enabled']!, _soundEnabledMeta));
+    }
+    if (data.containsKey('vibration_enabled')) {
+      context.handle(
+          _vibrationEnabledMeta,
+          vibrationEnabled.isAcceptableOrUnknown(
+              data['vibration_enabled']!, _vibrationEnabledMeta));
+    }
+    if (data.containsKey('default_add_rest_seconds')) {
+      context.handle(
+          _defaultAddRestSecondsMeta,
+          defaultAddRestSeconds.isAcceptableOrUnknown(
+              data['default_add_rest_seconds']!, _defaultAddRestSecondsMeta));
+    }
+    if (data.containsKey('show_rpe_rir')) {
+      context.handle(
+          _showRpeRirMeta,
+          showRpeRir.isAcceptableOrUnknown(
+              data['show_rpe_rir']!, _showRpeRirMeta));
+    }
+    if (data.containsKey('dumbbell_increment_kg')) {
+      context.handle(
+          _dumbbellIncrementKgMeta,
+          dumbbellIncrementKg.isAcceptableOrUnknown(
+              data['dumbbell_increment_kg']!, _dumbbellIncrementKgMeta));
+    }
+    if (data.containsKey('barbell_increment_kg')) {
+      context.handle(
+          _barbellIncrementKgMeta,
+          barbellIncrementKg.isAcceptableOrUnknown(
+              data['barbell_increment_kg']!, _barbellIncrementKgMeta));
+    }
+    if (data.containsKey('machine_increment_kg')) {
+      context.handle(
+          _machineIncrementKgMeta,
+          machineIncrementKg.isAcceptableOrUnknown(
+              data['machine_increment_kg']!, _machineIncrementKgMeta));
+    }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
@@ -196,6 +335,28 @@ class $UserProfilesTable extends UserProfiles
           data['${effectivePrefix}preferred_weight_increment_kg'])!,
       restTimerEnabled: attachedDatabase.typeMapping.read(
           DriftSqlType.bool, data['${effectivePrefix}rest_timer_enabled'])!,
+      recommendationStyle: $UserProfilesTable.$converterrecommendationStylen
+          .fromSql(attachedDatabase.typeMapping.read(DriftSqlType.string,
+              data['${effectivePrefix}recommendation_style'])),
+      autoEndTimeoutMinutes: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}auto_end_timeout_minutes']),
+      restNotificationsEnabled: attachedDatabase.typeMapping.read(
+          DriftSqlType.bool,
+          data['${effectivePrefix}rest_notifications_enabled']),
+      soundEnabled: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}sound_enabled']),
+      vibrationEnabled: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}vibration_enabled']),
+      defaultAddRestSeconds: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}default_add_rest_seconds']),
+      showRpeRir: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}show_rpe_rir']),
+      dumbbellIncrementKg: attachedDatabase.typeMapping.read(
+          DriftSqlType.double, data['${effectivePrefix}dumbbell_increment_kg']),
+      barbellIncrementKg: attachedDatabase.typeMapping.read(
+          DriftSqlType.double, data['${effectivePrefix}barbell_increment_kg']),
+      machineIncrementKg: attachedDatabase.typeMapping.read(
+          DriftSqlType.double, data['${effectivePrefix}machine_increment_kg']),
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
@@ -214,6 +375,12 @@ class $UserProfilesTable extends UserProfiles
   static JsonTypeConverter2<TrainingGoal, String, String>
       $converterprimaryGoal =
       const EnumNameConverter<TrainingGoal>(TrainingGoal.values);
+  static JsonTypeConverter2<RecommendationStyle, String, String>
+      $converterrecommendationStyle =
+      const EnumNameConverter<RecommendationStyle>(RecommendationStyle.values);
+  static JsonTypeConverter2<RecommendationStyle?, String?, String?>
+      $converterrecommendationStylen =
+      JsonTypeConverter2.asNullable($converterrecommendationStyle);
 }
 
 class UserProfileRow extends DataClass implements Insertable<UserProfileRow> {
@@ -227,6 +394,16 @@ class UserProfileRow extends DataClass implements Insertable<UserProfileRow> {
   final TrainingGoal primaryGoal;
   final double preferredWeightIncrementKg;
   final bool restTimerEnabled;
+  final RecommendationStyle? recommendationStyle;
+  final int? autoEndTimeoutMinutes;
+  final bool? restNotificationsEnabled;
+  final bool? soundEnabled;
+  final bool? vibrationEnabled;
+  final int? defaultAddRestSeconds;
+  final bool? showRpeRir;
+  final double? dumbbellIncrementKg;
+  final double? barbellIncrementKg;
+  final double? machineIncrementKg;
   final DateTime createdAt;
   final DateTime updatedAt;
   const UserProfileRow(
@@ -240,6 +417,16 @@ class UserProfileRow extends DataClass implements Insertable<UserProfileRow> {
       required this.primaryGoal,
       required this.preferredWeightIncrementKg,
       required this.restTimerEnabled,
+      this.recommendationStyle,
+      this.autoEndTimeoutMinutes,
+      this.restNotificationsEnabled,
+      this.soundEnabled,
+      this.vibrationEnabled,
+      this.defaultAddRestSeconds,
+      this.showRpeRir,
+      this.dumbbellIncrementKg,
+      this.barbellIncrementKg,
+      this.machineIncrementKg,
       required this.createdAt,
       required this.updatedAt});
   @override
@@ -271,6 +458,39 @@ class UserProfileRow extends DataClass implements Insertable<UserProfileRow> {
     map['preferred_weight_increment_kg'] =
         Variable<double>(preferredWeightIncrementKg);
     map['rest_timer_enabled'] = Variable<bool>(restTimerEnabled);
+    if (!nullToAbsent || recommendationStyle != null) {
+      map['recommendation_style'] = Variable<String>($UserProfilesTable
+          .$converterrecommendationStylen
+          .toSql(recommendationStyle));
+    }
+    if (!nullToAbsent || autoEndTimeoutMinutes != null) {
+      map['auto_end_timeout_minutes'] = Variable<int>(autoEndTimeoutMinutes);
+    }
+    if (!nullToAbsent || restNotificationsEnabled != null) {
+      map['rest_notifications_enabled'] =
+          Variable<bool>(restNotificationsEnabled);
+    }
+    if (!nullToAbsent || soundEnabled != null) {
+      map['sound_enabled'] = Variable<bool>(soundEnabled);
+    }
+    if (!nullToAbsent || vibrationEnabled != null) {
+      map['vibration_enabled'] = Variable<bool>(vibrationEnabled);
+    }
+    if (!nullToAbsent || defaultAddRestSeconds != null) {
+      map['default_add_rest_seconds'] = Variable<int>(defaultAddRestSeconds);
+    }
+    if (!nullToAbsent || showRpeRir != null) {
+      map['show_rpe_rir'] = Variable<bool>(showRpeRir);
+    }
+    if (!nullToAbsent || dumbbellIncrementKg != null) {
+      map['dumbbell_increment_kg'] = Variable<double>(dumbbellIncrementKg);
+    }
+    if (!nullToAbsent || barbellIncrementKg != null) {
+      map['barbell_increment_kg'] = Variable<double>(barbellIncrementKg);
+    }
+    if (!nullToAbsent || machineIncrementKg != null) {
+      map['machine_increment_kg'] = Variable<double>(machineIncrementKg);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
@@ -292,6 +512,36 @@ class UserProfileRow extends DataClass implements Insertable<UserProfileRow> {
       primaryGoal: Value(primaryGoal),
       preferredWeightIncrementKg: Value(preferredWeightIncrementKg),
       restTimerEnabled: Value(restTimerEnabled),
+      recommendationStyle: recommendationStyle == null && nullToAbsent
+          ? const Value.absent()
+          : Value(recommendationStyle),
+      autoEndTimeoutMinutes: autoEndTimeoutMinutes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(autoEndTimeoutMinutes),
+      restNotificationsEnabled: restNotificationsEnabled == null && nullToAbsent
+          ? const Value.absent()
+          : Value(restNotificationsEnabled),
+      soundEnabled: soundEnabled == null && nullToAbsent
+          ? const Value.absent()
+          : Value(soundEnabled),
+      vibrationEnabled: vibrationEnabled == null && nullToAbsent
+          ? const Value.absent()
+          : Value(vibrationEnabled),
+      defaultAddRestSeconds: defaultAddRestSeconds == null && nullToAbsent
+          ? const Value.absent()
+          : Value(defaultAddRestSeconds),
+      showRpeRir: showRpeRir == null && nullToAbsent
+          ? const Value.absent()
+          : Value(showRpeRir),
+      dumbbellIncrementKg: dumbbellIncrementKg == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dumbbellIncrementKg),
+      barbellIncrementKg: barbellIncrementKg == null && nullToAbsent
+          ? const Value.absent()
+          : Value(barbellIncrementKg),
+      machineIncrementKg: machineIncrementKg == null && nullToAbsent
+          ? const Value.absent()
+          : Value(machineIncrementKg),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -314,6 +564,23 @@ class UserProfileRow extends DataClass implements Insertable<UserProfileRow> {
       preferredWeightIncrementKg:
           serializer.fromJson<double>(json['preferredWeightIncrementKg']),
       restTimerEnabled: serializer.fromJson<bool>(json['restTimerEnabled']),
+      recommendationStyle: $UserProfilesTable.$converterrecommendationStylen
+          .fromJson(serializer.fromJson<String?>(json['recommendationStyle'])),
+      autoEndTimeoutMinutes:
+          serializer.fromJson<int?>(json['autoEndTimeoutMinutes']),
+      restNotificationsEnabled:
+          serializer.fromJson<bool?>(json['restNotificationsEnabled']),
+      soundEnabled: serializer.fromJson<bool?>(json['soundEnabled']),
+      vibrationEnabled: serializer.fromJson<bool?>(json['vibrationEnabled']),
+      defaultAddRestSeconds:
+          serializer.fromJson<int?>(json['defaultAddRestSeconds']),
+      showRpeRir: serializer.fromJson<bool?>(json['showRpeRir']),
+      dumbbellIncrementKg:
+          serializer.fromJson<double?>(json['dumbbellIncrementKg']),
+      barbellIncrementKg:
+          serializer.fromJson<double?>(json['barbellIncrementKg']),
+      machineIncrementKg:
+          serializer.fromJson<double?>(json['machineIncrementKg']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -336,6 +603,19 @@ class UserProfileRow extends DataClass implements Insertable<UserProfileRow> {
       'preferredWeightIncrementKg':
           serializer.toJson<double>(preferredWeightIncrementKg),
       'restTimerEnabled': serializer.toJson<bool>(restTimerEnabled),
+      'recommendationStyle': serializer.toJson<String?>($UserProfilesTable
+          .$converterrecommendationStylen
+          .toJson(recommendationStyle)),
+      'autoEndTimeoutMinutes': serializer.toJson<int?>(autoEndTimeoutMinutes),
+      'restNotificationsEnabled':
+          serializer.toJson<bool?>(restNotificationsEnabled),
+      'soundEnabled': serializer.toJson<bool?>(soundEnabled),
+      'vibrationEnabled': serializer.toJson<bool?>(vibrationEnabled),
+      'defaultAddRestSeconds': serializer.toJson<int?>(defaultAddRestSeconds),
+      'showRpeRir': serializer.toJson<bool?>(showRpeRir),
+      'dumbbellIncrementKg': serializer.toJson<double?>(dumbbellIncrementKg),
+      'barbellIncrementKg': serializer.toJson<double?>(barbellIncrementKg),
+      'machineIncrementKg': serializer.toJson<double?>(machineIncrementKg),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -352,6 +632,17 @@ class UserProfileRow extends DataClass implements Insertable<UserProfileRow> {
           TrainingGoal? primaryGoal,
           double? preferredWeightIncrementKg,
           bool? restTimerEnabled,
+          Value<RecommendationStyle?> recommendationStyle =
+              const Value.absent(),
+          Value<int?> autoEndTimeoutMinutes = const Value.absent(),
+          Value<bool?> restNotificationsEnabled = const Value.absent(),
+          Value<bool?> soundEnabled = const Value.absent(),
+          Value<bool?> vibrationEnabled = const Value.absent(),
+          Value<int?> defaultAddRestSeconds = const Value.absent(),
+          Value<bool?> showRpeRir = const Value.absent(),
+          Value<double?> dumbbellIncrementKg = const Value.absent(),
+          Value<double?> barbellIncrementKg = const Value.absent(),
+          Value<double?> machineIncrementKg = const Value.absent(),
           DateTime? createdAt,
           DateTime? updatedAt}) =>
       UserProfileRow(
@@ -367,6 +658,33 @@ class UserProfileRow extends DataClass implements Insertable<UserProfileRow> {
         preferredWeightIncrementKg:
             preferredWeightIncrementKg ?? this.preferredWeightIncrementKg,
         restTimerEnabled: restTimerEnabled ?? this.restTimerEnabled,
+        recommendationStyle: recommendationStyle.present
+            ? recommendationStyle.value
+            : this.recommendationStyle,
+        autoEndTimeoutMinutes: autoEndTimeoutMinutes.present
+            ? autoEndTimeoutMinutes.value
+            : this.autoEndTimeoutMinutes,
+        restNotificationsEnabled: restNotificationsEnabled.present
+            ? restNotificationsEnabled.value
+            : this.restNotificationsEnabled,
+        soundEnabled:
+            soundEnabled.present ? soundEnabled.value : this.soundEnabled,
+        vibrationEnabled: vibrationEnabled.present
+            ? vibrationEnabled.value
+            : this.vibrationEnabled,
+        defaultAddRestSeconds: defaultAddRestSeconds.present
+            ? defaultAddRestSeconds.value
+            : this.defaultAddRestSeconds,
+        showRpeRir: showRpeRir.present ? showRpeRir.value : this.showRpeRir,
+        dumbbellIncrementKg: dumbbellIncrementKg.present
+            ? dumbbellIncrementKg.value
+            : this.dumbbellIncrementKg,
+        barbellIncrementKg: barbellIncrementKg.present
+            ? barbellIncrementKg.value
+            : this.barbellIncrementKg,
+        machineIncrementKg: machineIncrementKg.present
+            ? machineIncrementKg.value
+            : this.machineIncrementKg,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
       );
@@ -391,6 +709,35 @@ class UserProfileRow extends DataClass implements Insertable<UserProfileRow> {
       restTimerEnabled: data.restTimerEnabled.present
           ? data.restTimerEnabled.value
           : this.restTimerEnabled,
+      recommendationStyle: data.recommendationStyle.present
+          ? data.recommendationStyle.value
+          : this.recommendationStyle,
+      autoEndTimeoutMinutes: data.autoEndTimeoutMinutes.present
+          ? data.autoEndTimeoutMinutes.value
+          : this.autoEndTimeoutMinutes,
+      restNotificationsEnabled: data.restNotificationsEnabled.present
+          ? data.restNotificationsEnabled.value
+          : this.restNotificationsEnabled,
+      soundEnabled: data.soundEnabled.present
+          ? data.soundEnabled.value
+          : this.soundEnabled,
+      vibrationEnabled: data.vibrationEnabled.present
+          ? data.vibrationEnabled.value
+          : this.vibrationEnabled,
+      defaultAddRestSeconds: data.defaultAddRestSeconds.present
+          ? data.defaultAddRestSeconds.value
+          : this.defaultAddRestSeconds,
+      showRpeRir:
+          data.showRpeRir.present ? data.showRpeRir.value : this.showRpeRir,
+      dumbbellIncrementKg: data.dumbbellIncrementKg.present
+          ? data.dumbbellIncrementKg.value
+          : this.dumbbellIncrementKg,
+      barbellIncrementKg: data.barbellIncrementKg.present
+          ? data.barbellIncrementKg.value
+          : this.barbellIncrementKg,
+      machineIncrementKg: data.machineIncrementKg.present
+          ? data.machineIncrementKg.value
+          : this.machineIncrementKg,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -409,6 +756,16 @@ class UserProfileRow extends DataClass implements Insertable<UserProfileRow> {
           ..write('primaryGoal: $primaryGoal, ')
           ..write('preferredWeightIncrementKg: $preferredWeightIncrementKg, ')
           ..write('restTimerEnabled: $restTimerEnabled, ')
+          ..write('recommendationStyle: $recommendationStyle, ')
+          ..write('autoEndTimeoutMinutes: $autoEndTimeoutMinutes, ')
+          ..write('restNotificationsEnabled: $restNotificationsEnabled, ')
+          ..write('soundEnabled: $soundEnabled, ')
+          ..write('vibrationEnabled: $vibrationEnabled, ')
+          ..write('defaultAddRestSeconds: $defaultAddRestSeconds, ')
+          ..write('showRpeRir: $showRpeRir, ')
+          ..write('dumbbellIncrementKg: $dumbbellIncrementKg, ')
+          ..write('barbellIncrementKg: $barbellIncrementKg, ')
+          ..write('machineIncrementKg: $machineIncrementKg, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -416,19 +773,30 @@ class UserProfileRow extends DataClass implements Insertable<UserProfileRow> {
   }
 
   @override
-  int get hashCode => Object.hash(
-      id,
-      name,
-      age,
-      sex,
-      heightCm,
-      bodyWeightKg,
-      trainingExperience,
-      primaryGoal,
-      preferredWeightIncrementKg,
-      restTimerEnabled,
-      createdAt,
-      updatedAt);
+  int get hashCode => Object.hashAll([
+        id,
+        name,
+        age,
+        sex,
+        heightCm,
+        bodyWeightKg,
+        trainingExperience,
+        primaryGoal,
+        preferredWeightIncrementKg,
+        restTimerEnabled,
+        recommendationStyle,
+        autoEndTimeoutMinutes,
+        restNotificationsEnabled,
+        soundEnabled,
+        vibrationEnabled,
+        defaultAddRestSeconds,
+        showRpeRir,
+        dumbbellIncrementKg,
+        barbellIncrementKg,
+        machineIncrementKg,
+        createdAt,
+        updatedAt
+      ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -443,6 +811,16 @@ class UserProfileRow extends DataClass implements Insertable<UserProfileRow> {
           other.primaryGoal == this.primaryGoal &&
           other.preferredWeightIncrementKg == this.preferredWeightIncrementKg &&
           other.restTimerEnabled == this.restTimerEnabled &&
+          other.recommendationStyle == this.recommendationStyle &&
+          other.autoEndTimeoutMinutes == this.autoEndTimeoutMinutes &&
+          other.restNotificationsEnabled == this.restNotificationsEnabled &&
+          other.soundEnabled == this.soundEnabled &&
+          other.vibrationEnabled == this.vibrationEnabled &&
+          other.defaultAddRestSeconds == this.defaultAddRestSeconds &&
+          other.showRpeRir == this.showRpeRir &&
+          other.dumbbellIncrementKg == this.dumbbellIncrementKg &&
+          other.barbellIncrementKg == this.barbellIncrementKg &&
+          other.machineIncrementKg == this.machineIncrementKg &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -458,6 +836,16 @@ class UserProfilesCompanion extends UpdateCompanion<UserProfileRow> {
   final Value<TrainingGoal> primaryGoal;
   final Value<double> preferredWeightIncrementKg;
   final Value<bool> restTimerEnabled;
+  final Value<RecommendationStyle?> recommendationStyle;
+  final Value<int?> autoEndTimeoutMinutes;
+  final Value<bool?> restNotificationsEnabled;
+  final Value<bool?> soundEnabled;
+  final Value<bool?> vibrationEnabled;
+  final Value<int?> defaultAddRestSeconds;
+  final Value<bool?> showRpeRir;
+  final Value<double?> dumbbellIncrementKg;
+  final Value<double?> barbellIncrementKg;
+  final Value<double?> machineIncrementKg;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
@@ -472,6 +860,16 @@ class UserProfilesCompanion extends UpdateCompanion<UserProfileRow> {
     this.primaryGoal = const Value.absent(),
     this.preferredWeightIncrementKg = const Value.absent(),
     this.restTimerEnabled = const Value.absent(),
+    this.recommendationStyle = const Value.absent(),
+    this.autoEndTimeoutMinutes = const Value.absent(),
+    this.restNotificationsEnabled = const Value.absent(),
+    this.soundEnabled = const Value.absent(),
+    this.vibrationEnabled = const Value.absent(),
+    this.defaultAddRestSeconds = const Value.absent(),
+    this.showRpeRir = const Value.absent(),
+    this.dumbbellIncrementKg = const Value.absent(),
+    this.barbellIncrementKg = const Value.absent(),
+    this.machineIncrementKg = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -487,6 +885,16 @@ class UserProfilesCompanion extends UpdateCompanion<UserProfileRow> {
     required TrainingGoal primaryGoal,
     required double preferredWeightIncrementKg,
     this.restTimerEnabled = const Value.absent(),
+    this.recommendationStyle = const Value.absent(),
+    this.autoEndTimeoutMinutes = const Value.absent(),
+    this.restNotificationsEnabled = const Value.absent(),
+    this.soundEnabled = const Value.absent(),
+    this.vibrationEnabled = const Value.absent(),
+    this.defaultAddRestSeconds = const Value.absent(),
+    this.showRpeRir = const Value.absent(),
+    this.dumbbellIncrementKg = const Value.absent(),
+    this.barbellIncrementKg = const Value.absent(),
+    this.machineIncrementKg = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
@@ -508,6 +916,16 @@ class UserProfilesCompanion extends UpdateCompanion<UserProfileRow> {
     Expression<String>? primaryGoal,
     Expression<double>? preferredWeightIncrementKg,
     Expression<bool>? restTimerEnabled,
+    Expression<String>? recommendationStyle,
+    Expression<int>? autoEndTimeoutMinutes,
+    Expression<bool>? restNotificationsEnabled,
+    Expression<bool>? soundEnabled,
+    Expression<bool>? vibrationEnabled,
+    Expression<int>? defaultAddRestSeconds,
+    Expression<bool>? showRpeRir,
+    Expression<double>? dumbbellIncrementKg,
+    Expression<double>? barbellIncrementKg,
+    Expression<double>? machineIncrementKg,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
@@ -524,6 +942,23 @@ class UserProfilesCompanion extends UpdateCompanion<UserProfileRow> {
       if (preferredWeightIncrementKg != null)
         'preferred_weight_increment_kg': preferredWeightIncrementKg,
       if (restTimerEnabled != null) 'rest_timer_enabled': restTimerEnabled,
+      if (recommendationStyle != null)
+        'recommendation_style': recommendationStyle,
+      if (autoEndTimeoutMinutes != null)
+        'auto_end_timeout_minutes': autoEndTimeoutMinutes,
+      if (restNotificationsEnabled != null)
+        'rest_notifications_enabled': restNotificationsEnabled,
+      if (soundEnabled != null) 'sound_enabled': soundEnabled,
+      if (vibrationEnabled != null) 'vibration_enabled': vibrationEnabled,
+      if (defaultAddRestSeconds != null)
+        'default_add_rest_seconds': defaultAddRestSeconds,
+      if (showRpeRir != null) 'show_rpe_rir': showRpeRir,
+      if (dumbbellIncrementKg != null)
+        'dumbbell_increment_kg': dumbbellIncrementKg,
+      if (barbellIncrementKg != null)
+        'barbell_increment_kg': barbellIncrementKg,
+      if (machineIncrementKg != null)
+        'machine_increment_kg': machineIncrementKg,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -541,6 +976,16 @@ class UserProfilesCompanion extends UpdateCompanion<UserProfileRow> {
       Value<TrainingGoal>? primaryGoal,
       Value<double>? preferredWeightIncrementKg,
       Value<bool>? restTimerEnabled,
+      Value<RecommendationStyle?>? recommendationStyle,
+      Value<int?>? autoEndTimeoutMinutes,
+      Value<bool?>? restNotificationsEnabled,
+      Value<bool?>? soundEnabled,
+      Value<bool?>? vibrationEnabled,
+      Value<int?>? defaultAddRestSeconds,
+      Value<bool?>? showRpeRir,
+      Value<double?>? dumbbellIncrementKg,
+      Value<double?>? barbellIncrementKg,
+      Value<double?>? machineIncrementKg,
       Value<DateTime>? createdAt,
       Value<DateTime>? updatedAt,
       Value<int>? rowid}) {
@@ -556,6 +1001,19 @@ class UserProfilesCompanion extends UpdateCompanion<UserProfileRow> {
       preferredWeightIncrementKg:
           preferredWeightIncrementKg ?? this.preferredWeightIncrementKg,
       restTimerEnabled: restTimerEnabled ?? this.restTimerEnabled,
+      recommendationStyle: recommendationStyle ?? this.recommendationStyle,
+      autoEndTimeoutMinutes:
+          autoEndTimeoutMinutes ?? this.autoEndTimeoutMinutes,
+      restNotificationsEnabled:
+          restNotificationsEnabled ?? this.restNotificationsEnabled,
+      soundEnabled: soundEnabled ?? this.soundEnabled,
+      vibrationEnabled: vibrationEnabled ?? this.vibrationEnabled,
+      defaultAddRestSeconds:
+          defaultAddRestSeconds ?? this.defaultAddRestSeconds,
+      showRpeRir: showRpeRir ?? this.showRpeRir,
+      dumbbellIncrementKg: dumbbellIncrementKg ?? this.dumbbellIncrementKg,
+      barbellIncrementKg: barbellIncrementKg ?? this.barbellIncrementKg,
+      machineIncrementKg: machineIncrementKg ?? this.machineIncrementKg,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -599,6 +1057,42 @@ class UserProfilesCompanion extends UpdateCompanion<UserProfileRow> {
     if (restTimerEnabled.present) {
       map['rest_timer_enabled'] = Variable<bool>(restTimerEnabled.value);
     }
+    if (recommendationStyle.present) {
+      map['recommendation_style'] = Variable<String>($UserProfilesTable
+          .$converterrecommendationStylen
+          .toSql(recommendationStyle.value));
+    }
+    if (autoEndTimeoutMinutes.present) {
+      map['auto_end_timeout_minutes'] =
+          Variable<int>(autoEndTimeoutMinutes.value);
+    }
+    if (restNotificationsEnabled.present) {
+      map['rest_notifications_enabled'] =
+          Variable<bool>(restNotificationsEnabled.value);
+    }
+    if (soundEnabled.present) {
+      map['sound_enabled'] = Variable<bool>(soundEnabled.value);
+    }
+    if (vibrationEnabled.present) {
+      map['vibration_enabled'] = Variable<bool>(vibrationEnabled.value);
+    }
+    if (defaultAddRestSeconds.present) {
+      map['default_add_rest_seconds'] =
+          Variable<int>(defaultAddRestSeconds.value);
+    }
+    if (showRpeRir.present) {
+      map['show_rpe_rir'] = Variable<bool>(showRpeRir.value);
+    }
+    if (dumbbellIncrementKg.present) {
+      map['dumbbell_increment_kg'] =
+          Variable<double>(dumbbellIncrementKg.value);
+    }
+    if (barbellIncrementKg.present) {
+      map['barbell_increment_kg'] = Variable<double>(barbellIncrementKg.value);
+    }
+    if (machineIncrementKg.present) {
+      map['machine_increment_kg'] = Variable<double>(machineIncrementKg.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -624,6 +1118,16 @@ class UserProfilesCompanion extends UpdateCompanion<UserProfileRow> {
           ..write('primaryGoal: $primaryGoal, ')
           ..write('preferredWeightIncrementKg: $preferredWeightIncrementKg, ')
           ..write('restTimerEnabled: $restTimerEnabled, ')
+          ..write('recommendationStyle: $recommendationStyle, ')
+          ..write('autoEndTimeoutMinutes: $autoEndTimeoutMinutes, ')
+          ..write('restNotificationsEnabled: $restNotificationsEnabled, ')
+          ..write('soundEnabled: $soundEnabled, ')
+          ..write('vibrationEnabled: $vibrationEnabled, ')
+          ..write('defaultAddRestSeconds: $defaultAddRestSeconds, ')
+          ..write('showRpeRir: $showRpeRir, ')
+          ..write('dumbbellIncrementKg: $dumbbellIncrementKg, ')
+          ..write('barbellIncrementKg: $barbellIncrementKg, ')
+          ..write('machineIncrementKg: $machineIncrementKg, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -682,6 +1186,13 @@ class $ExercisesTable extends Exercises
               type: DriftSqlType.string, requiredDuringInsert: true)
           .withConverter<EquipmentType>(
               $ExercisesTable.$converterequipmentType);
+  @override
+  late final GeneratedColumnWithTypeConverter<ExerciseCategory?, String>
+      exerciseCategory = GeneratedColumn<String>(
+              'exercise_category', aliasedName, true,
+              type: DriftSqlType.string, requiredDuringInsert: false)
+          .withConverter<ExerciseCategory?>(
+              $ExercisesTable.$converterexerciseCategoryn);
   static const VerificationMeta _isBodyweightMeta =
       const VerificationMeta('isBodyweight');
   @override
@@ -702,6 +1213,42 @@ class $ExercisesTable extends Exercises
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'CHECK ("is_unilateral" IN (0, 1))'),
       defaultValue: const Constant(false));
+  static const VerificationMeta _defaultIncrementKgMeta =
+      const VerificationMeta('defaultIncrementKg');
+  @override
+  late final GeneratedColumn<double> defaultIncrementKg =
+      GeneratedColumn<double>('default_increment_kg', aliasedName, true,
+          type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _minimumRecommendedRepsMeta =
+      const VerificationMeta('minimumRecommendedReps');
+  @override
+  late final GeneratedColumn<int> minimumRecommendedReps = GeneratedColumn<int>(
+      'minimum_recommended_reps', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _maximumRecommendedRepsMeta =
+      const VerificationMeta('maximumRecommendedReps');
+  @override
+  late final GeneratedColumn<int> maximumRecommendedReps = GeneratedColumn<int>(
+      'maximum_recommended_reps', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _defaultRestSecondsMeta =
+      const VerificationMeta('defaultRestSeconds');
+  @override
+  late final GeneratedColumn<int> defaultRestSeconds = GeneratedColumn<int>(
+      'default_rest_seconds', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _recommendedSetRangeMinMeta =
+      const VerificationMeta('recommendedSetRangeMin');
+  @override
+  late final GeneratedColumn<int> recommendedSetRangeMin = GeneratedColumn<int>(
+      'recommended_set_range_min', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _recommendedSetRangeMaxMeta =
+      const VerificationMeta('recommendedSetRangeMax');
+  @override
+  late final GeneratedColumn<int> recommendedSetRangeMax = GeneratedColumn<int>(
+      'recommended_set_range_max', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   static const VerificationMeta _notesMeta = const VerificationMeta('notes');
   @override
   late final GeneratedColumn<String> notes = GeneratedColumn<String>(
@@ -738,8 +1285,15 @@ class $ExercisesTable extends Exercises
         secondaryMuscleGroups,
         movementPattern,
         equipmentType,
+        exerciseCategory,
         isBodyweight,
         isUnilateral,
+        defaultIncrementKg,
+        minimumRecommendedReps,
+        maximumRecommendedReps,
+        defaultRestSeconds,
+        recommendedSetRangeMin,
+        recommendedSetRangeMax,
         notes,
         isCustom,
         createdAt,
@@ -798,6 +1352,42 @@ class $ExercisesTable extends Exercises
           isUnilateral.isAcceptableOrUnknown(
               data['is_unilateral']!, _isUnilateralMeta));
     }
+    if (data.containsKey('default_increment_kg')) {
+      context.handle(
+          _defaultIncrementKgMeta,
+          defaultIncrementKg.isAcceptableOrUnknown(
+              data['default_increment_kg']!, _defaultIncrementKgMeta));
+    }
+    if (data.containsKey('minimum_recommended_reps')) {
+      context.handle(
+          _minimumRecommendedRepsMeta,
+          minimumRecommendedReps.isAcceptableOrUnknown(
+              data['minimum_recommended_reps']!, _minimumRecommendedRepsMeta));
+    }
+    if (data.containsKey('maximum_recommended_reps')) {
+      context.handle(
+          _maximumRecommendedRepsMeta,
+          maximumRecommendedReps.isAcceptableOrUnknown(
+              data['maximum_recommended_reps']!, _maximumRecommendedRepsMeta));
+    }
+    if (data.containsKey('default_rest_seconds')) {
+      context.handle(
+          _defaultRestSecondsMeta,
+          defaultRestSeconds.isAcceptableOrUnknown(
+              data['default_rest_seconds']!, _defaultRestSecondsMeta));
+    }
+    if (data.containsKey('recommended_set_range_min')) {
+      context.handle(
+          _recommendedSetRangeMinMeta,
+          recommendedSetRangeMin.isAcceptableOrUnknown(
+              data['recommended_set_range_min']!, _recommendedSetRangeMinMeta));
+    }
+    if (data.containsKey('recommended_set_range_max')) {
+      context.handle(
+          _recommendedSetRangeMaxMeta,
+          recommendedSetRangeMax.isAcceptableOrUnknown(
+              data['recommended_set_range_max']!, _recommendedSetRangeMaxMeta));
+    }
     if (data.containsKey('notes')) {
       context.handle(
           _notesMeta, notes.isAcceptableOrUnknown(data['notes']!, _notesMeta));
@@ -844,10 +1434,27 @@ class $ExercisesTable extends Exercises
       equipmentType: $ExercisesTable.$converterequipmentType.fromSql(
           attachedDatabase.typeMapping.read(
               DriftSqlType.string, data['${effectivePrefix}equipment_type'])!),
+      exerciseCategory: $ExercisesTable.$converterexerciseCategoryn.fromSql(
+          attachedDatabase.typeMapping.read(DriftSqlType.string,
+              data['${effectivePrefix}exercise_category'])),
       isBodyweight: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_bodyweight'])!,
       isUnilateral: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_unilateral'])!,
+      defaultIncrementKg: attachedDatabase.typeMapping.read(
+          DriftSqlType.double, data['${effectivePrefix}default_increment_kg']),
+      minimumRecommendedReps: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}minimum_recommended_reps']),
+      maximumRecommendedReps: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}maximum_recommended_reps']),
+      defaultRestSeconds: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}default_rest_seconds']),
+      recommendedSetRangeMin: attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}recommended_set_range_min']),
+      recommendedSetRangeMax: attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}recommended_set_range_max']),
       notes: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}notes']),
       isCustom: attachedDatabase.typeMapping
@@ -869,6 +1476,12 @@ class $ExercisesTable extends Exercises
   static JsonTypeConverter2<EquipmentType, String, String>
       $converterequipmentType =
       const EnumNameConverter<EquipmentType>(EquipmentType.values);
+  static JsonTypeConverter2<ExerciseCategory, String, String>
+      $converterexerciseCategory =
+      const EnumNameConverter<ExerciseCategory>(ExerciseCategory.values);
+  static JsonTypeConverter2<ExerciseCategory?, String?, String?>
+      $converterexerciseCategoryn =
+      JsonTypeConverter2.asNullable($converterexerciseCategory);
 }
 
 class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
@@ -879,8 +1492,15 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
   final String secondaryMuscleGroups;
   final String movementPattern;
   final EquipmentType equipmentType;
+  final ExerciseCategory? exerciseCategory;
   final bool isBodyweight;
   final bool isUnilateral;
+  final double? defaultIncrementKg;
+  final int? minimumRecommendedReps;
+  final int? maximumRecommendedReps;
+  final int? defaultRestSeconds;
+  final int? recommendedSetRangeMin;
+  final int? recommendedSetRangeMax;
   final String? notes;
   final bool isCustom;
   final DateTime createdAt;
@@ -893,8 +1513,15 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
       required this.secondaryMuscleGroups,
       required this.movementPattern,
       required this.equipmentType,
+      this.exerciseCategory,
       required this.isBodyweight,
       required this.isUnilateral,
+      this.defaultIncrementKg,
+      this.minimumRecommendedReps,
+      this.maximumRecommendedReps,
+      this.defaultRestSeconds,
+      this.recommendedSetRangeMin,
+      this.recommendedSetRangeMax,
       this.notes,
       required this.isCustom,
       required this.createdAt,
@@ -915,8 +1542,30 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
       map['equipment_type'] = Variable<String>(
           $ExercisesTable.$converterequipmentType.toSql(equipmentType));
     }
+    if (!nullToAbsent || exerciseCategory != null) {
+      map['exercise_category'] = Variable<String>(
+          $ExercisesTable.$converterexerciseCategoryn.toSql(exerciseCategory));
+    }
     map['is_bodyweight'] = Variable<bool>(isBodyweight);
     map['is_unilateral'] = Variable<bool>(isUnilateral);
+    if (!nullToAbsent || defaultIncrementKg != null) {
+      map['default_increment_kg'] = Variable<double>(defaultIncrementKg);
+    }
+    if (!nullToAbsent || minimumRecommendedReps != null) {
+      map['minimum_recommended_reps'] = Variable<int>(minimumRecommendedReps);
+    }
+    if (!nullToAbsent || maximumRecommendedReps != null) {
+      map['maximum_recommended_reps'] = Variable<int>(maximumRecommendedReps);
+    }
+    if (!nullToAbsent || defaultRestSeconds != null) {
+      map['default_rest_seconds'] = Variable<int>(defaultRestSeconds);
+    }
+    if (!nullToAbsent || recommendedSetRangeMin != null) {
+      map['recommended_set_range_min'] = Variable<int>(recommendedSetRangeMin);
+    }
+    if (!nullToAbsent || recommendedSetRangeMax != null) {
+      map['recommended_set_range_max'] = Variable<int>(recommendedSetRangeMax);
+    }
     if (!nullToAbsent || notes != null) {
       map['notes'] = Variable<String>(notes);
     }
@@ -935,8 +1584,29 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
       secondaryMuscleGroups: Value(secondaryMuscleGroups),
       movementPattern: Value(movementPattern),
       equipmentType: Value(equipmentType),
+      exerciseCategory: exerciseCategory == null && nullToAbsent
+          ? const Value.absent()
+          : Value(exerciseCategory),
       isBodyweight: Value(isBodyweight),
       isUnilateral: Value(isUnilateral),
+      defaultIncrementKg: defaultIncrementKg == null && nullToAbsent
+          ? const Value.absent()
+          : Value(defaultIncrementKg),
+      minimumRecommendedReps: minimumRecommendedReps == null && nullToAbsent
+          ? const Value.absent()
+          : Value(minimumRecommendedReps),
+      maximumRecommendedReps: maximumRecommendedReps == null && nullToAbsent
+          ? const Value.absent()
+          : Value(maximumRecommendedReps),
+      defaultRestSeconds: defaultRestSeconds == null && nullToAbsent
+          ? const Value.absent()
+          : Value(defaultRestSeconds),
+      recommendedSetRangeMin: recommendedSetRangeMin == null && nullToAbsent
+          ? const Value.absent()
+          : Value(recommendedSetRangeMin),
+      recommendedSetRangeMax: recommendedSetRangeMax == null && nullToAbsent
+          ? const Value.absent()
+          : Value(recommendedSetRangeMax),
       notes:
           notes == null && nullToAbsent ? const Value.absent() : Value(notes),
       isCustom: Value(isCustom),
@@ -960,8 +1630,21 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
       movementPattern: serializer.fromJson<String>(json['movementPattern']),
       equipmentType: $ExercisesTable.$converterequipmentType
           .fromJson(serializer.fromJson<String>(json['equipmentType'])),
+      exerciseCategory: $ExercisesTable.$converterexerciseCategoryn
+          .fromJson(serializer.fromJson<String?>(json['exerciseCategory'])),
       isBodyweight: serializer.fromJson<bool>(json['isBodyweight']),
       isUnilateral: serializer.fromJson<bool>(json['isUnilateral']),
+      defaultIncrementKg:
+          serializer.fromJson<double?>(json['defaultIncrementKg']),
+      minimumRecommendedReps:
+          serializer.fromJson<int?>(json['minimumRecommendedReps']),
+      maximumRecommendedReps:
+          serializer.fromJson<int?>(json['maximumRecommendedReps']),
+      defaultRestSeconds: serializer.fromJson<int?>(json['defaultRestSeconds']),
+      recommendedSetRangeMin:
+          serializer.fromJson<int?>(json['recommendedSetRangeMin']),
+      recommendedSetRangeMax:
+          serializer.fromJson<int?>(json['recommendedSetRangeMax']),
       notes: serializer.fromJson<String?>(json['notes']),
       isCustom: serializer.fromJson<bool>(json['isCustom']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -981,8 +1664,16 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
       'movementPattern': serializer.toJson<String>(movementPattern),
       'equipmentType': serializer.toJson<String>(
           $ExercisesTable.$converterequipmentType.toJson(equipmentType)),
+      'exerciseCategory': serializer.toJson<String?>(
+          $ExercisesTable.$converterexerciseCategoryn.toJson(exerciseCategory)),
       'isBodyweight': serializer.toJson<bool>(isBodyweight),
       'isUnilateral': serializer.toJson<bool>(isUnilateral),
+      'defaultIncrementKg': serializer.toJson<double?>(defaultIncrementKg),
+      'minimumRecommendedReps': serializer.toJson<int?>(minimumRecommendedReps),
+      'maximumRecommendedReps': serializer.toJson<int?>(maximumRecommendedReps),
+      'defaultRestSeconds': serializer.toJson<int?>(defaultRestSeconds),
+      'recommendedSetRangeMin': serializer.toJson<int?>(recommendedSetRangeMin),
+      'recommendedSetRangeMax': serializer.toJson<int?>(recommendedSetRangeMax),
       'notes': serializer.toJson<String?>(notes),
       'isCustom': serializer.toJson<bool>(isCustom),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -998,8 +1689,15 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
           String? secondaryMuscleGroups,
           String? movementPattern,
           EquipmentType? equipmentType,
+          Value<ExerciseCategory?> exerciseCategory = const Value.absent(),
           bool? isBodyweight,
           bool? isUnilateral,
+          Value<double?> defaultIncrementKg = const Value.absent(),
+          Value<int?> minimumRecommendedReps = const Value.absent(),
+          Value<int?> maximumRecommendedReps = const Value.absent(),
+          Value<int?> defaultRestSeconds = const Value.absent(),
+          Value<int?> recommendedSetRangeMin = const Value.absent(),
+          Value<int?> recommendedSetRangeMax = const Value.absent(),
           Value<String?> notes = const Value.absent(),
           bool? isCustom,
           DateTime? createdAt,
@@ -1013,8 +1711,29 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
             secondaryMuscleGroups ?? this.secondaryMuscleGroups,
         movementPattern: movementPattern ?? this.movementPattern,
         equipmentType: equipmentType ?? this.equipmentType,
+        exerciseCategory: exerciseCategory.present
+            ? exerciseCategory.value
+            : this.exerciseCategory,
         isBodyweight: isBodyweight ?? this.isBodyweight,
         isUnilateral: isUnilateral ?? this.isUnilateral,
+        defaultIncrementKg: defaultIncrementKg.present
+            ? defaultIncrementKg.value
+            : this.defaultIncrementKg,
+        minimumRecommendedReps: minimumRecommendedReps.present
+            ? minimumRecommendedReps.value
+            : this.minimumRecommendedReps,
+        maximumRecommendedReps: maximumRecommendedReps.present
+            ? maximumRecommendedReps.value
+            : this.maximumRecommendedReps,
+        defaultRestSeconds: defaultRestSeconds.present
+            ? defaultRestSeconds.value
+            : this.defaultRestSeconds,
+        recommendedSetRangeMin: recommendedSetRangeMin.present
+            ? recommendedSetRangeMin.value
+            : this.recommendedSetRangeMin,
+        recommendedSetRangeMax: recommendedSetRangeMax.present
+            ? recommendedSetRangeMax.value
+            : this.recommendedSetRangeMax,
         notes: notes.present ? notes.value : this.notes,
         isCustom: isCustom ?? this.isCustom,
         createdAt: createdAt ?? this.createdAt,
@@ -1037,12 +1756,33 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
       equipmentType: data.equipmentType.present
           ? data.equipmentType.value
           : this.equipmentType,
+      exerciseCategory: data.exerciseCategory.present
+          ? data.exerciseCategory.value
+          : this.exerciseCategory,
       isBodyweight: data.isBodyweight.present
           ? data.isBodyweight.value
           : this.isBodyweight,
       isUnilateral: data.isUnilateral.present
           ? data.isUnilateral.value
           : this.isUnilateral,
+      defaultIncrementKg: data.defaultIncrementKg.present
+          ? data.defaultIncrementKg.value
+          : this.defaultIncrementKg,
+      minimumRecommendedReps: data.minimumRecommendedReps.present
+          ? data.minimumRecommendedReps.value
+          : this.minimumRecommendedReps,
+      maximumRecommendedReps: data.maximumRecommendedReps.present
+          ? data.maximumRecommendedReps.value
+          : this.maximumRecommendedReps,
+      defaultRestSeconds: data.defaultRestSeconds.present
+          ? data.defaultRestSeconds.value
+          : this.defaultRestSeconds,
+      recommendedSetRangeMin: data.recommendedSetRangeMin.present
+          ? data.recommendedSetRangeMin.value
+          : this.recommendedSetRangeMin,
+      recommendedSetRangeMax: data.recommendedSetRangeMax.present
+          ? data.recommendedSetRangeMax.value
+          : this.recommendedSetRangeMax,
       notes: data.notes.present ? data.notes.value : this.notes,
       isCustom: data.isCustom.present ? data.isCustom.value : this.isCustom,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -1060,8 +1800,15 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
           ..write('secondaryMuscleGroups: $secondaryMuscleGroups, ')
           ..write('movementPattern: $movementPattern, ')
           ..write('equipmentType: $equipmentType, ')
+          ..write('exerciseCategory: $exerciseCategory, ')
           ..write('isBodyweight: $isBodyweight, ')
           ..write('isUnilateral: $isUnilateral, ')
+          ..write('defaultIncrementKg: $defaultIncrementKg, ')
+          ..write('minimumRecommendedReps: $minimumRecommendedReps, ')
+          ..write('maximumRecommendedReps: $maximumRecommendedReps, ')
+          ..write('defaultRestSeconds: $defaultRestSeconds, ')
+          ..write('recommendedSetRangeMin: $recommendedSetRangeMin, ')
+          ..write('recommendedSetRangeMax: $recommendedSetRangeMax, ')
           ..write('notes: $notes, ')
           ..write('isCustom: $isCustom, ')
           ..write('createdAt: $createdAt, ')
@@ -1079,8 +1826,15 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
       secondaryMuscleGroups,
       movementPattern,
       equipmentType,
+      exerciseCategory,
       isBodyweight,
       isUnilateral,
+      defaultIncrementKg,
+      minimumRecommendedReps,
+      maximumRecommendedReps,
+      defaultRestSeconds,
+      recommendedSetRangeMin,
+      recommendedSetRangeMax,
       notes,
       isCustom,
       createdAt,
@@ -1096,8 +1850,15 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
           other.secondaryMuscleGroups == this.secondaryMuscleGroups &&
           other.movementPattern == this.movementPattern &&
           other.equipmentType == this.equipmentType &&
+          other.exerciseCategory == this.exerciseCategory &&
           other.isBodyweight == this.isBodyweight &&
           other.isUnilateral == this.isUnilateral &&
+          other.defaultIncrementKg == this.defaultIncrementKg &&
+          other.minimumRecommendedReps == this.minimumRecommendedReps &&
+          other.maximumRecommendedReps == this.maximumRecommendedReps &&
+          other.defaultRestSeconds == this.defaultRestSeconds &&
+          other.recommendedSetRangeMin == this.recommendedSetRangeMin &&
+          other.recommendedSetRangeMax == this.recommendedSetRangeMax &&
           other.notes == this.notes &&
           other.isCustom == this.isCustom &&
           other.createdAt == this.createdAt &&
@@ -1112,8 +1873,15 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
   final Value<String> secondaryMuscleGroups;
   final Value<String> movementPattern;
   final Value<EquipmentType> equipmentType;
+  final Value<ExerciseCategory?> exerciseCategory;
   final Value<bool> isBodyweight;
   final Value<bool> isUnilateral;
+  final Value<double?> defaultIncrementKg;
+  final Value<int?> minimumRecommendedReps;
+  final Value<int?> maximumRecommendedReps;
+  final Value<int?> defaultRestSeconds;
+  final Value<int?> recommendedSetRangeMin;
+  final Value<int?> recommendedSetRangeMax;
   final Value<String?> notes;
   final Value<bool> isCustom;
   final Value<DateTime> createdAt;
@@ -1127,8 +1895,15 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
     this.secondaryMuscleGroups = const Value.absent(),
     this.movementPattern = const Value.absent(),
     this.equipmentType = const Value.absent(),
+    this.exerciseCategory = const Value.absent(),
     this.isBodyweight = const Value.absent(),
     this.isUnilateral = const Value.absent(),
+    this.defaultIncrementKg = const Value.absent(),
+    this.minimumRecommendedReps = const Value.absent(),
+    this.maximumRecommendedReps = const Value.absent(),
+    this.defaultRestSeconds = const Value.absent(),
+    this.recommendedSetRangeMin = const Value.absent(),
+    this.recommendedSetRangeMax = const Value.absent(),
     this.notes = const Value.absent(),
     this.isCustom = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -1143,8 +1918,15 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
     this.secondaryMuscleGroups = const Value.absent(),
     this.movementPattern = const Value.absent(),
     required EquipmentType equipmentType,
+    this.exerciseCategory = const Value.absent(),
     this.isBodyweight = const Value.absent(),
     this.isUnilateral = const Value.absent(),
+    this.defaultIncrementKg = const Value.absent(),
+    this.minimumRecommendedReps = const Value.absent(),
+    this.maximumRecommendedReps = const Value.absent(),
+    this.defaultRestSeconds = const Value.absent(),
+    this.recommendedSetRangeMin = const Value.absent(),
+    this.recommendedSetRangeMax = const Value.absent(),
     this.notes = const Value.absent(),
     this.isCustom = const Value.absent(),
     required DateTime createdAt,
@@ -1165,8 +1947,15 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
     Expression<String>? secondaryMuscleGroups,
     Expression<String>? movementPattern,
     Expression<String>? equipmentType,
+    Expression<String>? exerciseCategory,
     Expression<bool>? isBodyweight,
     Expression<bool>? isUnilateral,
+    Expression<double>? defaultIncrementKg,
+    Expression<int>? minimumRecommendedReps,
+    Expression<int>? maximumRecommendedReps,
+    Expression<int>? defaultRestSeconds,
+    Expression<int>? recommendedSetRangeMin,
+    Expression<int>? recommendedSetRangeMax,
     Expression<String>? notes,
     Expression<bool>? isCustom,
     Expression<DateTime>? createdAt,
@@ -1183,8 +1972,21 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
         'secondary_muscle_groups': secondaryMuscleGroups,
       if (movementPattern != null) 'movement_pattern': movementPattern,
       if (equipmentType != null) 'equipment_type': equipmentType,
+      if (exerciseCategory != null) 'exercise_category': exerciseCategory,
       if (isBodyweight != null) 'is_bodyweight': isBodyweight,
       if (isUnilateral != null) 'is_unilateral': isUnilateral,
+      if (defaultIncrementKg != null)
+        'default_increment_kg': defaultIncrementKg,
+      if (minimumRecommendedReps != null)
+        'minimum_recommended_reps': minimumRecommendedReps,
+      if (maximumRecommendedReps != null)
+        'maximum_recommended_reps': maximumRecommendedReps,
+      if (defaultRestSeconds != null)
+        'default_rest_seconds': defaultRestSeconds,
+      if (recommendedSetRangeMin != null)
+        'recommended_set_range_min': recommendedSetRangeMin,
+      if (recommendedSetRangeMax != null)
+        'recommended_set_range_max': recommendedSetRangeMax,
       if (notes != null) 'notes': notes,
       if (isCustom != null) 'is_custom': isCustom,
       if (createdAt != null) 'created_at': createdAt,
@@ -1201,8 +2003,15 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
       Value<String>? secondaryMuscleGroups,
       Value<String>? movementPattern,
       Value<EquipmentType>? equipmentType,
+      Value<ExerciseCategory?>? exerciseCategory,
       Value<bool>? isBodyweight,
       Value<bool>? isUnilateral,
+      Value<double?>? defaultIncrementKg,
+      Value<int?>? minimumRecommendedReps,
+      Value<int?>? maximumRecommendedReps,
+      Value<int?>? defaultRestSeconds,
+      Value<int?>? recommendedSetRangeMin,
+      Value<int?>? recommendedSetRangeMax,
       Value<String?>? notes,
       Value<bool>? isCustom,
       Value<DateTime>? createdAt,
@@ -1217,8 +2026,19 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
           secondaryMuscleGroups ?? this.secondaryMuscleGroups,
       movementPattern: movementPattern ?? this.movementPattern,
       equipmentType: equipmentType ?? this.equipmentType,
+      exerciseCategory: exerciseCategory ?? this.exerciseCategory,
       isBodyweight: isBodyweight ?? this.isBodyweight,
       isUnilateral: isUnilateral ?? this.isUnilateral,
+      defaultIncrementKg: defaultIncrementKg ?? this.defaultIncrementKg,
+      minimumRecommendedReps:
+          minimumRecommendedReps ?? this.minimumRecommendedReps,
+      maximumRecommendedReps:
+          maximumRecommendedReps ?? this.maximumRecommendedReps,
+      defaultRestSeconds: defaultRestSeconds ?? this.defaultRestSeconds,
+      recommendedSetRangeMin:
+          recommendedSetRangeMin ?? this.recommendedSetRangeMin,
+      recommendedSetRangeMax:
+          recommendedSetRangeMax ?? this.recommendedSetRangeMax,
       notes: notes ?? this.notes,
       isCustom: isCustom ?? this.isCustom,
       createdAt: createdAt ?? this.createdAt,
@@ -1254,11 +2074,38 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
       map['equipment_type'] = Variable<String>(
           $ExercisesTable.$converterequipmentType.toSql(equipmentType.value));
     }
+    if (exerciseCategory.present) {
+      map['exercise_category'] = Variable<String>($ExercisesTable
+          .$converterexerciseCategoryn
+          .toSql(exerciseCategory.value));
+    }
     if (isBodyweight.present) {
       map['is_bodyweight'] = Variable<bool>(isBodyweight.value);
     }
     if (isUnilateral.present) {
       map['is_unilateral'] = Variable<bool>(isUnilateral.value);
+    }
+    if (defaultIncrementKg.present) {
+      map['default_increment_kg'] = Variable<double>(defaultIncrementKg.value);
+    }
+    if (minimumRecommendedReps.present) {
+      map['minimum_recommended_reps'] =
+          Variable<int>(minimumRecommendedReps.value);
+    }
+    if (maximumRecommendedReps.present) {
+      map['maximum_recommended_reps'] =
+          Variable<int>(maximumRecommendedReps.value);
+    }
+    if (defaultRestSeconds.present) {
+      map['default_rest_seconds'] = Variable<int>(defaultRestSeconds.value);
+    }
+    if (recommendedSetRangeMin.present) {
+      map['recommended_set_range_min'] =
+          Variable<int>(recommendedSetRangeMin.value);
+    }
+    if (recommendedSetRangeMax.present) {
+      map['recommended_set_range_max'] =
+          Variable<int>(recommendedSetRangeMax.value);
     }
     if (notes.present) {
       map['notes'] = Variable<String>(notes.value);
@@ -1288,8 +2135,15 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
           ..write('secondaryMuscleGroups: $secondaryMuscleGroups, ')
           ..write('movementPattern: $movementPattern, ')
           ..write('equipmentType: $equipmentType, ')
+          ..write('exerciseCategory: $exerciseCategory, ')
           ..write('isBodyweight: $isBodyweight, ')
           ..write('isUnilateral: $isUnilateral, ')
+          ..write('defaultIncrementKg: $defaultIncrementKg, ')
+          ..write('minimumRecommendedReps: $minimumRecommendedReps, ')
+          ..write('maximumRecommendedReps: $maximumRecommendedReps, ')
+          ..write('defaultRestSeconds: $defaultRestSeconds, ')
+          ..write('recommendedSetRangeMin: $recommendedSetRangeMin, ')
+          ..write('recommendedSetRangeMax: $recommendedSetRangeMax, ')
           ..write('notes: $notes, ')
           ..write('isCustom: $isCustom, ')
           ..write('createdAt: $createdAt, ')
@@ -2283,6 +3137,30 @@ class $WorkoutSetsTable extends WorkoutSets
   late final GeneratedColumn<double> estimatedOneRepMaxKg =
       GeneratedColumn<double>('estimated_one_rep_max_kg', aliasedName, true,
           type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _restBeforeSetSecondsMeta =
+      const VerificationMeta('restBeforeSetSeconds');
+  @override
+  late final GeneratedColumn<int> restBeforeSetSeconds = GeneratedColumn<int>(
+      'rest_before_set_seconds', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _restAfterSetSecondsMeta =
+      const VerificationMeta('restAfterSetSeconds');
+  @override
+  late final GeneratedColumn<int> restAfterSetSeconds = GeneratedColumn<int>(
+      'rest_after_set_seconds', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _startedAtMeta =
+      const VerificationMeta('startedAt');
+  @override
+  late final GeneratedColumn<DateTime> startedAt = GeneratedColumn<DateTime>(
+      'started_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _completedAtMeta =
+      const VerificationMeta('completedAt');
+  @override
+  late final GeneratedColumn<DateTime> completedAt = GeneratedColumn<DateTime>(
+      'completed_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -2312,6 +3190,10 @@ class $WorkoutSetsTable extends WorkoutSets
         isWarmup,
         isFailure,
         estimatedOneRepMaxKg,
+        restBeforeSetSeconds,
+        restAfterSetSeconds,
+        startedAt,
+        completedAt,
         createdAt,
         updatedAt,
         notes
@@ -2379,6 +3261,28 @@ class $WorkoutSetsTable extends WorkoutSets
           estimatedOneRepMaxKg.isAcceptableOrUnknown(
               data['estimated_one_rep_max_kg']!, _estimatedOneRepMaxKgMeta));
     }
+    if (data.containsKey('rest_before_set_seconds')) {
+      context.handle(
+          _restBeforeSetSecondsMeta,
+          restBeforeSetSeconds.isAcceptableOrUnknown(
+              data['rest_before_set_seconds']!, _restBeforeSetSecondsMeta));
+    }
+    if (data.containsKey('rest_after_set_seconds')) {
+      context.handle(
+          _restAfterSetSecondsMeta,
+          restAfterSetSeconds.isAcceptableOrUnknown(
+              data['rest_after_set_seconds']!, _restAfterSetSecondsMeta));
+    }
+    if (data.containsKey('started_at')) {
+      context.handle(_startedAtMeta,
+          startedAt.isAcceptableOrUnknown(data['started_at']!, _startedAtMeta));
+    }
+    if (data.containsKey('completed_at')) {
+      context.handle(
+          _completedAtMeta,
+          completedAt.isAcceptableOrUnknown(
+              data['completed_at']!, _completedAtMeta));
+    }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
@@ -2425,6 +3329,14 @@ class $WorkoutSetsTable extends WorkoutSets
       estimatedOneRepMaxKg: attachedDatabase.typeMapping.read(
           DriftSqlType.double,
           data['${effectivePrefix}estimated_one_rep_max_kg']),
+      restBeforeSetSeconds: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}rest_before_set_seconds']),
+      restAfterSetSeconds: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}rest_after_set_seconds']),
+      startedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}started_at']),
+      completedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}completed_at']),
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
@@ -2451,6 +3363,10 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
   final bool isWarmup;
   final bool isFailure;
   final double? estimatedOneRepMaxKg;
+  final int? restBeforeSetSeconds;
+  final int? restAfterSetSeconds;
+  final DateTime? startedAt;
+  final DateTime? completedAt;
   final DateTime createdAt;
   final DateTime updatedAt;
   final String? notes;
@@ -2465,6 +3381,10 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
       required this.isWarmup,
       required this.isFailure,
       this.estimatedOneRepMaxKg,
+      this.restBeforeSetSeconds,
+      this.restAfterSetSeconds,
+      this.startedAt,
+      this.completedAt,
       required this.createdAt,
       required this.updatedAt,
       this.notes});
@@ -2486,6 +3406,18 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
     map['is_failure'] = Variable<bool>(isFailure);
     if (!nullToAbsent || estimatedOneRepMaxKg != null) {
       map['estimated_one_rep_max_kg'] = Variable<double>(estimatedOneRepMaxKg);
+    }
+    if (!nullToAbsent || restBeforeSetSeconds != null) {
+      map['rest_before_set_seconds'] = Variable<int>(restBeforeSetSeconds);
+    }
+    if (!nullToAbsent || restAfterSetSeconds != null) {
+      map['rest_after_set_seconds'] = Variable<int>(restAfterSetSeconds);
+    }
+    if (!nullToAbsent || startedAt != null) {
+      map['started_at'] = Variable<DateTime>(startedAt);
+    }
+    if (!nullToAbsent || completedAt != null) {
+      map['completed_at'] = Variable<DateTime>(completedAt);
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -2509,6 +3441,18 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
       estimatedOneRepMaxKg: estimatedOneRepMaxKg == null && nullToAbsent
           ? const Value.absent()
           : Value(estimatedOneRepMaxKg),
+      restBeforeSetSeconds: restBeforeSetSeconds == null && nullToAbsent
+          ? const Value.absent()
+          : Value(restBeforeSetSeconds),
+      restAfterSetSeconds: restAfterSetSeconds == null && nullToAbsent
+          ? const Value.absent()
+          : Value(restAfterSetSeconds),
+      startedAt: startedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(startedAt),
+      completedAt: completedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(completedAt),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       notes:
@@ -2531,6 +3475,12 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
       isFailure: serializer.fromJson<bool>(json['isFailure']),
       estimatedOneRepMaxKg:
           serializer.fromJson<double?>(json['estimatedOneRepMaxKg']),
+      restBeforeSetSeconds:
+          serializer.fromJson<int?>(json['restBeforeSetSeconds']),
+      restAfterSetSeconds:
+          serializer.fromJson<int?>(json['restAfterSetSeconds']),
+      startedAt: serializer.fromJson<DateTime?>(json['startedAt']),
+      completedAt: serializer.fromJson<DateTime?>(json['completedAt']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       notes: serializer.fromJson<String?>(json['notes']),
@@ -2550,6 +3500,10 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
       'isWarmup': serializer.toJson<bool>(isWarmup),
       'isFailure': serializer.toJson<bool>(isFailure),
       'estimatedOneRepMaxKg': serializer.toJson<double?>(estimatedOneRepMaxKg),
+      'restBeforeSetSeconds': serializer.toJson<int?>(restBeforeSetSeconds),
+      'restAfterSetSeconds': serializer.toJson<int?>(restAfterSetSeconds),
+      'startedAt': serializer.toJson<DateTime?>(startedAt),
+      'completedAt': serializer.toJson<DateTime?>(completedAt),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'notes': serializer.toJson<String?>(notes),
@@ -2567,6 +3521,10 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
           bool? isWarmup,
           bool? isFailure,
           Value<double?> estimatedOneRepMaxKg = const Value.absent(),
+          Value<int?> restBeforeSetSeconds = const Value.absent(),
+          Value<int?> restAfterSetSeconds = const Value.absent(),
+          Value<DateTime?> startedAt = const Value.absent(),
+          Value<DateTime?> completedAt = const Value.absent(),
           DateTime? createdAt,
           DateTime? updatedAt,
           Value<String?> notes = const Value.absent()}) =>
@@ -2583,6 +3541,14 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
         estimatedOneRepMaxKg: estimatedOneRepMaxKg.present
             ? estimatedOneRepMaxKg.value
             : this.estimatedOneRepMaxKg,
+        restBeforeSetSeconds: restBeforeSetSeconds.present
+            ? restBeforeSetSeconds.value
+            : this.restBeforeSetSeconds,
+        restAfterSetSeconds: restAfterSetSeconds.present
+            ? restAfterSetSeconds.value
+            : this.restAfterSetSeconds,
+        startedAt: startedAt.present ? startedAt.value : this.startedAt,
+        completedAt: completedAt.present ? completedAt.value : this.completedAt,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
         notes: notes.present ? notes.value : this.notes,
@@ -2603,6 +3569,15 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
       estimatedOneRepMaxKg: data.estimatedOneRepMaxKg.present
           ? data.estimatedOneRepMaxKg.value
           : this.estimatedOneRepMaxKg,
+      restBeforeSetSeconds: data.restBeforeSetSeconds.present
+          ? data.restBeforeSetSeconds.value
+          : this.restBeforeSetSeconds,
+      restAfterSetSeconds: data.restAfterSetSeconds.present
+          ? data.restAfterSetSeconds.value
+          : this.restAfterSetSeconds,
+      startedAt: data.startedAt.present ? data.startedAt.value : this.startedAt,
+      completedAt:
+          data.completedAt.present ? data.completedAt.value : this.completedAt,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       notes: data.notes.present ? data.notes.value : this.notes,
@@ -2622,6 +3597,10 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
           ..write('isWarmup: $isWarmup, ')
           ..write('isFailure: $isFailure, ')
           ..write('estimatedOneRepMaxKg: $estimatedOneRepMaxKg, ')
+          ..write('restBeforeSetSeconds: $restBeforeSetSeconds, ')
+          ..write('restAfterSetSeconds: $restAfterSetSeconds, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('completedAt: $completedAt, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('notes: $notes')
@@ -2641,6 +3620,10 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
       isWarmup,
       isFailure,
       estimatedOneRepMaxKg,
+      restBeforeSetSeconds,
+      restAfterSetSeconds,
+      startedAt,
+      completedAt,
       createdAt,
       updatedAt,
       notes);
@@ -2658,6 +3641,10 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
           other.isWarmup == this.isWarmup &&
           other.isFailure == this.isFailure &&
           other.estimatedOneRepMaxKg == this.estimatedOneRepMaxKg &&
+          other.restBeforeSetSeconds == this.restBeforeSetSeconds &&
+          other.restAfterSetSeconds == this.restAfterSetSeconds &&
+          other.startedAt == this.startedAt &&
+          other.completedAt == this.completedAt &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.notes == this.notes);
@@ -2674,6 +3661,10 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
   final Value<bool> isWarmup;
   final Value<bool> isFailure;
   final Value<double?> estimatedOneRepMaxKg;
+  final Value<int?> restBeforeSetSeconds;
+  final Value<int?> restAfterSetSeconds;
+  final Value<DateTime?> startedAt;
+  final Value<DateTime?> completedAt;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<String?> notes;
@@ -2689,6 +3680,10 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
     this.isWarmup = const Value.absent(),
     this.isFailure = const Value.absent(),
     this.estimatedOneRepMaxKg = const Value.absent(),
+    this.restBeforeSetSeconds = const Value.absent(),
+    this.restAfterSetSeconds = const Value.absent(),
+    this.startedAt = const Value.absent(),
+    this.completedAt = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.notes = const Value.absent(),
@@ -2705,6 +3700,10 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
     this.isWarmup = const Value.absent(),
     this.isFailure = const Value.absent(),
     this.estimatedOneRepMaxKg = const Value.absent(),
+    this.restBeforeSetSeconds = const Value.absent(),
+    this.restAfterSetSeconds = const Value.absent(),
+    this.startedAt = const Value.absent(),
+    this.completedAt = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
     this.notes = const Value.absent(),
@@ -2727,6 +3726,10 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
     Expression<bool>? isWarmup,
     Expression<bool>? isFailure,
     Expression<double>? estimatedOneRepMaxKg,
+    Expression<int>? restBeforeSetSeconds,
+    Expression<int>? restAfterSetSeconds,
+    Expression<DateTime>? startedAt,
+    Expression<DateTime>? completedAt,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<String>? notes,
@@ -2744,6 +3747,12 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
       if (isFailure != null) 'is_failure': isFailure,
       if (estimatedOneRepMaxKg != null)
         'estimated_one_rep_max_kg': estimatedOneRepMaxKg,
+      if (restBeforeSetSeconds != null)
+        'rest_before_set_seconds': restBeforeSetSeconds,
+      if (restAfterSetSeconds != null)
+        'rest_after_set_seconds': restAfterSetSeconds,
+      if (startedAt != null) 'started_at': startedAt,
+      if (completedAt != null) 'completed_at': completedAt,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (notes != null) 'notes': notes,
@@ -2762,6 +3771,10 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
       Value<bool>? isWarmup,
       Value<bool>? isFailure,
       Value<double?>? estimatedOneRepMaxKg,
+      Value<int?>? restBeforeSetSeconds,
+      Value<int?>? restAfterSetSeconds,
+      Value<DateTime?>? startedAt,
+      Value<DateTime?>? completedAt,
       Value<DateTime>? createdAt,
       Value<DateTime>? updatedAt,
       Value<String?>? notes,
@@ -2777,6 +3790,10 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
       isWarmup: isWarmup ?? this.isWarmup,
       isFailure: isFailure ?? this.isFailure,
       estimatedOneRepMaxKg: estimatedOneRepMaxKg ?? this.estimatedOneRepMaxKg,
+      restBeforeSetSeconds: restBeforeSetSeconds ?? this.restBeforeSetSeconds,
+      restAfterSetSeconds: restAfterSetSeconds ?? this.restAfterSetSeconds,
+      startedAt: startedAt ?? this.startedAt,
+      completedAt: completedAt ?? this.completedAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       notes: notes ?? this.notes,
@@ -2818,6 +3835,19 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
       map['estimated_one_rep_max_kg'] =
           Variable<double>(estimatedOneRepMaxKg.value);
     }
+    if (restBeforeSetSeconds.present) {
+      map['rest_before_set_seconds'] =
+          Variable<int>(restBeforeSetSeconds.value);
+    }
+    if (restAfterSetSeconds.present) {
+      map['rest_after_set_seconds'] = Variable<int>(restAfterSetSeconds.value);
+    }
+    if (startedAt.present) {
+      map['started_at'] = Variable<DateTime>(startedAt.value);
+    }
+    if (completedAt.present) {
+      map['completed_at'] = Variable<DateTime>(completedAt.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -2846,9 +3876,607 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
           ..write('isWarmup: $isWarmup, ')
           ..write('isFailure: $isFailure, ')
           ..write('estimatedOneRepMaxKg: $estimatedOneRepMaxKg, ')
+          ..write('restBeforeSetSeconds: $restBeforeSetSeconds, ')
+          ..write('restAfterSetSeconds: $restAfterSetSeconds, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('completedAt: $completedAt, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('notes: $notes, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $RestTimerStatesTable extends RestTimerStates
+    with TableInfo<$RestTimerStatesTable, RestTimerStateRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RestTimerStatesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _sessionIdMeta =
+      const VerificationMeta('sessionId');
+  @override
+  late final GeneratedColumn<String> sessionId = GeneratedColumn<String>(
+      'session_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _exerciseIdMeta =
+      const VerificationMeta('exerciseId');
+  @override
+  late final GeneratedColumn<String> exerciseId = GeneratedColumn<String>(
+      'exercise_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _afterSetIdMeta =
+      const VerificationMeta('afterSetId');
+  @override
+  late final GeneratedColumn<String> afterSetId = GeneratedColumn<String>(
+      'after_set_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _startedAtMeta =
+      const VerificationMeta('startedAt');
+  @override
+  late final GeneratedColumn<DateTime> startedAt = GeneratedColumn<DateTime>(
+      'started_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _endsAtMeta = const VerificationMeta('endsAt');
+  @override
+  late final GeneratedColumn<DateTime> endsAt = GeneratedColumn<DateTime>(
+      'ends_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _totalSecondsMeta =
+      const VerificationMeta('totalSeconds');
+  @override
+  late final GeneratedColumn<int> totalSeconds = GeneratedColumn<int>(
+      'total_seconds', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _isRunningMeta =
+      const VerificationMeta('isRunning');
+  @override
+  late final GeneratedColumn<bool> isRunning = GeneratedColumn<bool>(
+      'is_running', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_running" IN (0, 1))'),
+      defaultValue: const Constant(true));
+  static const VerificationMeta _isPausedMeta =
+      const VerificationMeta('isPaused');
+  @override
+  late final GeneratedColumn<bool> isPaused = GeneratedColumn<bool>(
+      'is_paused', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_paused" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _pausedAtMeta =
+      const VerificationMeta('pausedAt');
+  @override
+  late final GeneratedColumn<DateTime> pausedAt = GeneratedColumn<DateTime>(
+      'paused_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _accumulatedPausedSecondsMeta =
+      const VerificationMeta('accumulatedPausedSeconds');
+  @override
+  late final GeneratedColumn<int> accumulatedPausedSeconds =
+      GeneratedColumn<int>('accumulated_paused_seconds', aliasedName, false,
+          type: DriftSqlType.int,
+          requiredDuringInsert: false,
+          defaultValue: const Constant(0));
+  static const VerificationMeta _allowSilentNotificationMeta =
+      const VerificationMeta('allowSilentNotification');
+  @override
+  late final GeneratedColumn<bool> allowSilentNotification =
+      GeneratedColumn<bool>('allow_silent_notification', aliasedName, false,
+          type: DriftSqlType.bool,
+          requiredDuringInsert: false,
+          defaultConstraints: GeneratedColumn.constraintIsAlways(
+              'CHECK ("allow_silent_notification" IN (0, 1))'),
+          defaultValue: const Constant(true));
+  @override
+  List<GeneratedColumn> get $columns => [
+        sessionId,
+        exerciseId,
+        afterSetId,
+        startedAt,
+        endsAt,
+        totalSeconds,
+        isRunning,
+        isPaused,
+        pausedAt,
+        accumulatedPausedSeconds,
+        allowSilentNotification
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'rest_timer_states';
+  @override
+  VerificationContext validateIntegrity(Insertable<RestTimerStateRow> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('session_id')) {
+      context.handle(_sessionIdMeta,
+          sessionId.isAcceptableOrUnknown(data['session_id']!, _sessionIdMeta));
+    } else if (isInserting) {
+      context.missing(_sessionIdMeta);
+    }
+    if (data.containsKey('exercise_id')) {
+      context.handle(
+          _exerciseIdMeta,
+          exerciseId.isAcceptableOrUnknown(
+              data['exercise_id']!, _exerciseIdMeta));
+    }
+    if (data.containsKey('after_set_id')) {
+      context.handle(
+          _afterSetIdMeta,
+          afterSetId.isAcceptableOrUnknown(
+              data['after_set_id']!, _afterSetIdMeta));
+    }
+    if (data.containsKey('started_at')) {
+      context.handle(_startedAtMeta,
+          startedAt.isAcceptableOrUnknown(data['started_at']!, _startedAtMeta));
+    } else if (isInserting) {
+      context.missing(_startedAtMeta);
+    }
+    if (data.containsKey('ends_at')) {
+      context.handle(_endsAtMeta,
+          endsAt.isAcceptableOrUnknown(data['ends_at']!, _endsAtMeta));
+    } else if (isInserting) {
+      context.missing(_endsAtMeta);
+    }
+    if (data.containsKey('total_seconds')) {
+      context.handle(
+          _totalSecondsMeta,
+          totalSeconds.isAcceptableOrUnknown(
+              data['total_seconds']!, _totalSecondsMeta));
+    } else if (isInserting) {
+      context.missing(_totalSecondsMeta);
+    }
+    if (data.containsKey('is_running')) {
+      context.handle(_isRunningMeta,
+          isRunning.isAcceptableOrUnknown(data['is_running']!, _isRunningMeta));
+    }
+    if (data.containsKey('is_paused')) {
+      context.handle(_isPausedMeta,
+          isPaused.isAcceptableOrUnknown(data['is_paused']!, _isPausedMeta));
+    }
+    if (data.containsKey('paused_at')) {
+      context.handle(_pausedAtMeta,
+          pausedAt.isAcceptableOrUnknown(data['paused_at']!, _pausedAtMeta));
+    }
+    if (data.containsKey('accumulated_paused_seconds')) {
+      context.handle(
+          _accumulatedPausedSecondsMeta,
+          accumulatedPausedSeconds.isAcceptableOrUnknown(
+              data['accumulated_paused_seconds']!,
+              _accumulatedPausedSecondsMeta));
+    }
+    if (data.containsKey('allow_silent_notification')) {
+      context.handle(
+          _allowSilentNotificationMeta,
+          allowSilentNotification.isAcceptableOrUnknown(
+              data['allow_silent_notification']!,
+              _allowSilentNotificationMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {sessionId};
+  @override
+  RestTimerStateRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RestTimerStateRow(
+      sessionId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}session_id'])!,
+      exerciseId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}exercise_id']),
+      afterSetId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}after_set_id']),
+      startedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}started_at'])!,
+      endsAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}ends_at'])!,
+      totalSeconds: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}total_seconds'])!,
+      isRunning: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_running'])!,
+      isPaused: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_paused'])!,
+      pausedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}paused_at']),
+      accumulatedPausedSeconds: attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}accumulated_paused_seconds'])!,
+      allowSilentNotification: attachedDatabase.typeMapping.read(
+          DriftSqlType.bool,
+          data['${effectivePrefix}allow_silent_notification'])!,
+    );
+  }
+
+  @override
+  $RestTimerStatesTable createAlias(String alias) {
+    return $RestTimerStatesTable(attachedDatabase, alias);
+  }
+}
+
+class RestTimerStateRow extends DataClass
+    implements Insertable<RestTimerStateRow> {
+  final String sessionId;
+  final String? exerciseId;
+  final String? afterSetId;
+  final DateTime startedAt;
+  final DateTime endsAt;
+  final int totalSeconds;
+  final bool isRunning;
+  final bool isPaused;
+  final DateTime? pausedAt;
+  final int accumulatedPausedSeconds;
+  final bool allowSilentNotification;
+  const RestTimerStateRow(
+      {required this.sessionId,
+      this.exerciseId,
+      this.afterSetId,
+      required this.startedAt,
+      required this.endsAt,
+      required this.totalSeconds,
+      required this.isRunning,
+      required this.isPaused,
+      this.pausedAt,
+      required this.accumulatedPausedSeconds,
+      required this.allowSilentNotification});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['session_id'] = Variable<String>(sessionId);
+    if (!nullToAbsent || exerciseId != null) {
+      map['exercise_id'] = Variable<String>(exerciseId);
+    }
+    if (!nullToAbsent || afterSetId != null) {
+      map['after_set_id'] = Variable<String>(afterSetId);
+    }
+    map['started_at'] = Variable<DateTime>(startedAt);
+    map['ends_at'] = Variable<DateTime>(endsAt);
+    map['total_seconds'] = Variable<int>(totalSeconds);
+    map['is_running'] = Variable<bool>(isRunning);
+    map['is_paused'] = Variable<bool>(isPaused);
+    if (!nullToAbsent || pausedAt != null) {
+      map['paused_at'] = Variable<DateTime>(pausedAt);
+    }
+    map['accumulated_paused_seconds'] = Variable<int>(accumulatedPausedSeconds);
+    map['allow_silent_notification'] = Variable<bool>(allowSilentNotification);
+    return map;
+  }
+
+  RestTimerStatesCompanion toCompanion(bool nullToAbsent) {
+    return RestTimerStatesCompanion(
+      sessionId: Value(sessionId),
+      exerciseId: exerciseId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(exerciseId),
+      afterSetId: afterSetId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(afterSetId),
+      startedAt: Value(startedAt),
+      endsAt: Value(endsAt),
+      totalSeconds: Value(totalSeconds),
+      isRunning: Value(isRunning),
+      isPaused: Value(isPaused),
+      pausedAt: pausedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(pausedAt),
+      accumulatedPausedSeconds: Value(accumulatedPausedSeconds),
+      allowSilentNotification: Value(allowSilentNotification),
+    );
+  }
+
+  factory RestTimerStateRow.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RestTimerStateRow(
+      sessionId: serializer.fromJson<String>(json['sessionId']),
+      exerciseId: serializer.fromJson<String?>(json['exerciseId']),
+      afterSetId: serializer.fromJson<String?>(json['afterSetId']),
+      startedAt: serializer.fromJson<DateTime>(json['startedAt']),
+      endsAt: serializer.fromJson<DateTime>(json['endsAt']),
+      totalSeconds: serializer.fromJson<int>(json['totalSeconds']),
+      isRunning: serializer.fromJson<bool>(json['isRunning']),
+      isPaused: serializer.fromJson<bool>(json['isPaused']),
+      pausedAt: serializer.fromJson<DateTime?>(json['pausedAt']),
+      accumulatedPausedSeconds:
+          serializer.fromJson<int>(json['accumulatedPausedSeconds']),
+      allowSilentNotification:
+          serializer.fromJson<bool>(json['allowSilentNotification']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'sessionId': serializer.toJson<String>(sessionId),
+      'exerciseId': serializer.toJson<String?>(exerciseId),
+      'afterSetId': serializer.toJson<String?>(afterSetId),
+      'startedAt': serializer.toJson<DateTime>(startedAt),
+      'endsAt': serializer.toJson<DateTime>(endsAt),
+      'totalSeconds': serializer.toJson<int>(totalSeconds),
+      'isRunning': serializer.toJson<bool>(isRunning),
+      'isPaused': serializer.toJson<bool>(isPaused),
+      'pausedAt': serializer.toJson<DateTime?>(pausedAt),
+      'accumulatedPausedSeconds':
+          serializer.toJson<int>(accumulatedPausedSeconds),
+      'allowSilentNotification':
+          serializer.toJson<bool>(allowSilentNotification),
+    };
+  }
+
+  RestTimerStateRow copyWith(
+          {String? sessionId,
+          Value<String?> exerciseId = const Value.absent(),
+          Value<String?> afterSetId = const Value.absent(),
+          DateTime? startedAt,
+          DateTime? endsAt,
+          int? totalSeconds,
+          bool? isRunning,
+          bool? isPaused,
+          Value<DateTime?> pausedAt = const Value.absent(),
+          int? accumulatedPausedSeconds,
+          bool? allowSilentNotification}) =>
+      RestTimerStateRow(
+        sessionId: sessionId ?? this.sessionId,
+        exerciseId: exerciseId.present ? exerciseId.value : this.exerciseId,
+        afterSetId: afterSetId.present ? afterSetId.value : this.afterSetId,
+        startedAt: startedAt ?? this.startedAt,
+        endsAt: endsAt ?? this.endsAt,
+        totalSeconds: totalSeconds ?? this.totalSeconds,
+        isRunning: isRunning ?? this.isRunning,
+        isPaused: isPaused ?? this.isPaused,
+        pausedAt: pausedAt.present ? pausedAt.value : this.pausedAt,
+        accumulatedPausedSeconds:
+            accumulatedPausedSeconds ?? this.accumulatedPausedSeconds,
+        allowSilentNotification:
+            allowSilentNotification ?? this.allowSilentNotification,
+      );
+  RestTimerStateRow copyWithCompanion(RestTimerStatesCompanion data) {
+    return RestTimerStateRow(
+      sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
+      exerciseId:
+          data.exerciseId.present ? data.exerciseId.value : this.exerciseId,
+      afterSetId:
+          data.afterSetId.present ? data.afterSetId.value : this.afterSetId,
+      startedAt: data.startedAt.present ? data.startedAt.value : this.startedAt,
+      endsAt: data.endsAt.present ? data.endsAt.value : this.endsAt,
+      totalSeconds: data.totalSeconds.present
+          ? data.totalSeconds.value
+          : this.totalSeconds,
+      isRunning: data.isRunning.present ? data.isRunning.value : this.isRunning,
+      isPaused: data.isPaused.present ? data.isPaused.value : this.isPaused,
+      pausedAt: data.pausedAt.present ? data.pausedAt.value : this.pausedAt,
+      accumulatedPausedSeconds: data.accumulatedPausedSeconds.present
+          ? data.accumulatedPausedSeconds.value
+          : this.accumulatedPausedSeconds,
+      allowSilentNotification: data.allowSilentNotification.present
+          ? data.allowSilentNotification.value
+          : this.allowSilentNotification,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RestTimerStateRow(')
+          ..write('sessionId: $sessionId, ')
+          ..write('exerciseId: $exerciseId, ')
+          ..write('afterSetId: $afterSetId, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('endsAt: $endsAt, ')
+          ..write('totalSeconds: $totalSeconds, ')
+          ..write('isRunning: $isRunning, ')
+          ..write('isPaused: $isPaused, ')
+          ..write('pausedAt: $pausedAt, ')
+          ..write('accumulatedPausedSeconds: $accumulatedPausedSeconds, ')
+          ..write('allowSilentNotification: $allowSilentNotification')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      sessionId,
+      exerciseId,
+      afterSetId,
+      startedAt,
+      endsAt,
+      totalSeconds,
+      isRunning,
+      isPaused,
+      pausedAt,
+      accumulatedPausedSeconds,
+      allowSilentNotification);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RestTimerStateRow &&
+          other.sessionId == this.sessionId &&
+          other.exerciseId == this.exerciseId &&
+          other.afterSetId == this.afterSetId &&
+          other.startedAt == this.startedAt &&
+          other.endsAt == this.endsAt &&
+          other.totalSeconds == this.totalSeconds &&
+          other.isRunning == this.isRunning &&
+          other.isPaused == this.isPaused &&
+          other.pausedAt == this.pausedAt &&
+          other.accumulatedPausedSeconds == this.accumulatedPausedSeconds &&
+          other.allowSilentNotification == this.allowSilentNotification);
+}
+
+class RestTimerStatesCompanion extends UpdateCompanion<RestTimerStateRow> {
+  final Value<String> sessionId;
+  final Value<String?> exerciseId;
+  final Value<String?> afterSetId;
+  final Value<DateTime> startedAt;
+  final Value<DateTime> endsAt;
+  final Value<int> totalSeconds;
+  final Value<bool> isRunning;
+  final Value<bool> isPaused;
+  final Value<DateTime?> pausedAt;
+  final Value<int> accumulatedPausedSeconds;
+  final Value<bool> allowSilentNotification;
+  final Value<int> rowid;
+  const RestTimerStatesCompanion({
+    this.sessionId = const Value.absent(),
+    this.exerciseId = const Value.absent(),
+    this.afterSetId = const Value.absent(),
+    this.startedAt = const Value.absent(),
+    this.endsAt = const Value.absent(),
+    this.totalSeconds = const Value.absent(),
+    this.isRunning = const Value.absent(),
+    this.isPaused = const Value.absent(),
+    this.pausedAt = const Value.absent(),
+    this.accumulatedPausedSeconds = const Value.absent(),
+    this.allowSilentNotification = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  RestTimerStatesCompanion.insert({
+    required String sessionId,
+    this.exerciseId = const Value.absent(),
+    this.afterSetId = const Value.absent(),
+    required DateTime startedAt,
+    required DateTime endsAt,
+    required int totalSeconds,
+    this.isRunning = const Value.absent(),
+    this.isPaused = const Value.absent(),
+    this.pausedAt = const Value.absent(),
+    this.accumulatedPausedSeconds = const Value.absent(),
+    this.allowSilentNotification = const Value.absent(),
+    this.rowid = const Value.absent(),
+  })  : sessionId = Value(sessionId),
+        startedAt = Value(startedAt),
+        endsAt = Value(endsAt),
+        totalSeconds = Value(totalSeconds);
+  static Insertable<RestTimerStateRow> custom({
+    Expression<String>? sessionId,
+    Expression<String>? exerciseId,
+    Expression<String>? afterSetId,
+    Expression<DateTime>? startedAt,
+    Expression<DateTime>? endsAt,
+    Expression<int>? totalSeconds,
+    Expression<bool>? isRunning,
+    Expression<bool>? isPaused,
+    Expression<DateTime>? pausedAt,
+    Expression<int>? accumulatedPausedSeconds,
+    Expression<bool>? allowSilentNotification,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (sessionId != null) 'session_id': sessionId,
+      if (exerciseId != null) 'exercise_id': exerciseId,
+      if (afterSetId != null) 'after_set_id': afterSetId,
+      if (startedAt != null) 'started_at': startedAt,
+      if (endsAt != null) 'ends_at': endsAt,
+      if (totalSeconds != null) 'total_seconds': totalSeconds,
+      if (isRunning != null) 'is_running': isRunning,
+      if (isPaused != null) 'is_paused': isPaused,
+      if (pausedAt != null) 'paused_at': pausedAt,
+      if (accumulatedPausedSeconds != null)
+        'accumulated_paused_seconds': accumulatedPausedSeconds,
+      if (allowSilentNotification != null)
+        'allow_silent_notification': allowSilentNotification,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  RestTimerStatesCompanion copyWith(
+      {Value<String>? sessionId,
+      Value<String?>? exerciseId,
+      Value<String?>? afterSetId,
+      Value<DateTime>? startedAt,
+      Value<DateTime>? endsAt,
+      Value<int>? totalSeconds,
+      Value<bool>? isRunning,
+      Value<bool>? isPaused,
+      Value<DateTime?>? pausedAt,
+      Value<int>? accumulatedPausedSeconds,
+      Value<bool>? allowSilentNotification,
+      Value<int>? rowid}) {
+    return RestTimerStatesCompanion(
+      sessionId: sessionId ?? this.sessionId,
+      exerciseId: exerciseId ?? this.exerciseId,
+      afterSetId: afterSetId ?? this.afterSetId,
+      startedAt: startedAt ?? this.startedAt,
+      endsAt: endsAt ?? this.endsAt,
+      totalSeconds: totalSeconds ?? this.totalSeconds,
+      isRunning: isRunning ?? this.isRunning,
+      isPaused: isPaused ?? this.isPaused,
+      pausedAt: pausedAt ?? this.pausedAt,
+      accumulatedPausedSeconds:
+          accumulatedPausedSeconds ?? this.accumulatedPausedSeconds,
+      allowSilentNotification:
+          allowSilentNotification ?? this.allowSilentNotification,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (sessionId.present) {
+      map['session_id'] = Variable<String>(sessionId.value);
+    }
+    if (exerciseId.present) {
+      map['exercise_id'] = Variable<String>(exerciseId.value);
+    }
+    if (afterSetId.present) {
+      map['after_set_id'] = Variable<String>(afterSetId.value);
+    }
+    if (startedAt.present) {
+      map['started_at'] = Variable<DateTime>(startedAt.value);
+    }
+    if (endsAt.present) {
+      map['ends_at'] = Variable<DateTime>(endsAt.value);
+    }
+    if (totalSeconds.present) {
+      map['total_seconds'] = Variable<int>(totalSeconds.value);
+    }
+    if (isRunning.present) {
+      map['is_running'] = Variable<bool>(isRunning.value);
+    }
+    if (isPaused.present) {
+      map['is_paused'] = Variable<bool>(isPaused.value);
+    }
+    if (pausedAt.present) {
+      map['paused_at'] = Variable<DateTime>(pausedAt.value);
+    }
+    if (accumulatedPausedSeconds.present) {
+      map['accumulated_paused_seconds'] =
+          Variable<int>(accumulatedPausedSeconds.value);
+    }
+    if (allowSilentNotification.present) {
+      map['allow_silent_notification'] =
+          Variable<bool>(allowSilentNotification.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RestTimerStatesCompanion(')
+          ..write('sessionId: $sessionId, ')
+          ..write('exerciseId: $exerciseId, ')
+          ..write('afterSetId: $afterSetId, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('endsAt: $endsAt, ')
+          ..write('totalSeconds: $totalSeconds, ')
+          ..write('isRunning: $isRunning, ')
+          ..write('isPaused: $isPaused, ')
+          ..write('pausedAt: $pausedAt, ')
+          ..write('accumulatedPausedSeconds: $accumulatedPausedSeconds, ')
+          ..write('allowSilentNotification: $allowSilentNotification, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2865,12 +4493,20 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $WorkoutExercisesTable workoutExercises =
       $WorkoutExercisesTable(this);
   late final $WorkoutSetsTable workoutSets = $WorkoutSetsTable(this);
+  late final $RestTimerStatesTable restTimerStates =
+      $RestTimerStatesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [userProfiles, exercises, workoutSessions, workoutExercises, workoutSets];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+        userProfiles,
+        exercises,
+        workoutSessions,
+        workoutExercises,
+        workoutSets,
+        restTimerStates
+      ];
 }
 
 typedef $$UserProfilesTableCreateCompanionBuilder = UserProfilesCompanion
@@ -2885,6 +4521,16 @@ typedef $$UserProfilesTableCreateCompanionBuilder = UserProfilesCompanion
   required TrainingGoal primaryGoal,
   required double preferredWeightIncrementKg,
   Value<bool> restTimerEnabled,
+  Value<RecommendationStyle?> recommendationStyle,
+  Value<int?> autoEndTimeoutMinutes,
+  Value<bool?> restNotificationsEnabled,
+  Value<bool?> soundEnabled,
+  Value<bool?> vibrationEnabled,
+  Value<int?> defaultAddRestSeconds,
+  Value<bool?> showRpeRir,
+  Value<double?> dumbbellIncrementKg,
+  Value<double?> barbellIncrementKg,
+  Value<double?> machineIncrementKg,
   required DateTime createdAt,
   required DateTime updatedAt,
   Value<int> rowid,
@@ -2901,6 +4547,16 @@ typedef $$UserProfilesTableUpdateCompanionBuilder = UserProfilesCompanion
   Value<TrainingGoal> primaryGoal,
   Value<double> preferredWeightIncrementKg,
   Value<bool> restTimerEnabled,
+  Value<RecommendationStyle?> recommendationStyle,
+  Value<int?> autoEndTimeoutMinutes,
+  Value<bool?> restNotificationsEnabled,
+  Value<bool?> soundEnabled,
+  Value<bool?> vibrationEnabled,
+  Value<int?> defaultAddRestSeconds,
+  Value<bool?> showRpeRir,
+  Value<double?> dumbbellIncrementKg,
+  Value<double?> barbellIncrementKg,
+  Value<double?> machineIncrementKg,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
   Value<int> rowid,
@@ -2949,6 +4605,46 @@ class $$UserProfilesTableFilterComposer
 
   ColumnFilters<bool> get restTimerEnabled => $composableBuilder(
       column: $table.restTimerEnabled,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnWithTypeConverterFilters<RecommendationStyle?, RecommendationStyle,
+          String>
+      get recommendationStyle => $composableBuilder(
+          column: $table.recommendationStyle,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnFilters<int> get autoEndTimeoutMinutes => $composableBuilder(
+      column: $table.autoEndTimeoutMinutes,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get restNotificationsEnabled => $composableBuilder(
+      column: $table.restNotificationsEnabled,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get soundEnabled => $composableBuilder(
+      column: $table.soundEnabled, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get vibrationEnabled => $composableBuilder(
+      column: $table.vibrationEnabled,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get defaultAddRestSeconds => $composableBuilder(
+      column: $table.defaultAddRestSeconds,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get showRpeRir => $composableBuilder(
+      column: $table.showRpeRir, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get dumbbellIncrementKg => $composableBuilder(
+      column: $table.dumbbellIncrementKg,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get barbellIncrementKg => $composableBuilder(
+      column: $table.barbellIncrementKg,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get machineIncrementKg => $composableBuilder(
+      column: $table.machineIncrementKg,
       builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
@@ -3001,6 +4697,45 @@ class $$UserProfilesTableOrderingComposer
       column: $table.restTimerEnabled,
       builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get recommendationStyle => $composableBuilder(
+      column: $table.recommendationStyle,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get autoEndTimeoutMinutes => $composableBuilder(
+      column: $table.autoEndTimeoutMinutes,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get restNotificationsEnabled => $composableBuilder(
+      column: $table.restNotificationsEnabled,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get soundEnabled => $composableBuilder(
+      column: $table.soundEnabled,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get vibrationEnabled => $composableBuilder(
+      column: $table.vibrationEnabled,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get defaultAddRestSeconds => $composableBuilder(
+      column: $table.defaultAddRestSeconds,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get showRpeRir => $composableBuilder(
+      column: $table.showRpeRir, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get dumbbellIncrementKg => $composableBuilder(
+      column: $table.dumbbellIncrementKg,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get barbellIncrementKg => $composableBuilder(
+      column: $table.barbellIncrementKg,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get machineIncrementKg => $composableBuilder(
+      column: $table.machineIncrementKg,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
@@ -3049,6 +4784,37 @@ class $$UserProfilesTableAnnotationComposer
   GeneratedColumn<bool> get restTimerEnabled => $composableBuilder(
       column: $table.restTimerEnabled, builder: (column) => column);
 
+  GeneratedColumnWithTypeConverter<RecommendationStyle?, String>
+      get recommendationStyle => $composableBuilder(
+          column: $table.recommendationStyle, builder: (column) => column);
+
+  GeneratedColumn<int> get autoEndTimeoutMinutes => $composableBuilder(
+      column: $table.autoEndTimeoutMinutes, builder: (column) => column);
+
+  GeneratedColumn<bool> get restNotificationsEnabled => $composableBuilder(
+      column: $table.restNotificationsEnabled, builder: (column) => column);
+
+  GeneratedColumn<bool> get soundEnabled => $composableBuilder(
+      column: $table.soundEnabled, builder: (column) => column);
+
+  GeneratedColumn<bool> get vibrationEnabled => $composableBuilder(
+      column: $table.vibrationEnabled, builder: (column) => column);
+
+  GeneratedColumn<int> get defaultAddRestSeconds => $composableBuilder(
+      column: $table.defaultAddRestSeconds, builder: (column) => column);
+
+  GeneratedColumn<bool> get showRpeRir => $composableBuilder(
+      column: $table.showRpeRir, builder: (column) => column);
+
+  GeneratedColumn<double> get dumbbellIncrementKg => $composableBuilder(
+      column: $table.dumbbellIncrementKg, builder: (column) => column);
+
+  GeneratedColumn<double> get barbellIncrementKg => $composableBuilder(
+      column: $table.barbellIncrementKg, builder: (column) => column);
+
+  GeneratedColumn<double> get machineIncrementKg => $composableBuilder(
+      column: $table.machineIncrementKg, builder: (column) => column);
+
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
@@ -3092,6 +4858,17 @@ class $$UserProfilesTableTableManager extends RootTableManager<
             Value<TrainingGoal> primaryGoal = const Value.absent(),
             Value<double> preferredWeightIncrementKg = const Value.absent(),
             Value<bool> restTimerEnabled = const Value.absent(),
+            Value<RecommendationStyle?> recommendationStyle =
+                const Value.absent(),
+            Value<int?> autoEndTimeoutMinutes = const Value.absent(),
+            Value<bool?> restNotificationsEnabled = const Value.absent(),
+            Value<bool?> soundEnabled = const Value.absent(),
+            Value<bool?> vibrationEnabled = const Value.absent(),
+            Value<int?> defaultAddRestSeconds = const Value.absent(),
+            Value<bool?> showRpeRir = const Value.absent(),
+            Value<double?> dumbbellIncrementKg = const Value.absent(),
+            Value<double?> barbellIncrementKg = const Value.absent(),
+            Value<double?> machineIncrementKg = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
@@ -3107,6 +4884,16 @@ class $$UserProfilesTableTableManager extends RootTableManager<
             primaryGoal: primaryGoal,
             preferredWeightIncrementKg: preferredWeightIncrementKg,
             restTimerEnabled: restTimerEnabled,
+            recommendationStyle: recommendationStyle,
+            autoEndTimeoutMinutes: autoEndTimeoutMinutes,
+            restNotificationsEnabled: restNotificationsEnabled,
+            soundEnabled: soundEnabled,
+            vibrationEnabled: vibrationEnabled,
+            defaultAddRestSeconds: defaultAddRestSeconds,
+            showRpeRir: showRpeRir,
+            dumbbellIncrementKg: dumbbellIncrementKg,
+            barbellIncrementKg: barbellIncrementKg,
+            machineIncrementKg: machineIncrementKg,
             createdAt: createdAt,
             updatedAt: updatedAt,
             rowid: rowid,
@@ -3122,6 +4909,17 @@ class $$UserProfilesTableTableManager extends RootTableManager<
             required TrainingGoal primaryGoal,
             required double preferredWeightIncrementKg,
             Value<bool> restTimerEnabled = const Value.absent(),
+            Value<RecommendationStyle?> recommendationStyle =
+                const Value.absent(),
+            Value<int?> autoEndTimeoutMinutes = const Value.absent(),
+            Value<bool?> restNotificationsEnabled = const Value.absent(),
+            Value<bool?> soundEnabled = const Value.absent(),
+            Value<bool?> vibrationEnabled = const Value.absent(),
+            Value<int?> defaultAddRestSeconds = const Value.absent(),
+            Value<bool?> showRpeRir = const Value.absent(),
+            Value<double?> dumbbellIncrementKg = const Value.absent(),
+            Value<double?> barbellIncrementKg = const Value.absent(),
+            Value<double?> machineIncrementKg = const Value.absent(),
             required DateTime createdAt,
             required DateTime updatedAt,
             Value<int> rowid = const Value.absent(),
@@ -3137,6 +4935,16 @@ class $$UserProfilesTableTableManager extends RootTableManager<
             primaryGoal: primaryGoal,
             preferredWeightIncrementKg: preferredWeightIncrementKg,
             restTimerEnabled: restTimerEnabled,
+            recommendationStyle: recommendationStyle,
+            autoEndTimeoutMinutes: autoEndTimeoutMinutes,
+            restNotificationsEnabled: restNotificationsEnabled,
+            soundEnabled: soundEnabled,
+            vibrationEnabled: vibrationEnabled,
+            defaultAddRestSeconds: defaultAddRestSeconds,
+            showRpeRir: showRpeRir,
+            dumbbellIncrementKg: dumbbellIncrementKg,
+            barbellIncrementKg: barbellIncrementKg,
+            machineIncrementKg: machineIncrementKg,
             createdAt: createdAt,
             updatedAt: updatedAt,
             rowid: rowid,
@@ -3171,8 +4979,15 @@ typedef $$ExercisesTableCreateCompanionBuilder = ExercisesCompanion Function({
   Value<String> secondaryMuscleGroups,
   Value<String> movementPattern,
   required EquipmentType equipmentType,
+  Value<ExerciseCategory?> exerciseCategory,
   Value<bool> isBodyweight,
   Value<bool> isUnilateral,
+  Value<double?> defaultIncrementKg,
+  Value<int?> minimumRecommendedReps,
+  Value<int?> maximumRecommendedReps,
+  Value<int?> defaultRestSeconds,
+  Value<int?> recommendedSetRangeMin,
+  Value<int?> recommendedSetRangeMax,
   Value<String?> notes,
   Value<bool> isCustom,
   required DateTime createdAt,
@@ -3187,8 +5002,15 @@ typedef $$ExercisesTableUpdateCompanionBuilder = ExercisesCompanion Function({
   Value<String> secondaryMuscleGroups,
   Value<String> movementPattern,
   Value<EquipmentType> equipmentType,
+  Value<ExerciseCategory?> exerciseCategory,
   Value<bool> isBodyweight,
   Value<bool> isUnilateral,
+  Value<double?> defaultIncrementKg,
+  Value<int?> minimumRecommendedReps,
+  Value<int?> maximumRecommendedReps,
+  Value<int?> defaultRestSeconds,
+  Value<int?> recommendedSetRangeMin,
+  Value<int?> recommendedSetRangeMax,
   Value<String?> notes,
   Value<bool> isCustom,
   Value<DateTime> createdAt,
@@ -3233,11 +5055,40 @@ class $$ExercisesTableFilterComposer
           column: $table.equipmentType,
           builder: (column) => ColumnWithTypeConverterFilters(column));
 
+  ColumnWithTypeConverterFilters<ExerciseCategory?, ExerciseCategory, String>
+      get exerciseCategory => $composableBuilder(
+          column: $table.exerciseCategory,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
   ColumnFilters<bool> get isBodyweight => $composableBuilder(
       column: $table.isBodyweight, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<bool> get isUnilateral => $composableBuilder(
       column: $table.isUnilateral, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get defaultIncrementKg => $composableBuilder(
+      column: $table.defaultIncrementKg,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get minimumRecommendedReps => $composableBuilder(
+      column: $table.minimumRecommendedReps,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get maximumRecommendedReps => $composableBuilder(
+      column: $table.maximumRecommendedReps,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get defaultRestSeconds => $composableBuilder(
+      column: $table.defaultRestSeconds,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get recommendedSetRangeMin => $composableBuilder(
+      column: $table.recommendedSetRangeMin,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get recommendedSetRangeMax => $composableBuilder(
+      column: $table.recommendedSetRangeMax,
+      builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get notes => $composableBuilder(
       column: $table.notes, builder: (column) => ColumnFilters(column));
@@ -3286,12 +5137,40 @@ class $$ExercisesTableOrderingComposer
       column: $table.equipmentType,
       builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get exerciseCategory => $composableBuilder(
+      column: $table.exerciseCategory,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<bool> get isBodyweight => $composableBuilder(
       column: $table.isBodyweight,
       builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<bool> get isUnilateral => $composableBuilder(
       column: $table.isUnilateral,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get defaultIncrementKg => $composableBuilder(
+      column: $table.defaultIncrementKg,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get minimumRecommendedReps => $composableBuilder(
+      column: $table.minimumRecommendedReps,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get maximumRecommendedReps => $composableBuilder(
+      column: $table.maximumRecommendedReps,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get defaultRestSeconds => $composableBuilder(
+      column: $table.defaultRestSeconds,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get recommendedSetRangeMin => $composableBuilder(
+      column: $table.recommendedSetRangeMin,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get recommendedSetRangeMax => $composableBuilder(
+      column: $table.recommendedSetRangeMax,
       builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get notes => $composableBuilder(
@@ -3338,11 +5217,33 @@ class $$ExercisesTableAnnotationComposer
       $composableBuilder(
           column: $table.equipmentType, builder: (column) => column);
 
+  GeneratedColumnWithTypeConverter<ExerciseCategory?, String>
+      get exerciseCategory => $composableBuilder(
+          column: $table.exerciseCategory, builder: (column) => column);
+
   GeneratedColumn<bool> get isBodyweight => $composableBuilder(
       column: $table.isBodyweight, builder: (column) => column);
 
   GeneratedColumn<bool> get isUnilateral => $composableBuilder(
       column: $table.isUnilateral, builder: (column) => column);
+
+  GeneratedColumn<double> get defaultIncrementKg => $composableBuilder(
+      column: $table.defaultIncrementKg, builder: (column) => column);
+
+  GeneratedColumn<int> get minimumRecommendedReps => $composableBuilder(
+      column: $table.minimumRecommendedReps, builder: (column) => column);
+
+  GeneratedColumn<int> get maximumRecommendedReps => $composableBuilder(
+      column: $table.maximumRecommendedReps, builder: (column) => column);
+
+  GeneratedColumn<int> get defaultRestSeconds => $composableBuilder(
+      column: $table.defaultRestSeconds, builder: (column) => column);
+
+  GeneratedColumn<int> get recommendedSetRangeMin => $composableBuilder(
+      column: $table.recommendedSetRangeMin, builder: (column) => column);
+
+  GeneratedColumn<int> get recommendedSetRangeMax => $composableBuilder(
+      column: $table.recommendedSetRangeMax, builder: (column) => column);
 
   GeneratedColumn<String> get notes =>
       $composableBuilder(column: $table.notes, builder: (column) => column);
@@ -3387,8 +5288,15 @@ class $$ExercisesTableTableManager extends RootTableManager<
             Value<String> secondaryMuscleGroups = const Value.absent(),
             Value<String> movementPattern = const Value.absent(),
             Value<EquipmentType> equipmentType = const Value.absent(),
+            Value<ExerciseCategory?> exerciseCategory = const Value.absent(),
             Value<bool> isBodyweight = const Value.absent(),
             Value<bool> isUnilateral = const Value.absent(),
+            Value<double?> defaultIncrementKg = const Value.absent(),
+            Value<int?> minimumRecommendedReps = const Value.absent(),
+            Value<int?> maximumRecommendedReps = const Value.absent(),
+            Value<int?> defaultRestSeconds = const Value.absent(),
+            Value<int?> recommendedSetRangeMin = const Value.absent(),
+            Value<int?> recommendedSetRangeMax = const Value.absent(),
             Value<String?> notes = const Value.absent(),
             Value<bool> isCustom = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
@@ -3403,8 +5311,15 @@ class $$ExercisesTableTableManager extends RootTableManager<
             secondaryMuscleGroups: secondaryMuscleGroups,
             movementPattern: movementPattern,
             equipmentType: equipmentType,
+            exerciseCategory: exerciseCategory,
             isBodyweight: isBodyweight,
             isUnilateral: isUnilateral,
+            defaultIncrementKg: defaultIncrementKg,
+            minimumRecommendedReps: minimumRecommendedReps,
+            maximumRecommendedReps: maximumRecommendedReps,
+            defaultRestSeconds: defaultRestSeconds,
+            recommendedSetRangeMin: recommendedSetRangeMin,
+            recommendedSetRangeMax: recommendedSetRangeMax,
             notes: notes,
             isCustom: isCustom,
             createdAt: createdAt,
@@ -3419,8 +5334,15 @@ class $$ExercisesTableTableManager extends RootTableManager<
             Value<String> secondaryMuscleGroups = const Value.absent(),
             Value<String> movementPattern = const Value.absent(),
             required EquipmentType equipmentType,
+            Value<ExerciseCategory?> exerciseCategory = const Value.absent(),
             Value<bool> isBodyweight = const Value.absent(),
             Value<bool> isUnilateral = const Value.absent(),
+            Value<double?> defaultIncrementKg = const Value.absent(),
+            Value<int?> minimumRecommendedReps = const Value.absent(),
+            Value<int?> maximumRecommendedReps = const Value.absent(),
+            Value<int?> defaultRestSeconds = const Value.absent(),
+            Value<int?> recommendedSetRangeMin = const Value.absent(),
+            Value<int?> recommendedSetRangeMax = const Value.absent(),
             Value<String?> notes = const Value.absent(),
             Value<bool> isCustom = const Value.absent(),
             required DateTime createdAt,
@@ -3435,8 +5357,15 @@ class $$ExercisesTableTableManager extends RootTableManager<
             secondaryMuscleGroups: secondaryMuscleGroups,
             movementPattern: movementPattern,
             equipmentType: equipmentType,
+            exerciseCategory: exerciseCategory,
             isBodyweight: isBodyweight,
             isUnilateral: isUnilateral,
+            defaultIncrementKg: defaultIncrementKg,
+            minimumRecommendedReps: minimumRecommendedReps,
+            maximumRecommendedReps: maximumRecommendedReps,
+            defaultRestSeconds: defaultRestSeconds,
+            recommendedSetRangeMin: recommendedSetRangeMin,
+            recommendedSetRangeMax: recommendedSetRangeMax,
             notes: notes,
             isCustom: isCustom,
             createdAt: createdAt,
@@ -3935,6 +5864,10 @@ typedef $$WorkoutSetsTableCreateCompanionBuilder = WorkoutSetsCompanion
   Value<bool> isWarmup,
   Value<bool> isFailure,
   Value<double?> estimatedOneRepMaxKg,
+  Value<int?> restBeforeSetSeconds,
+  Value<int?> restAfterSetSeconds,
+  Value<DateTime?> startedAt,
+  Value<DateTime?> completedAt,
   required DateTime createdAt,
   required DateTime updatedAt,
   Value<String?> notes,
@@ -3952,6 +5885,10 @@ typedef $$WorkoutSetsTableUpdateCompanionBuilder = WorkoutSetsCompanion
   Value<bool> isWarmup,
   Value<bool> isFailure,
   Value<double?> estimatedOneRepMaxKg,
+  Value<int?> restBeforeSetSeconds,
+  Value<int?> restAfterSetSeconds,
+  Value<DateTime?> startedAt,
+  Value<DateTime?> completedAt,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
   Value<String?> notes,
@@ -3998,6 +5935,20 @@ class $$WorkoutSetsTableFilterComposer
   ColumnFilters<double> get estimatedOneRepMaxKg => $composableBuilder(
       column: $table.estimatedOneRepMaxKg,
       builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get restBeforeSetSeconds => $composableBuilder(
+      column: $table.restBeforeSetSeconds,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get restAfterSetSeconds => $composableBuilder(
+      column: $table.restAfterSetSeconds,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get startedAt => $composableBuilder(
+      column: $table.startedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get completedAt => $composableBuilder(
+      column: $table.completedAt, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
@@ -4050,6 +6001,20 @@ class $$WorkoutSetsTableOrderingComposer
       column: $table.estimatedOneRepMaxKg,
       builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<int> get restBeforeSetSeconds => $composableBuilder(
+      column: $table.restBeforeSetSeconds,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get restAfterSetSeconds => $composableBuilder(
+      column: $table.restAfterSetSeconds,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get startedAt => $composableBuilder(
+      column: $table.startedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get completedAt => $composableBuilder(
+      column: $table.completedAt, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
@@ -4099,6 +6064,18 @@ class $$WorkoutSetsTableAnnotationComposer
   GeneratedColumn<double> get estimatedOneRepMaxKg => $composableBuilder(
       column: $table.estimatedOneRepMaxKg, builder: (column) => column);
 
+  GeneratedColumn<int> get restBeforeSetSeconds => $composableBuilder(
+      column: $table.restBeforeSetSeconds, builder: (column) => column);
+
+  GeneratedColumn<int> get restAfterSetSeconds => $composableBuilder(
+      column: $table.restAfterSetSeconds, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get startedAt =>
+      $composableBuilder(column: $table.startedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get completedAt => $composableBuilder(
+      column: $table.completedAt, builder: (column) => column);
+
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
@@ -4145,6 +6122,10 @@ class $$WorkoutSetsTableTableManager extends RootTableManager<
             Value<bool> isWarmup = const Value.absent(),
             Value<bool> isFailure = const Value.absent(),
             Value<double?> estimatedOneRepMaxKg = const Value.absent(),
+            Value<int?> restBeforeSetSeconds = const Value.absent(),
+            Value<int?> restAfterSetSeconds = const Value.absent(),
+            Value<DateTime?> startedAt = const Value.absent(),
+            Value<DateTime?> completedAt = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
             Value<String?> notes = const Value.absent(),
@@ -4161,6 +6142,10 @@ class $$WorkoutSetsTableTableManager extends RootTableManager<
             isWarmup: isWarmup,
             isFailure: isFailure,
             estimatedOneRepMaxKg: estimatedOneRepMaxKg,
+            restBeforeSetSeconds: restBeforeSetSeconds,
+            restAfterSetSeconds: restAfterSetSeconds,
+            startedAt: startedAt,
+            completedAt: completedAt,
             createdAt: createdAt,
             updatedAt: updatedAt,
             notes: notes,
@@ -4177,6 +6162,10 @@ class $$WorkoutSetsTableTableManager extends RootTableManager<
             Value<bool> isWarmup = const Value.absent(),
             Value<bool> isFailure = const Value.absent(),
             Value<double?> estimatedOneRepMaxKg = const Value.absent(),
+            Value<int?> restBeforeSetSeconds = const Value.absent(),
+            Value<int?> restAfterSetSeconds = const Value.absent(),
+            Value<DateTime?> startedAt = const Value.absent(),
+            Value<DateTime?> completedAt = const Value.absent(),
             required DateTime createdAt,
             required DateTime updatedAt,
             Value<String?> notes = const Value.absent(),
@@ -4193,6 +6182,10 @@ class $$WorkoutSetsTableTableManager extends RootTableManager<
             isWarmup: isWarmup,
             isFailure: isFailure,
             estimatedOneRepMaxKg: estimatedOneRepMaxKg,
+            restBeforeSetSeconds: restBeforeSetSeconds,
+            restAfterSetSeconds: restAfterSetSeconds,
+            startedAt: startedAt,
+            completedAt: completedAt,
             createdAt: createdAt,
             updatedAt: updatedAt,
             notes: notes,
@@ -4220,6 +6213,275 @@ typedef $$WorkoutSetsTableProcessedTableManager = ProcessedTableManager<
     ),
     WorkoutSetRow,
     PrefetchHooks Function()>;
+typedef $$RestTimerStatesTableCreateCompanionBuilder = RestTimerStatesCompanion
+    Function({
+  required String sessionId,
+  Value<String?> exerciseId,
+  Value<String?> afterSetId,
+  required DateTime startedAt,
+  required DateTime endsAt,
+  required int totalSeconds,
+  Value<bool> isRunning,
+  Value<bool> isPaused,
+  Value<DateTime?> pausedAt,
+  Value<int> accumulatedPausedSeconds,
+  Value<bool> allowSilentNotification,
+  Value<int> rowid,
+});
+typedef $$RestTimerStatesTableUpdateCompanionBuilder = RestTimerStatesCompanion
+    Function({
+  Value<String> sessionId,
+  Value<String?> exerciseId,
+  Value<String?> afterSetId,
+  Value<DateTime> startedAt,
+  Value<DateTime> endsAt,
+  Value<int> totalSeconds,
+  Value<bool> isRunning,
+  Value<bool> isPaused,
+  Value<DateTime?> pausedAt,
+  Value<int> accumulatedPausedSeconds,
+  Value<bool> allowSilentNotification,
+  Value<int> rowid,
+});
+
+class $$RestTimerStatesTableFilterComposer
+    extends Composer<_$AppDatabase, $RestTimerStatesTable> {
+  $$RestTimerStatesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get sessionId => $composableBuilder(
+      column: $table.sessionId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get exerciseId => $composableBuilder(
+      column: $table.exerciseId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get afterSetId => $composableBuilder(
+      column: $table.afterSetId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get startedAt => $composableBuilder(
+      column: $table.startedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get endsAt => $composableBuilder(
+      column: $table.endsAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get totalSeconds => $composableBuilder(
+      column: $table.totalSeconds, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isRunning => $composableBuilder(
+      column: $table.isRunning, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isPaused => $composableBuilder(
+      column: $table.isPaused, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get pausedAt => $composableBuilder(
+      column: $table.pausedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get accumulatedPausedSeconds => $composableBuilder(
+      column: $table.accumulatedPausedSeconds,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get allowSilentNotification => $composableBuilder(
+      column: $table.allowSilentNotification,
+      builder: (column) => ColumnFilters(column));
+}
+
+class $$RestTimerStatesTableOrderingComposer
+    extends Composer<_$AppDatabase, $RestTimerStatesTable> {
+  $$RestTimerStatesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get sessionId => $composableBuilder(
+      column: $table.sessionId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get exerciseId => $composableBuilder(
+      column: $table.exerciseId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get afterSetId => $composableBuilder(
+      column: $table.afterSetId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get startedAt => $composableBuilder(
+      column: $table.startedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get endsAt => $composableBuilder(
+      column: $table.endsAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get totalSeconds => $composableBuilder(
+      column: $table.totalSeconds,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isRunning => $composableBuilder(
+      column: $table.isRunning, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isPaused => $composableBuilder(
+      column: $table.isPaused, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get pausedAt => $composableBuilder(
+      column: $table.pausedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get accumulatedPausedSeconds => $composableBuilder(
+      column: $table.accumulatedPausedSeconds,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get allowSilentNotification => $composableBuilder(
+      column: $table.allowSilentNotification,
+      builder: (column) => ColumnOrderings(column));
+}
+
+class $$RestTimerStatesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $RestTimerStatesTable> {
+  $$RestTimerStatesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get sessionId =>
+      $composableBuilder(column: $table.sessionId, builder: (column) => column);
+
+  GeneratedColumn<String> get exerciseId => $composableBuilder(
+      column: $table.exerciseId, builder: (column) => column);
+
+  GeneratedColumn<String> get afterSetId => $composableBuilder(
+      column: $table.afterSetId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get startedAt =>
+      $composableBuilder(column: $table.startedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get endsAt =>
+      $composableBuilder(column: $table.endsAt, builder: (column) => column);
+
+  GeneratedColumn<int> get totalSeconds => $composableBuilder(
+      column: $table.totalSeconds, builder: (column) => column);
+
+  GeneratedColumn<bool> get isRunning =>
+      $composableBuilder(column: $table.isRunning, builder: (column) => column);
+
+  GeneratedColumn<bool> get isPaused =>
+      $composableBuilder(column: $table.isPaused, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get pausedAt =>
+      $composableBuilder(column: $table.pausedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get accumulatedPausedSeconds => $composableBuilder(
+      column: $table.accumulatedPausedSeconds, builder: (column) => column);
+
+  GeneratedColumn<bool> get allowSilentNotification => $composableBuilder(
+      column: $table.allowSilentNotification, builder: (column) => column);
+}
+
+class $$RestTimerStatesTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $RestTimerStatesTable,
+    RestTimerStateRow,
+    $$RestTimerStatesTableFilterComposer,
+    $$RestTimerStatesTableOrderingComposer,
+    $$RestTimerStatesTableAnnotationComposer,
+    $$RestTimerStatesTableCreateCompanionBuilder,
+    $$RestTimerStatesTableUpdateCompanionBuilder,
+    (
+      RestTimerStateRow,
+      BaseReferences<_$AppDatabase, $RestTimerStatesTable, RestTimerStateRow>
+    ),
+    RestTimerStateRow,
+    PrefetchHooks Function()> {
+  $$RestTimerStatesTableTableManager(
+      _$AppDatabase db, $RestTimerStatesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$RestTimerStatesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RestTimerStatesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$RestTimerStatesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> sessionId = const Value.absent(),
+            Value<String?> exerciseId = const Value.absent(),
+            Value<String?> afterSetId = const Value.absent(),
+            Value<DateTime> startedAt = const Value.absent(),
+            Value<DateTime> endsAt = const Value.absent(),
+            Value<int> totalSeconds = const Value.absent(),
+            Value<bool> isRunning = const Value.absent(),
+            Value<bool> isPaused = const Value.absent(),
+            Value<DateTime?> pausedAt = const Value.absent(),
+            Value<int> accumulatedPausedSeconds = const Value.absent(),
+            Value<bool> allowSilentNotification = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              RestTimerStatesCompanion(
+            sessionId: sessionId,
+            exerciseId: exerciseId,
+            afterSetId: afterSetId,
+            startedAt: startedAt,
+            endsAt: endsAt,
+            totalSeconds: totalSeconds,
+            isRunning: isRunning,
+            isPaused: isPaused,
+            pausedAt: pausedAt,
+            accumulatedPausedSeconds: accumulatedPausedSeconds,
+            allowSilentNotification: allowSilentNotification,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String sessionId,
+            Value<String?> exerciseId = const Value.absent(),
+            Value<String?> afterSetId = const Value.absent(),
+            required DateTime startedAt,
+            required DateTime endsAt,
+            required int totalSeconds,
+            Value<bool> isRunning = const Value.absent(),
+            Value<bool> isPaused = const Value.absent(),
+            Value<DateTime?> pausedAt = const Value.absent(),
+            Value<int> accumulatedPausedSeconds = const Value.absent(),
+            Value<bool> allowSilentNotification = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              RestTimerStatesCompanion.insert(
+            sessionId: sessionId,
+            exerciseId: exerciseId,
+            afterSetId: afterSetId,
+            startedAt: startedAt,
+            endsAt: endsAt,
+            totalSeconds: totalSeconds,
+            isRunning: isRunning,
+            isPaused: isPaused,
+            pausedAt: pausedAt,
+            accumulatedPausedSeconds: accumulatedPausedSeconds,
+            allowSilentNotification: allowSilentNotification,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$RestTimerStatesTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $RestTimerStatesTable,
+    RestTimerStateRow,
+    $$RestTimerStatesTableFilterComposer,
+    $$RestTimerStatesTableOrderingComposer,
+    $$RestTimerStatesTableAnnotationComposer,
+    $$RestTimerStatesTableCreateCompanionBuilder,
+    $$RestTimerStatesTableUpdateCompanionBuilder,
+    (
+      RestTimerStateRow,
+      BaseReferences<_$AppDatabase, $RestTimerStatesTable, RestTimerStateRow>
+    ),
+    RestTimerStateRow,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -4234,4 +6496,6 @@ class $AppDatabaseManager {
       $$WorkoutExercisesTableTableManager(_db, _db.workoutExercises);
   $$WorkoutSetsTableTableManager get workoutSets =>
       $$WorkoutSetsTableTableManager(_db, _db.workoutSets);
+  $$RestTimerStatesTableTableManager get restTimerStates =>
+      $$RestTimerStatesTableTableManager(_db, _db.restTimerStates);
 }

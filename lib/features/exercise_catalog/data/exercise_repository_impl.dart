@@ -23,13 +23,43 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
         secondaryMuscleGroups: _decodeList(row.secondaryMuscleGroups),
         movementPattern: row.movementPattern,
         equipmentType: row.equipmentType,
+        exerciseCategory:
+            row.exerciseCategory ?? _deriveCategory(row.equipmentType),
         isBodyweight: row.isBodyweight,
         isUnilateral: row.isUnilateral,
+        defaultIncrementKg: row.defaultIncrementKg,
+        minimumRecommendedReps: row.minimumRecommendedReps,
+        maximumRecommendedReps: row.maximumRecommendedReps,
+        defaultRestSeconds: row.defaultRestSeconds,
+        recommendedSetRangeMin: row.recommendedSetRangeMin,
+        recommendedSetRangeMax: row.recommendedSetRangeMax,
         notes: row.notes,
         isCustom: row.isCustom,
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
       );
+
+  /// Fallback category for legacy rows migrated without one.
+  static ExerciseCategory _deriveCategory(EquipmentType eq) {
+    switch (eq) {
+      case EquipmentType.barbell:
+      case EquipmentType.dumbbell:
+      case EquipmentType.smithMachine:
+        return ExerciseCategory.compoundUpper;
+      case EquipmentType.machine:
+      case EquipmentType.plateLoaded:
+        return ExerciseCategory.machineCompound;
+      case EquipmentType.bodyweight:
+        return ExerciseCategory.bodyweight;
+      case EquipmentType.assistedBodyweight:
+        return ExerciseCategory.assistedBodyweight;
+      case EquipmentType.cable:
+      case EquipmentType.resistanceBand:
+      case EquipmentType.kettlebell:
+      case EquipmentType.other:
+        return ExerciseCategory.isolation;
+    }
+  }
 
   static List<String> _decodeList(String raw) {
     if (raw.isEmpty) return const [];
@@ -68,8 +98,10 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
                 Value(_encodeList(s.secondaryMuscleGroups)),
             movementPattern: Value(s.movementPattern),
             equipmentType: s.equipmentType,
+            exerciseCategory: Value(s.exerciseCategory),
             isBodyweight: Value(s.isBodyweight),
             isUnilateral: Value(s.isUnilateral),
+            defaultIncrementKg: Value(s.defaultIncrementKg),
             notes: Value(s.notes),
             isCustom: const Value(false),
             createdAt: now,
@@ -109,8 +141,15 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
                 Value(_encodeList(exercise.secondaryMuscleGroups)),
             movementPattern: Value(exercise.movementPattern),
             equipmentType: exercise.equipmentType,
+            exerciseCategory: Value(exercise.exerciseCategory),
             isBodyweight: Value(exercise.isBodyweight),
             isUnilateral: Value(exercise.isUnilateral),
+            defaultIncrementKg: Value(exercise.defaultIncrementKg),
+            minimumRecommendedReps: Value(exercise.minimumRecommendedReps),
+            maximumRecommendedReps: Value(exercise.maximumRecommendedReps),
+            defaultRestSeconds: Value(exercise.defaultRestSeconds),
+            recommendedSetRangeMin: Value(exercise.recommendedSetRangeMin),
+            recommendedSetRangeMax: Value(exercise.recommendedSetRangeMax),
             notes: Value(exercise.notes),
             isCustom: const Value(true),
             createdAt: exercise.createdAt,

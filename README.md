@@ -13,13 +13,23 @@ no cloud, no accounts. All data stays on your device.
   catalog (~44 exercises across common gym equipment).
 - **Workout sessions**: start, log sets, auto rest timer, manual or automatic
   end (after 120 min of inactivity).
-- **Epley-based recommendation engine**:
-  - Estimated 1RM: `e1RM = weight × (1 + reps / 30)`
-  - Recommended load (inverse Epley): `load = e1RM / (1 + targetReps / 30)`
-  - Goal-based rep/set/intensity/rest profiles
-  - Performance-based load progression (±2.5 % / 5 % / 10 %)
+- **Evidence-informed recommendation engine** (autoregulated progressive overload):
+  - Epley e1RM (`weight × (1 + reps/30)`) + inverse Epley for load.
+  - Per-**exercise-category** rep/set/rest defaults (compound vs isolation vs
+    machine vs bodyweight vs assisted vs core).
+  - Ascending-load progression: hit the top of the range with manageable
+    effort → increase load and drop reps (e.g. 15 kg×12 → 17.5 kg×8–10).
+  - Autoregulation from RPE/RIR/failure, **rest-aware** adjustments, and
+    performance-drop detection.
+  - Isolation guardrails (no aggressive low-rep jumps), assisted-bodyweight
+    progression (reduce assistance), and suggested working-set counts.
+  - Configurable style: conservative / balanced / aggressive. Recommendations
+    are described as *evidence-informed heuristics*, never medical advice.
 - **Rest timer**: start/pause/resume/skip/+30 s, wall-clock based so it stays
-  accurate across backgrounding; haptic + sound on finish.
+  accurate across backgrounding; **persisted** so it survives process death.
+- **Silent notifications**: ongoing "workout in progress" + rest countdown,
+  rest-finished update with +30 s / skip / end actions (sound & vibration off
+  by default).
 - **Workout summary**: duration, exercises, working sets, total reps, total
   volume load, best e1RM per exercise, set-by-set history, personal records.
 - **History & per-exercise progress**.

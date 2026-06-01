@@ -22,6 +22,17 @@ class UserProfiles extends Table {
   TextColumn get primaryGoal => textEnum<TrainingGoal>()();
   RealColumn get preferredWeightIncrementKg => real()();
   BoolColumn get restTimerEnabled => boolean().withDefault(const Constant(true))();
+  TextColumn get recommendationStyle =>
+      textEnum<RecommendationStyle>().nullable()();
+  IntColumn get autoEndTimeoutMinutes => integer().nullable()();
+  BoolColumn get restNotificationsEnabled => boolean().nullable()();
+  BoolColumn get soundEnabled => boolean().nullable()();
+  BoolColumn get vibrationEnabled => boolean().nullable()();
+  IntColumn get defaultAddRestSeconds => integer().nullable()();
+  BoolColumn get showRpeRir => boolean().nullable()();
+  RealColumn get dumbbellIncrementKg => real().nullable()();
+  RealColumn get barbellIncrementKg => real().nullable()();
+  RealColumn get machineIncrementKg => real().nullable()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
 
@@ -38,8 +49,15 @@ class Exercises extends Table {
   TextColumn get secondaryMuscleGroups => text().withDefault(const Constant(''))();
   TextColumn get movementPattern => text().withDefault(const Constant(''))();
   TextColumn get equipmentType => textEnum<EquipmentType>()();
+  TextColumn get exerciseCategory => textEnum<ExerciseCategory>().nullable()();
   BoolColumn get isBodyweight => boolean().withDefault(const Constant(false))();
   BoolColumn get isUnilateral => boolean().withDefault(const Constant(false))();
+  RealColumn get defaultIncrementKg => real().nullable()();
+  IntColumn get minimumRecommendedReps => integer().nullable()();
+  IntColumn get maximumRecommendedReps => integer().nullable()();
+  IntColumn get defaultRestSeconds => integer().nullable()();
+  IntColumn get recommendedSetRangeMin => integer().nullable()();
+  IntColumn get recommendedSetRangeMax => integer().nullable()();
   TextColumn get notes => text().nullable()();
   BoolColumn get isCustom => boolean().withDefault(const Constant(false))();
   DateTimeColumn get createdAt => dateTime()();
@@ -92,12 +110,36 @@ class WorkoutSets extends Table {
   BoolColumn get isWarmup => boolean().withDefault(const Constant(false))();
   BoolColumn get isFailure => boolean().withDefault(const Constant(false))();
   RealColumn get estimatedOneRepMaxKg => real().nullable()();
+  IntColumn get restBeforeSetSeconds => integer().nullable()();
+  IntColumn get restAfterSetSeconds => integer().nullable()();
+  DateTimeColumn get startedAt => dateTime().nullable()();
+  DateTimeColumn get completedAt => dateTime().nullable()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
   TextColumn get notes => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
+}
+
+@DataClassName('RestTimerStateRow')
+class RestTimerStates extends Table {
+  TextColumn get sessionId => text()();
+  TextColumn get exerciseId => text().nullable()();
+  TextColumn get afterSetId => text().nullable()();
+  DateTimeColumn get startedAt => dateTime()();
+  DateTimeColumn get endsAt => dateTime()();
+  IntColumn get totalSeconds => integer()();
+  BoolColumn get isRunning => boolean().withDefault(const Constant(true))();
+  BoolColumn get isPaused => boolean().withDefault(const Constant(false))();
+  DateTimeColumn get pausedAt => dateTime().nullable()();
+  IntColumn get accumulatedPausedSeconds =>
+      integer().withDefault(const Constant(0))();
+  BoolColumn get allowSilentNotification =>
+      boolean().withDefault(const Constant(true))();
+
+  @override
+  Set<Column> get primaryKey => {sessionId};
 }
 
 // ----------------------------- Database -----------------------------
@@ -108,6 +150,7 @@ class WorkoutSets extends Table {
   WorkoutSessions,
   WorkoutExercises,
   WorkoutSets,
+  RestTimerStates,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -116,7 +159,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -124,7 +167,35 @@ class AppDatabase extends _$AppDatabase {
           await m.createAll();
         },
         onUpgrade: (m, from, to) async {
-          // Future schema migrations are added here, version by version.
+          // v2: evidence-informed fields + persisted rest timer.
+          if (from < 2) {
+            await m.addColumn(
+                userProfiles, userProfiles.recommendationStyle);
+            await m.addColumn(
+                userProfiles, userProfiles.autoEndTimeoutMinutes);
+            await m.addColumn(
+                userProfiles, userProfiles.restNotificationsEnabled);
+            await m.addColumn(userProfiles, userProfiles.soundEnabled);
+            await m.addColumn(userProfiles, userProfiles.vibrationEnabled);
+            await m.addColumn(
+                userProfiles, userProfiles.defaultAddRestSeconds);
+            await m.addColumn(userProfiles, userProfiles.showRpeRir);
+            await m.addColumn(userProfiles, userProfiles.dumbbellIncrementKg);
+            await m.addColumn(userProfiles, userProfiles.barbellIncrementKg);
+            await m.addColumn(userProfiles, userProfiles.machineIncrementKg);
+            await m.addColumn(exercises, exercises.exerciseCategory);
+            await m.addColumn(exercises, exercises.defaultIncrementKg);
+            await m.addColumn(exercises, exercises.minimumRecommendedReps);
+            await m.addColumn(exercises, exercises.maximumRecommendedReps);
+            await m.addColumn(exercises, exercises.defaultRestSeconds);
+            await m.addColumn(exercises, exercises.recommendedSetRangeMin);
+            await m.addColumn(exercises, exercises.recommendedSetRangeMax);
+            await m.addColumn(workoutSets, workoutSets.restBeforeSetSeconds);
+            await m.addColumn(workoutSets, workoutSets.restAfterSetSeconds);
+            await m.addColumn(workoutSets, workoutSets.startedAt);
+            await m.addColumn(workoutSets, workoutSets.completedAt);
+            await m.createTable(restTimerStates);
+          }
         },
       );
 }

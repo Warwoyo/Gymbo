@@ -1,4 +1,5 @@
 import '../../../core/enums.dart';
+import 'persisted_rest_timer.dart';
 import 'workout_exercise.dart';
 import 'workout_session.dart';
 import 'workout_set.dart';
@@ -41,6 +42,7 @@ abstract class WorkoutRepository {
   /// Returns the existing session-exercise or creates it.
   Future<WorkoutExercise> ensureExercise(String sessionId, String exerciseId);
   Future<List<WorkoutExercise>> getSessionExercises(String sessionId);
+  Future<void> endWorkoutExercise(String workoutExerciseId);
 
   Future<WorkoutSet> logSet(WorkoutSet set);
   Future<void> updateSet(WorkoutSet set);
@@ -55,4 +57,9 @@ abstract class WorkoutRepository {
     required String userProfileId,
     required String exerciseId,
   });
+
+  // Rest-timer persistence (spec §8).
+  Future<void> saveRestTimer(PersistedRestTimer timer);
+  Future<PersistedRestTimer?> getRestTimer(String sessionId);
+  Future<void> clearRestTimer(String sessionId);
 }

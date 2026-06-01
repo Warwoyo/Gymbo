@@ -53,6 +53,23 @@ class HomeScreen extends ConsumerWidget {
                   style: Theme.of(context).textTheme.bodyMedium),
             const SizedBox(height: 16),
 
+            // Notice when the previous workout was auto-ended.
+            lastSession.maybeWhen(
+              data: (s) => (s != null &&
+                      s.status == WorkoutSessionStatus.autoCompleted)
+                  ? Card(
+                      color:
+                          Theme.of(context).colorScheme.surfaceContainerHighest,
+                      child: const ListTile(
+                        leading: Icon(Icons.info_outline),
+                        title: Text(
+                            'Your previous workout was automatically ended after inactivity.'),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+              orElse: () => const SizedBox.shrink(),
+            ),
+
             // Active session resume card.
             activeSession.maybeWhen(
               data: (s) => s == null

@@ -9,8 +9,10 @@ class SeedExercise {
     this.secondaryMuscleGroups = const [],
     required this.movementPattern,
     required this.equipmentType,
+    required this.exerciseCategory,
     this.isBodyweight = false,
     this.isUnilateral = false,
+    this.defaultIncrementKg,
     this.notes,
   });
 
@@ -20,8 +22,10 @@ class SeedExercise {
   final List<String> secondaryMuscleGroups;
   final String movementPattern;
   final EquipmentType equipmentType;
+  final ExerciseCategory exerciseCategory;
   final bool isBodyweight;
   final bool isUnilateral;
+  final double? defaultIncrementKg;
   final String? notes;
 }
 
@@ -35,6 +39,8 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Triceps', 'Front Delts'],
     movementPattern: 'Horizontal Push',
     equipmentType: EquipmentType.barbell,
+    exerciseCategory: ExerciseCategory.compoundUpper,
+    defaultIncrementKg: 2.5,
   ),
   SeedExercise(
     name: 'Dumbbell Bench Press',
@@ -43,6 +49,8 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Triceps', 'Front Delts'],
     movementPattern: 'Horizontal Push',
     equipmentType: EquipmentType.dumbbell,
+    exerciseCategory: ExerciseCategory.compoundUpper,
+    defaultIncrementKg: 2.5,
   ),
   SeedExercise(
     name: 'Incline Dumbbell Press',
@@ -51,6 +59,8 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Front Delts', 'Triceps'],
     movementPattern: 'Incline Push',
     equipmentType: EquipmentType.dumbbell,
+    exerciseCategory: ExerciseCategory.compoundUpper,
+    defaultIncrementKg: 2.5,
   ),
   SeedExercise(
     name: 'Machine Chest Press',
@@ -59,6 +69,7 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Triceps', 'Front Delts'],
     movementPattern: 'Horizontal Push',
     equipmentType: EquipmentType.machine,
+    exerciseCategory: ExerciseCategory.machineCompound,
   ),
   SeedExercise(
     name: 'Cable Chest Fly',
@@ -66,6 +77,7 @@ const List<SeedExercise> kSeedExercises = [
     primaryMuscleGroup: 'Chest',
     movementPattern: 'Horizontal Adduction',
     equipmentType: EquipmentType.cable,
+    exerciseCategory: ExerciseCategory.isolation,
   ),
   SeedExercise(
     name: 'Pec Deck Fly',
@@ -73,6 +85,7 @@ const List<SeedExercise> kSeedExercises = [
     primaryMuscleGroup: 'Chest',
     movementPattern: 'Horizontal Adduction',
     equipmentType: EquipmentType.machine,
+    exerciseCategory: ExerciseCategory.machineIsolation,
   ),
   SeedExercise(
     name: 'Overhead Press',
@@ -81,6 +94,8 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Triceps', 'Upper Chest'],
     movementPattern: 'Vertical Push',
     equipmentType: EquipmentType.barbell,
+    exerciseCategory: ExerciseCategory.compoundUpper,
+    defaultIncrementKg: 2.5,
   ),
   SeedExercise(
     name: 'Dumbbell Shoulder Press',
@@ -89,6 +104,8 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Triceps'],
     movementPattern: 'Vertical Push',
     equipmentType: EquipmentType.dumbbell,
+    exerciseCategory: ExerciseCategory.compoundUpper,
+    defaultIncrementKg: 2.5,
   ),
   SeedExercise(
     name: 'Machine Shoulder Press',
@@ -97,6 +114,7 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Triceps'],
     movementPattern: 'Vertical Push',
     equipmentType: EquipmentType.machine,
+    exerciseCategory: ExerciseCategory.machineCompound,
   ),
   SeedExercise(
     name: 'Lateral Raise',
@@ -104,6 +122,8 @@ const List<SeedExercise> kSeedExercises = [
     primaryMuscleGroup: 'Side Delts',
     movementPattern: 'Lateral Raise',
     equipmentType: EquipmentType.dumbbell,
+    exerciseCategory: ExerciseCategory.isolation,
+    defaultIncrementKg: 1.0,
   ),
   SeedExercise(
     name: 'Cable Lateral Raise',
@@ -111,7 +131,9 @@ const List<SeedExercise> kSeedExercises = [
     primaryMuscleGroup: 'Side Delts',
     movementPattern: 'Lateral Raise',
     equipmentType: EquipmentType.cable,
+    exerciseCategory: ExerciseCategory.isolation,
     isUnilateral: true,
+    defaultIncrementKg: 1.0,
   ),
   SeedExercise(
     name: 'Triceps Pushdown',
@@ -119,6 +141,7 @@ const List<SeedExercise> kSeedExercises = [
     primaryMuscleGroup: 'Triceps',
     movementPattern: 'Elbow Extension',
     equipmentType: EquipmentType.cable,
+    exerciseCategory: ExerciseCategory.isolation,
   ),
   SeedExercise(
     name: 'Overhead Cable Triceps Extension',
@@ -126,6 +149,7 @@ const List<SeedExercise> kSeedExercises = [
     primaryMuscleGroup: 'Triceps',
     movementPattern: 'Elbow Extension',
     equipmentType: EquipmentType.cable,
+    exerciseCategory: ExerciseCategory.isolation,
   ),
   SeedExercise(
     name: 'Dip',
@@ -134,7 +158,19 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Triceps', 'Front Delts'],
     movementPattern: 'Vertical Push',
     equipmentType: EquipmentType.bodyweight,
+    exerciseCategory: ExerciseCategory.bodyweight,
     isBodyweight: true,
+  ),
+  SeedExercise(
+    name: 'Assisted Dip',
+    dayType: DayType.push,
+    primaryMuscleGroup: 'Chest',
+    secondaryMuscleGroups: ['Triceps', 'Front Delts'],
+    movementPattern: 'Vertical Push',
+    equipmentType: EquipmentType.assistedBodyweight,
+    exerciseCategory: ExerciseCategory.assistedBodyweight,
+    defaultIncrementKg: 5.0,
+    notes: 'Weight = assistance. Reduce assistance to progress.',
   ),
   SeedExercise(
     name: 'Push-Up',
@@ -143,6 +179,7 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Triceps', 'Front Delts'],
     movementPattern: 'Horizontal Push',
     equipmentType: EquipmentType.bodyweight,
+    exerciseCategory: ExerciseCategory.bodyweight,
     isBodyweight: true,
   ),
 
@@ -154,7 +191,19 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Biceps', 'Upper Back'],
     movementPattern: 'Vertical Pull',
     equipmentType: EquipmentType.bodyweight,
+    exerciseCategory: ExerciseCategory.bodyweight,
     isBodyweight: true,
+  ),
+  SeedExercise(
+    name: 'Assisted Pull-Up',
+    dayType: DayType.pull,
+    primaryMuscleGroup: 'Lats',
+    secondaryMuscleGroups: ['Biceps', 'Upper Back'],
+    movementPattern: 'Vertical Pull',
+    equipmentType: EquipmentType.assistedBodyweight,
+    exerciseCategory: ExerciseCategory.assistedBodyweight,
+    defaultIncrementKg: 5.0,
+    notes: 'Weight = assistance. Reduce assistance to progress.',
   ),
   SeedExercise(
     name: 'Lat Pulldown',
@@ -163,6 +212,7 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Biceps'],
     movementPattern: 'Vertical Pull',
     equipmentType: EquipmentType.cable,
+    exerciseCategory: ExerciseCategory.compoundUpper,
   ),
   SeedExercise(
     name: 'Seated Cable Row',
@@ -171,6 +221,7 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Lats', 'Biceps'],
     movementPattern: 'Horizontal Pull',
     equipmentType: EquipmentType.cable,
+    exerciseCategory: ExerciseCategory.compoundUpper,
   ),
   SeedExercise(
     name: 'Chest-Supported Row',
@@ -179,6 +230,7 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Lats', 'Biceps'],
     movementPattern: 'Horizontal Pull',
     equipmentType: EquipmentType.machine,
+    exerciseCategory: ExerciseCategory.machineCompound,
   ),
   SeedExercise(
     name: 'Barbell Row',
@@ -187,6 +239,8 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Lats', 'Biceps', 'Spinal Erectors'],
     movementPattern: 'Horizontal Pull',
     equipmentType: EquipmentType.barbell,
+    exerciseCategory: ExerciseCategory.compoundUpper,
+    defaultIncrementKg: 2.5,
   ),
   SeedExercise(
     name: 'Dumbbell Row',
@@ -195,7 +249,9 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Mid Back', 'Biceps'],
     movementPattern: 'Horizontal Pull',
     equipmentType: EquipmentType.dumbbell,
+    exerciseCategory: ExerciseCategory.compoundUpper,
     isUnilateral: true,
+    defaultIncrementKg: 2.5,
   ),
   SeedExercise(
     name: 'Machine Row',
@@ -204,6 +260,7 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Lats', 'Biceps'],
     movementPattern: 'Horizontal Pull',
     equipmentType: EquipmentType.machine,
+    exerciseCategory: ExerciseCategory.machineCompound,
   ),
   SeedExercise(
     name: 'Face Pull',
@@ -212,6 +269,7 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Upper Back'],
     movementPattern: 'Horizontal Pull',
     equipmentType: EquipmentType.cable,
+    exerciseCategory: ExerciseCategory.isolation,
   ),
   SeedExercise(
     name: 'Rear Delt Fly',
@@ -219,6 +277,8 @@ const List<SeedExercise> kSeedExercises = [
     primaryMuscleGroup: 'Rear Delts',
     movementPattern: 'Horizontal Abduction',
     equipmentType: EquipmentType.dumbbell,
+    exerciseCategory: ExerciseCategory.isolation,
+    defaultIncrementKg: 1.0,
   ),
   SeedExercise(
     name: 'Barbell Curl',
@@ -226,6 +286,7 @@ const List<SeedExercise> kSeedExercises = [
     primaryMuscleGroup: 'Biceps',
     movementPattern: 'Elbow Flexion',
     equipmentType: EquipmentType.barbell,
+    exerciseCategory: ExerciseCategory.isolation,
   ),
   SeedExercise(
     name: 'Dumbbell Curl',
@@ -233,6 +294,8 @@ const List<SeedExercise> kSeedExercises = [
     primaryMuscleGroup: 'Biceps',
     movementPattern: 'Elbow Flexion',
     equipmentType: EquipmentType.dumbbell,
+    exerciseCategory: ExerciseCategory.isolation,
+    defaultIncrementKg: 1.0,
   ),
   SeedExercise(
     name: 'Cable Curl',
@@ -240,6 +303,7 @@ const List<SeedExercise> kSeedExercises = [
     primaryMuscleGroup: 'Biceps',
     movementPattern: 'Elbow Flexion',
     equipmentType: EquipmentType.cable,
+    exerciseCategory: ExerciseCategory.isolation,
   ),
   SeedExercise(
     name: 'Hammer Curl',
@@ -248,6 +312,8 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Forearms'],
     movementPattern: 'Elbow Flexion',
     equipmentType: EquipmentType.dumbbell,
+    exerciseCategory: ExerciseCategory.isolation,
+    defaultIncrementKg: 1.0,
   ),
   SeedExercise(
     name: 'Preacher Curl',
@@ -255,6 +321,7 @@ const List<SeedExercise> kSeedExercises = [
     primaryMuscleGroup: 'Biceps',
     movementPattern: 'Elbow Flexion',
     equipmentType: EquipmentType.machine,
+    exerciseCategory: ExerciseCategory.machineIsolation,
   ),
 
   // ---------------- Leg Day ----------------
@@ -265,6 +332,8 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Glutes', 'Spinal Erectors'],
     movementPattern: 'Squat',
     equipmentType: EquipmentType.barbell,
+    exerciseCategory: ExerciseCategory.compoundLower,
+    defaultIncrementKg: 2.5,
   ),
   SeedExercise(
     name: 'Front Squat',
@@ -273,6 +342,8 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Glutes', 'Upper Back'],
     movementPattern: 'Squat',
     equipmentType: EquipmentType.barbell,
+    exerciseCategory: ExerciseCategory.compoundLower,
+    defaultIncrementKg: 2.5,
   ),
   SeedExercise(
     name: 'Smith Machine Squat',
@@ -281,6 +352,7 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Glutes'],
     movementPattern: 'Squat',
     equipmentType: EquipmentType.smithMachine,
+    exerciseCategory: ExerciseCategory.compoundLower,
   ),
   SeedExercise(
     name: 'Leg Press',
@@ -289,6 +361,8 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Glutes'],
     movementPattern: 'Squat',
     equipmentType: EquipmentType.plateLoaded,
+    exerciseCategory: ExerciseCategory.compoundLower,
+    defaultIncrementKg: 5.0,
   ),
   SeedExercise(
     name: 'Hack Squat',
@@ -297,6 +371,8 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Glutes'],
     movementPattern: 'Squat',
     equipmentType: EquipmentType.plateLoaded,
+    exerciseCategory: ExerciseCategory.compoundLower,
+    defaultIncrementKg: 5.0,
   ),
   SeedExercise(
     name: 'Romanian Deadlift',
@@ -305,6 +381,8 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Glutes', 'Spinal Erectors'],
     movementPattern: 'Hip Hinge',
     equipmentType: EquipmentType.barbell,
+    exerciseCategory: ExerciseCategory.compoundLower,
+    defaultIncrementKg: 2.5,
   ),
   SeedExercise(
     name: 'Deadlift',
@@ -313,6 +391,8 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Glutes', 'Hamstrings', 'Back'],
     movementPattern: 'Hip Hinge',
     equipmentType: EquipmentType.barbell,
+    exerciseCategory: ExerciseCategory.compoundLower,
+    defaultIncrementKg: 2.5,
   ),
   SeedExercise(
     name: 'Leg Extension',
@@ -320,6 +400,7 @@ const List<SeedExercise> kSeedExercises = [
     primaryMuscleGroup: 'Quads',
     movementPattern: 'Knee Extension',
     equipmentType: EquipmentType.machine,
+    exerciseCategory: ExerciseCategory.machineIsolation,
   ),
   SeedExercise(
     name: 'Lying Leg Curl',
@@ -327,6 +408,7 @@ const List<SeedExercise> kSeedExercises = [
     primaryMuscleGroup: 'Hamstrings',
     movementPattern: 'Knee Flexion',
     equipmentType: EquipmentType.machine,
+    exerciseCategory: ExerciseCategory.machineIsolation,
   ),
   SeedExercise(
     name: 'Seated Leg Curl',
@@ -334,6 +416,7 @@ const List<SeedExercise> kSeedExercises = [
     primaryMuscleGroup: 'Hamstrings',
     movementPattern: 'Knee Flexion',
     equipmentType: EquipmentType.machine,
+    exerciseCategory: ExerciseCategory.machineIsolation,
   ),
   SeedExercise(
     name: 'Walking Lunge',
@@ -342,7 +425,9 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Glutes', 'Hamstrings'],
     movementPattern: 'Lunge',
     equipmentType: EquipmentType.dumbbell,
+    exerciseCategory: ExerciseCategory.compoundLower,
     isUnilateral: true,
+    defaultIncrementKg: 2.0,
   ),
   SeedExercise(
     name: 'Bulgarian Split Squat',
@@ -351,7 +436,9 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Glutes'],
     movementPattern: 'Lunge',
     equipmentType: EquipmentType.dumbbell,
+    exerciseCategory: ExerciseCategory.compoundLower,
     isUnilateral: true,
+    defaultIncrementKg: 2.0,
   ),
   SeedExercise(
     name: 'Hip Thrust',
@@ -360,6 +447,8 @@ const List<SeedExercise> kSeedExercises = [
     secondaryMuscleGroups: ['Hamstrings'],
     movementPattern: 'Hip Extension',
     equipmentType: EquipmentType.barbell,
+    exerciseCategory: ExerciseCategory.compoundLower,
+    defaultIncrementKg: 2.5,
   ),
   SeedExercise(
     name: 'Standing Calf Raise',
@@ -367,6 +456,7 @@ const List<SeedExercise> kSeedExercises = [
     primaryMuscleGroup: 'Calves',
     movementPattern: 'Ankle Plantarflexion',
     equipmentType: EquipmentType.machine,
+    exerciseCategory: ExerciseCategory.machineIsolation,
   ),
   SeedExercise(
     name: 'Seated Calf Raise',
@@ -374,5 +464,6 @@ const List<SeedExercise> kSeedExercises = [
     primaryMuscleGroup: 'Calves',
     movementPattern: 'Ankle Plantarflexion',
     equipmentType: EquipmentType.machine,
+    exerciseCategory: ExerciseCategory.machineIsolation,
   ),
 ];

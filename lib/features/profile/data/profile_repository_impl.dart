@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../../core/enums.dart';
 import '../../../data/db/app_database.dart';
 import '../domain/profile_repository.dart';
 import '../domain/user_profile.dart';
@@ -23,6 +24,17 @@ class ProfileRepositoryImpl implements ProfileRepository {
         primaryGoal: row.primaryGoal,
         preferredWeightIncrementKg: row.preferredWeightIncrementKg,
         restTimerEnabled: row.restTimerEnabled,
+        recommendationStyle:
+            row.recommendationStyle ?? RecommendationStyle.balanced,
+        autoEndTimeoutMinutes: row.autoEndTimeoutMinutes ?? 120,
+        restNotificationsEnabled: row.restNotificationsEnabled ?? true,
+        soundEnabled: row.soundEnabled ?? false,
+        vibrationEnabled: row.vibrationEnabled ?? false,
+        defaultAddRestSeconds: row.defaultAddRestSeconds ?? 30,
+        showRpeRir: row.showRpeRir ?? true,
+        dumbbellIncrementKg: row.dumbbellIncrementKg,
+        barbellIncrementKg: row.barbellIncrementKg,
+        machineIncrementKg: row.machineIncrementKg,
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
       );
@@ -57,6 +69,17 @@ class ProfileRepositoryImpl implements ProfileRepository {
             primaryGoal: profile.primaryGoal,
             preferredWeightIncrementKg: profile.preferredWeightIncrementKg,
             restTimerEnabled: Value(profile.restTimerEnabled),
+            recommendationStyle: Value(profile.recommendationStyle),
+            autoEndTimeoutMinutes: Value(profile.autoEndTimeoutMinutes),
+            restNotificationsEnabled:
+                Value(profile.restNotificationsEnabled),
+            soundEnabled: Value(profile.soundEnabled),
+            vibrationEnabled: Value(profile.vibrationEnabled),
+            defaultAddRestSeconds: Value(profile.defaultAddRestSeconds),
+            showRpeRir: Value(profile.showRpeRir),
+            dumbbellIncrementKg: Value(profile.dumbbellIncrementKg),
+            barbellIncrementKg: Value(profile.barbellIncrementKg),
+            machineIncrementKg: Value(profile.machineIncrementKg),
             createdAt: profile.createdAt,
             updatedAt: profile.updatedAt,
           ),

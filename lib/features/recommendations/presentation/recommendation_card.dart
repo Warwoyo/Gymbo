@@ -1,26 +1,31 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/utils/formatting.dart';
-import '../../workout/presentation/workout_controller.dart';
-import '../domain/recommendation_engine.dart';
+import '../../exercise_catalog/domain/exercise.dart';
+import '../domain/evidence_recommendation_engine.dart';
 
-/// Displays the next-set recommendation (spec §Recommendation Display).
+/// Displays the evidence-informed next-set recommendation (spec §6).
 class RecommendationCard extends StatelessWidget {
-  const RecommendationCard({super.key, required this.view});
+  const RecommendationCard({
+    super.key,
+    required this.recommendation,
+    required this.exercise,
+  });
 
-  final RecommendationView view;
+  final EvidenceRecommendation recommendation;
+  final Exercise exercise;
 
   @override
   Widget build(BuildContext context) {
-    final r = view.recommendation;
+    final r = recommendation;
     final scheme = Theme.of(context).colorScheme;
     final theme = Theme.of(context);
+    final isAssisted = exercise.exerciseCategory.isAssisted;
 
-    final (icon, trend) = switch (view.direction) {
-      AdjustmentDirection.increase => (Icons.trending_up, 'Progressing up'),
-      AdjustmentDirection.decrease => (Icons.trending_down, 'Backing off'),
-      AdjustmentDirection.hold => (Icons.trending_flat, 'Holding steady'),
-    };
+    final (icon, color) = _labelStyle(r.label, scheme);
+    final weightLabel = isAssisted
+        ? 'Assistance ${Format.kg(r.recommendedWeightKg)}'
+        : Format.kg(r.recommendedWeightKg);
 
     return Card(
       color: scheme.tertiaryContainer.withValues(alpha: 0.5),
@@ -31,65 +36,122 @@ class RecommendationCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.auto_awesome, color: scheme.tertiary),
+                Icon(icon, color: color),
                 const SizedBox(width: 8),
-                Text('Recommendation', style: theme.textTheme.titleMedium),
-                const Spacer(),
-                Icon(icon, size: 18),
-                const SizedBox(width: 4),
-                Text(trend, style: theme.textTheme.labelMedium),
+                Expanded(
+                  child: Text(r.label.label,
+                      style: theme.textTheme.titleMedium
+                          ?.copyWith(fontWeight: FontWeight.bold)),
+                ),
+                _ConfidenceChip(confidence: r.confidence),
               ],
             ),
             const Divider(height: 20),
-            _big(context, 'Estimated 1RM',
-                Format.kg(r.estimatedOneRepMaxKg)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Next set', style: theme.textTheme.bodyLarge),
+                Flexible(
+                  child: Text(
+                    '$weightLabel × ${r.repRangeLabel}',
+                    textAlign: TextAlign.right,
+                    style: theme.textTheme.titleLarge
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            _row(context, 'Estimated 1RM',
+                r.estimatedOneRmKg > 0 ? Format.kg(r.estimatedOneRmKg) : '—'),
+            _row(context, 'Suggested sets',
+                '${r.recommendedSetsMin}–${r.recommendedSetsMax}'),
+            _row(context, 'Rest',
+                '${r.restRangeMinSeconds}–${r.restRangeMaxSeconds} sec'),
             const SizedBox(height: 8),
-            _big(
-              context,
-              'Next set',
-              '${Format.kg(view.finalLoadKg)} × ${r.targetReps} reps',
-              highlight: true,
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: scheme.surface.withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(r.setsGuidanceMessage,
+                  style: theme.textTheme.bodyMedium
+                      ?.copyWith(fontWeight: FontWeight.w600)),
             ),
             const SizedBox(height: 8),
-            _row('Target range',
-                '${r.targetRepRangeMin}-${r.targetRepRangeMax} reps, '
-                '${r.targetSetsMin}-${r.targetSetsMax} sets'),
-            _row('Load range',
-                '${Format.kg(r.recommendedLoadRangeMinKg)} – ${Format.kg(r.recommendedLoadRangeMaxKg)}'),
-            _row('Rest', '${r.restSeconds} seconds'),
+            Text(r.explanation, style: theme.textTheme.bodySmall),
+            if (r.warnings.isNotEmpty) ...[
+              const SizedBox(height: 6),
+              ...r.warnings.map((w) => Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.info_outline,
+                          size: 14, color: scheme.error),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(w,
+                            style: theme.textTheme.bodySmall
+                                ?.copyWith(color: scheme.error)),
+                      ),
+                    ],
+                  )),
+            ],
             const SizedBox(height: 8),
-            Text(r.explanation,
-                style: theme.textTheme.bodySmall
-                    ?.copyWith(fontStyle: FontStyle.italic)),
+            Text(r.evidenceLabel,
+                style: theme.textTheme.labelSmall?.copyWith(
+                    fontStyle: FontStyle.italic,
+                    color: scheme.onSurfaceVariant)),
           ],
         ),
       ),
     );
   }
 
-  Widget _big(BuildContext context, String label, String value,
-      {bool highlight = false}) {
-    final theme = Theme.of(context);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: theme.textTheme.bodyLarge),
-        Text(
-          value,
-          style: (highlight
-                  ? theme.textTheme.headlineSmall
-                  : theme.textTheme.titleMedium)
-              ?.copyWith(fontWeight: FontWeight.bold),
-        ),
-      ],
-    );
-  }
-
-  Widget _row(String k, String v) => Padding(
+  Widget _row(BuildContext context, String k, String v) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 2),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [Text(k), Text(v)],
         ),
       );
+
+  (IconData, Color) _labelStyle(RecommendationLabel label, ColorScheme s) {
+    switch (label) {
+      case RecommendationLabel.increaseLoad:
+      case RecommendationLabel.increaseDifficulty:
+        return (Icons.trending_up, s.primary);
+      case RecommendationLabel.holdSteady:
+        return (Icons.trending_flat, s.secondary);
+      case RecommendationLabel.reduceLoad:
+      case RecommendationLabel.deloadSuggested:
+        return (Icons.trending_down, s.error);
+      case RecommendationLabel.restMore:
+        return (Icons.timer, s.tertiary);
+      case RecommendationLabel.finishExercise:
+        return (Icons.flag, s.error);
+    }
+  }
+}
+
+class _ConfidenceChip extends StatelessWidget {
+  const _ConfidenceChip({required this.confidence});
+  final RecommendationConfidence confidence;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = switch (confidence) {
+      RecommendationConfidence.high => 'High confidence',
+      RecommendationConfidence.medium => 'Medium confidence',
+      RecommendationConfidence.low => 'Low confidence',
+    };
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(text, style: Theme.of(context).textTheme.labelSmall),
+    );
+  }
 }

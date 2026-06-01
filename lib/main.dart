@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'app/app.dart';
 import 'app/providers.dart';
 import 'core/constants/app_constants.dart';
+import 'core/services/notification_service.dart';
 import 'data/db/app_database.dart';
 
 Future<void> main() async {
@@ -12,6 +13,9 @@ Future<void> main() async {
 
   final db = AppDatabase();
   final prefs = await SharedPreferences.getInstance();
+
+  await NotificationService.instance.init();
+  await NotificationService.instance.requestPermission();
 
   final container = ProviderContainer(
     overrides: [

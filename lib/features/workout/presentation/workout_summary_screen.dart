@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/enums.dart';
 import '../../../core/utils/formatting.dart';
 import '../domain/workout_summary.dart';
 import 'session_providers.dart';
@@ -83,8 +84,12 @@ class _StatGrid extends StatelessWidget {
     final stats = <(String, String)>[
       ('Exercises', '${summary.numberOfExercises}'),
       ('Working sets', '${summary.totalWorkingSets}'),
+      ('Warm-up sets', '${summary.totalWarmupSets}'),
       ('Total reps', '${summary.totalReps}'),
       ('Volume load', Format.kg(summary.totalVolumeLoad)),
+      ('Best e1RM', Format.kg(summary.bestEstimatedOneRepMaxKg)),
+      ('Avg rest', Format.mmss(summary.averageRestSeconds)),
+      ('Longest rest', Format.mmss(summary.longestRestSeconds)),
     ];
     return GridView.count(
       crossAxisCount: 2,
@@ -139,18 +144,54 @@ class _ExerciseCard extends StatelessWidget {
                   const Icon(Icons.emoji_events, size: 18),
               ],
             ),
-            if (ex.bestEstimatedOneRepMaxKg > 0)
-              Text('Best e1RM: ${Format.kg(ex.bestEstimatedOneRepMaxKg)}',
-                  style: Theme.of(context).textTheme.bodySmall),
+            Row(
+              children: [
+                if (ex.bestEstimatedOneRepMaxKg > 0)
+                  Text('Best e1RM: ${Format.kg(ex.bestEstimatedOneRepMaxKg)}',
+                      style: Theme.of(context).textTheme.bodySmall),
+                const Spacer(),
+                _TrendChip(trend: ex.trend),
+              ],
+            ),
+            Text('Volume: ${Format.kg(ex.totalVolume)}',
+                style: Theme.of(context).textTheme.bodySmall),
             const SizedBox(height: 6),
             for (final s in ex.sets)
               Text(
                 '  Set ${s.setNumber}: ${Format.kg(s.weightKg)} × ${s.reps}'
                 '${s.isWarmup ? '  (warm-up)' : ''}',
               ),
+            const SizedBox(height: 6),
+            Text(ex.nextTimeAdvice,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontStyle: FontStyle.italic)),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _TrendChip extends StatelessWidget {
+  const _TrendChip({required this.trend});
+  final PerformanceTrend trend;
+
+  @override
+  Widget build(BuildContext context) {
+    final (icon, color, text) = switch (trend) {
+      PerformanceTrend.improved =>
+        (Icons.trending_up, Colors.green, 'Improved'),
+      PerformanceTrend.declined =>
+        (Icons.trending_down, Theme.of(context).colorScheme.error, 'Declined'),
+      PerformanceTrend.stable => (Icons.trending_flat, Colors.grey, 'Stable'),
+    };
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 16, color: color),
+        const SizedBox(width: 4),
+        Text(text, style: Theme.of(context).textTheme.labelSmall),
+      ],
     );
   }
 }

@@ -26,6 +26,7 @@ enum EquipmentType {
   machine,
   smithMachine,
   bodyweight,
+  assistedBodyweight,
   plateLoaded,
   resistanceBand,
   kettlebell,
@@ -45,6 +46,8 @@ enum EquipmentType {
         return 'Smith Machine';
       case EquipmentType.bodyweight:
         return 'Bodyweight';
+      case EquipmentType.assistedBodyweight:
+        return 'Assisted Bodyweight';
       case EquipmentType.plateLoaded:
         return 'Plate Loaded Machine';
       case EquipmentType.resistanceBand:
@@ -58,6 +61,86 @@ enum EquipmentType {
 
   /// Default load increment in kg for this equipment type.
   bool get isFreeWeightDumbbell => this == EquipmentType.dumbbell;
+}
+
+/// Movement/role classification driving evidence-informed defaults.
+enum ExerciseCategory {
+  compoundUpper,
+  compoundLower,
+  isolation,
+  machineCompound,
+  machineIsolation,
+  bodyweight,
+  assistedBodyweight,
+  core;
+
+  String get label {
+    switch (this) {
+      case ExerciseCategory.compoundUpper:
+        return 'Compound Upper';
+      case ExerciseCategory.compoundLower:
+        return 'Compound Lower';
+      case ExerciseCategory.isolation:
+        return 'Isolation';
+      case ExerciseCategory.machineCompound:
+        return 'Machine Compound';
+      case ExerciseCategory.machineIsolation:
+        return 'Machine Isolation';
+      case ExerciseCategory.bodyweight:
+        return 'Bodyweight';
+      case ExerciseCategory.assistedBodyweight:
+        return 'Assisted Bodyweight';
+      case ExerciseCategory.core:
+        return 'Core';
+    }
+  }
+
+  bool get isIsolation =>
+      this == ExerciseCategory.isolation ||
+      this == ExerciseCategory.machineIsolation;
+
+  bool get isAssisted => this == ExerciseCategory.assistedBodyweight;
+
+  bool get isBodyweightStyle =>
+      this == ExerciseCategory.bodyweight ||
+      this == ExerciseCategory.assistedBodyweight ||
+      this == ExerciseCategory.core;
+}
+
+/// How aggressively the engine should progress load.
+enum RecommendationStyle {
+  conservative,
+  balanced,
+  aggressive;
+
+  String get label {
+    switch (this) {
+      case RecommendationStyle.conservative:
+        return 'Conservative';
+      case RecommendationStyle.balanced:
+        return 'Balanced';
+      case RecommendationStyle.aggressive:
+        return 'Aggressive';
+    }
+  }
+}
+
+/// Trend of performance across an exercise's working sets.
+enum PerformanceTrend {
+  improved,
+  stable,
+  declined;
+
+  String get label {
+    switch (this) {
+      case PerformanceTrend.improved:
+        return 'Improved';
+      case PerformanceTrend.stable:
+        return 'Stable';
+      case PerformanceTrend.declined:
+        return 'Declined';
+    }
+  }
 }
 
 /// Primary training goal selected on the profile.

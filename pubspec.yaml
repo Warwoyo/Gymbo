@@ -26,6 +26,10 @@ dependencies:
   # Local key/value (active profile selection + settings)
   shared_preferences: ^2.3.3
 
+  # Local silent notifications for the rest timer / active workout
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.9.4
+
   # Helpers
   uuid: ^4.5.1
   intl: ^0.19.0

@@ -2,13 +2,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../app/providers.dart';
-import '../../../core/constants/app_constants.dart';
 import '../../../core/enums.dart';
+import '../../../core/services/notification_service.dart';
 import '../../exercise_catalog/domain/exercise.dart';
 import '../../profile/domain/user_profile.dart';
 import '../../profile/presentation/profile_controller.dart';
-import '../../recommendations/domain/recommendation_engine.dart';
-import '../../recommendations/domain/workout_recommendation.dart';
+import '../../recommendations/domain/evidence_recommendation_engine.dart';
 import '../domain/workout_exercise.dart';
 import '../domain/workout_repository.dart';
 import '../domain/workout_session.dart';
@@ -36,19 +35,6 @@ class WorkoutExerciseView {
       workingSets.isEmpty ? null : workingSets.last;
 }
 
-/// A recommendation plus the performance-based load adjustment applied to it.
-class RecommendationView {
-  const RecommendationView({
-    required this.recommendation,
-    required this.direction,
-    required this.finalLoadKg,
-  });
-
-  final WorkoutRecommendation recommendation;
-  final AdjustmentDirection direction;
-  final double finalLoadKg;
-}
-
 class ActiveWorkoutState {
   const ActiveWorkoutState({
     required this.session,
@@ -60,7 +46,7 @@ class ActiveWorkoutState {
   final WorkoutSession session;
   final List<WorkoutExerciseView> exercises;
   final String? selectedExerciseId;
-  final RecommendationView? recommendation;
+  final EvidenceRecommendation? recommendation;
 
   WorkoutExerciseView? get selected {
     if (selectedExerciseId == null) return null;
@@ -74,13 +60,15 @@ class ActiveWorkoutState {
     WorkoutSession? session,
     List<WorkoutExerciseView>? exercises,
     String? selectedExerciseId,
-    RecommendationView? recommendation,
+    EvidenceRecommendation? recommendation,
     bool clearRecommendation = false,
+    bool clearSelection = false,
   }) {
     return ActiveWorkoutState(
       session: session ?? this.session,
       exercises: exercises ?? this.exercises,
-      selectedExerciseId: selectedExerciseId ?? this.selectedExerciseId,
+      selectedExerciseId:
+          clearSelection ? null : (selectedExerciseId ?? this.selectedExerciseId),
       recommendation:
           clearRecommendation ? null : (recommendation ?? this.recommendation),
     );
@@ -93,14 +81,56 @@ final activeWorkoutProvider = AsyncNotifierProvider.family<WorkoutController,
 class WorkoutController
     extends FamilyAsyncNotifier<ActiveWorkoutState, String> {
   WorkoutRepository get _repo => ref.read(workoutRepositoryProvider);
-  RecommendationEngine get _engine => ref.read(recommendationEngineProvider);
+  EvidenceRecommendationEngine get _engine =>
+      ref.read(evidenceEngineProvider);
 
   late String _sessionId;
 
   @override
   Future<ActiveWorkoutState> build(String sessionId) async {
     _sessionId = sessionId;
-    return _load();
+    _configureRestTimer();
+    final loaded = await _load();
+    await _restoreRestTimer();
+    _bindNotifications(loaded.session.status.isOpen);
+    return loaded;
+  }
+
+  void _bindNotifications(bool sessionOpen) {
+    final notif = NotificationService.instance;
+    notif.onAction = (id) {
+      final rt = ref.read(restTimerProvider.notifier);
+      switch (id) {
+        case NotifAction.add30:
+          rt.addSeconds(_profile?.defaultAddRestSeconds ?? 30);
+        case NotifAction.skip:
+          rt.skip();
+        case NotifAction.end:
+          endWorkout();
+      }
+    };
+    if (sessionOpen && (_profile?.restNotificationsEnabled ?? true)) {
+      notif.showWorkoutActive();
+    }
+  }
+
+  void _configureRestTimer() {
+    final p = _profile;
+    ref.read(restTimerProvider.notifier).configure(
+          sessionId: _sessionId,
+          options: RestTimerOptions(
+            notificationsEnabled: p?.restNotificationsEnabled ?? true,
+            soundEnabled: p?.soundEnabled ?? false,
+            vibrationEnabled: p?.vibrationEnabled ?? false,
+          ),
+        );
+  }
+
+  Future<void> _restoreRestTimer() async {
+    final persisted = await _repo.getRestTimer(_sessionId);
+    if (persisted != null) {
+      ref.read(restTimerProvider.notifier).restore(persisted);
+    }
   }
 
   Future<ActiveWorkoutState> _load({String? selectedExerciseId}) async {
@@ -121,59 +151,61 @@ class WorkoutController
 
     final current = state.valueOrNull;
     final selected = selectedExerciseId ?? current?.selectedExerciseId;
-    final rec = current?.recommendation;
     return ActiveWorkoutState(
       session: session,
       exercises: views,
       selectedExerciseId: selected,
-      recommendation: rec,
+      recommendation: current?.recommendation,
     );
   }
 
   UserProfile? get _profile => ref.read(activeProfileProvider).valueOrNull;
 
-  double get _increment =>
-      _profile?.preferredWeightIncrementKg ?? AppConstants.defaultIncrementKg;
+  TrainingGoal get _goal => _profile?.primaryGoal ?? TrainingGoal.hypertrophy;
+  RecommendationStyle get _style =>
+      _profile?.recommendationStyle ?? RecommendationStyle.balanced;
+
+  double _incrementFor(Exercise ex) =>
+      ex.incrementKg(_profile?.incrementForEquipment(ex.equipmentType));
 
   Future<void> selectExercise(String exerciseId) async {
     await _repo.ensureExercise(_sessionId, exerciseId);
     await _repo.updateActivity(_sessionId);
     final reloaded = await _load(selectedExerciseId: exerciseId);
-    // Recompute recommendation from the latest working set, if any.
     final view = reloaded.selected;
-    RecommendationView? rec;
-    if (view?.lastWorkingSet != null) {
-      rec = _buildRecommendation(view!.exercise.id, view.lastWorkingSet!);
-    }
+    final rec = view == null ? null : _buildRecommendation(view);
     state = AsyncData(reloaded.copyWith(
       recommendation: rec,
       clearRecommendation: rec == null,
     ));
   }
 
-  RecommendationView _buildRecommendation(String exerciseId, WorkoutSet basis) {
-    final goal = _profile?.primaryGoal ?? TrainingGoal.hypertrophy;
-    final rec = _engine.generateRecommendation(
-      exerciseId: exerciseId,
-      basedOnSetId: basis.id,
-      loggedWeightKg: basis.weightKg,
-      loggedReps: basis.reps,
-      goal: goal,
-      incrementKg: _increment,
-    );
-    final adjustment = _engine.adjustForPerformance(
-      currentLoadKg: rec.recommendedLoadKg,
-      completedReps: basis.reps,
-      targetRepLowerBound: rec.targetRepRangeMin,
-      targetRepUpperBound: rec.targetRepRangeMax,
-      incrementKg: _increment,
-    );
-    return RecommendationView(
-      recommendation: rec,
-      direction: adjustment.direction,
-      finalLoadKg: adjustment.adjustedLoadKg,
-    );
+  /// Builds an evidence-informed recommendation from a view's working sets.
+  EvidenceRecommendation? _buildRecommendation(WorkoutExerciseView view) {
+    final working = view.workingSets;
+    if (working.isEmpty) return null;
+    final current = _toInput(working.last);
+    final previous =
+        working.sublist(0, working.length - 1).map(_toInput).toList();
+    return _engine.recommend(RecommendationContext(
+      category: view.exercise.exerciseCategory,
+      goal: _goal,
+      incrementKg: _incrementFor(view.exercise),
+      currentSet: current,
+      previousWorkingSets: previous,
+      style: _style,
+    ));
   }
+
+  LoggedSetInput _toInput(WorkoutSet s) => LoggedSetInput(
+        weightKg: s.weightKg,
+        reps: s.reps,
+        rpe: s.rpe,
+        rir: s.rir,
+        isFailure: s.isFailure,
+        isWarmup: s.isWarmup,
+        restBeforeSetSeconds: s.restBeforeSetSeconds,
+      );
 
   Future<void> logSet({
     required double weightKg,
@@ -188,9 +220,19 @@ class WorkoutController
     if (selected == null) return;
 
     final now = DateTime.now();
+
+    // Rest before this set = time since the previous set completed.
+    int? restBefore;
+    if (selected.sets.isNotEmpty) {
+      final last = selected.sets.last;
+      final ref0 = last.completedAt ?? last.createdAt;
+      final secs = now.difference(ref0).inSeconds;
+      if (secs >= 0) restBefore = secs;
+    }
+
     double? e1rm;
     if (!isWarmup && reps >= 1 && reps <= 30 && weightKg > 0) {
-      e1rm = _engine.estimateOneRepMax(weightKg, reps);
+      e1rm = _engine.epleyE1rm(weightKg, reps);
     }
 
     final set = WorkoutSet(
@@ -204,6 +246,9 @@ class WorkoutController
       isWarmup: isWarmup,
       isFailure: isFailure,
       estimatedOneRepMaxKg: e1rm,
+      restBeforeSetSeconds: restBefore,
+      startedAt: now,
+      completedAt: now,
       createdAt: now,
       updatedAt: now,
       notes: notes,
@@ -214,22 +259,28 @@ class WorkoutController
 
     final reloaded = await _load();
     final view = reloaded.selected;
-
-    RecommendationView? rec;
-    if (!isWarmup && view?.lastWorkingSet != null) {
-      rec = _buildRecommendation(view!.exercise.id, view.lastWorkingSet!);
-    } else {
-      rec = reloaded.recommendation;
-    }
-    state = AsyncData(reloaded.copyWith(recommendation: rec));
+    final rec = view == null ? null : _buildRecommendation(view);
+    state = AsyncData(reloaded.copyWith(
+      recommendation: rec,
+      clearRecommendation: rec == null,
+    ));
 
     // Auto-start the rest timer unless disabled in the profile.
     final restEnabled = _profile?.restTimerEnabled ?? true;
     if (restEnabled) {
-      final goal = _profile?.primaryGoal ?? TrainingGoal.hypertrophy;
-      final seconds =
-          rec?.recommendation.restSeconds ?? _engine.defaultRestSeconds(goal);
-      ref.read(restTimerProvider.notifier).start(seconds);
+      _configureRestTimer();
+      final seconds = rec?.recommendedRestSeconds ??
+          _engine.recommend(RecommendationContext(
+            category: selected.exercise.exerciseCategory,
+            goal: _goal,
+            incrementKg: _incrementFor(selected.exercise),
+            currentSet: LoggedSetInput(weightKg: weightKg, reps: reps),
+          )).recommendedRestSeconds;
+      await ref.read(restTimerProvider.notifier).start(
+            seconds,
+            exerciseId: selected.exercise.id,
+            afterSetId: set.id,
+          );
     }
   }
 
@@ -238,13 +289,24 @@ class WorkoutController
     await _repo.updateActivity(_sessionId);
     final reloaded = await _load();
     final view = reloaded.selected;
-    RecommendationView? rec;
-    if (view?.lastWorkingSet != null) {
-      rec = _buildRecommendation(view!.exercise.id, view.lastWorkingSet!);
-    }
+    final rec = view == null ? null : _buildRecommendation(view);
     state = AsyncData(reloaded.copyWith(
       recommendation: rec,
       clearRecommendation: rec == null,
+    ));
+  }
+
+  /// Marks the current exercise complete and clears the selection.
+  Future<void> endExercise() async {
+    final selected = state.valueOrNull?.selected;
+    if (selected != null) {
+      await _repo.endWorkoutExercise(selected.workoutExercise.id);
+    }
+    ref.read(restTimerProvider.notifier).skip();
+    final reloaded = await _load();
+    state = AsyncData(reloaded.copyWith(
+      clearSelection: true,
+      clearRecommendation: true,
     ));
   }
 
@@ -252,6 +314,8 @@ class WorkoutController
 
   Future<WorkoutSession> endWorkout() async {
     ref.read(restTimerProvider.notifier).skip();
+    await _repo.clearRestTimer(_sessionId);
+    NotificationService.instance.cancelAll();
     final ended = await _repo.endSession(_sessionId);
     state = AsyncData((await _load()));
     return ended;
