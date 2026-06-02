@@ -1157,6 +1157,13 @@ class $ExercisesTable extends Exercises
       GeneratedColumn<String>('day_type', aliasedName, false,
               type: DriftSqlType.string, requiredDuringInsert: true)
           .withConverter<DayType>($ExercisesTable.$converterdayType);
+  static const VerificationMeta _tagsMeta = const VerificationMeta('tags');
+  @override
+  late final GeneratedColumn<String> tags = GeneratedColumn<String>(
+      'tags', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
   static const VerificationMeta _primaryMuscleGroupMeta =
       const VerificationMeta('primaryMuscleGroup');
   @override
@@ -1281,6 +1288,7 @@ class $ExercisesTable extends Exercises
         id,
         name,
         dayType,
+        tags,
         primaryMuscleGroup,
         secondaryMuscleGroups,
         movementPattern,
@@ -1319,6 +1327,10 @@ class $ExercisesTable extends Exercises
           _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
     } else if (isInserting) {
       context.missing(_nameMeta);
+    }
+    if (data.containsKey('tags')) {
+      context.handle(
+          _tagsMeta, tags.isAcceptableOrUnknown(data['tags']!, _tagsMeta));
     }
     if (data.containsKey('primary_muscle_group')) {
       context.handle(
@@ -1424,6 +1436,8 @@ class $ExercisesTable extends Exercises
       dayType: $ExercisesTable.$converterdayType.fromSql(attachedDatabase
           .typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}day_type'])!),
+      tags: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}tags'])!,
       primaryMuscleGroup: attachedDatabase.typeMapping.read(
           DriftSqlType.string, data['${effectivePrefix}primary_muscle_group'])!,
       secondaryMuscleGroups: attachedDatabase.typeMapping.read(
@@ -1488,6 +1502,7 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
   final String id;
   final String name;
   final DayType dayType;
+  final String tags;
   final String primaryMuscleGroup;
   final String secondaryMuscleGroups;
   final String movementPattern;
@@ -1509,6 +1524,7 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
       {required this.id,
       required this.name,
       required this.dayType,
+      required this.tags,
       required this.primaryMuscleGroup,
       required this.secondaryMuscleGroups,
       required this.movementPattern,
@@ -1580,6 +1596,7 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
       id: Value(id),
       name: Value(name),
       dayType: Value(dayType),
+      tags: Value(tags),
       primaryMuscleGroup: Value(primaryMuscleGroup),
       secondaryMuscleGroups: Value(secondaryMuscleGroups),
       movementPattern: Value(movementPattern),
@@ -1623,6 +1640,7 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
       name: serializer.fromJson<String>(json['name']),
       dayType: $ExercisesTable.$converterdayType
           .fromJson(serializer.fromJson<String>(json['dayType'])),
+      tags: serializer.fromJson<String?>(json['tags']) ?? '',
       primaryMuscleGroup:
           serializer.fromJson<String>(json['primaryMuscleGroup']),
       secondaryMuscleGroups:
@@ -1659,6 +1677,7 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
       'name': serializer.toJson<String>(name),
       'dayType': serializer
           .toJson<String>($ExercisesTable.$converterdayType.toJson(dayType)),
+      'tags': serializer.toJson<String>(tags),
       'primaryMuscleGroup': serializer.toJson<String>(primaryMuscleGroup),
       'secondaryMuscleGroups': serializer.toJson<String>(secondaryMuscleGroups),
       'movementPattern': serializer.toJson<String>(movementPattern),
@@ -1685,6 +1704,7 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
           {String? id,
           String? name,
           DayType? dayType,
+          String? tags,
           String? primaryMuscleGroup,
           String? secondaryMuscleGroups,
           String? movementPattern,
@@ -1706,6 +1726,7 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
         id: id ?? this.id,
         name: name ?? this.name,
         dayType: dayType ?? this.dayType,
+        tags: tags ?? this.tags,
         primaryMuscleGroup: primaryMuscleGroup ?? this.primaryMuscleGroup,
         secondaryMuscleGroups:
             secondaryMuscleGroups ?? this.secondaryMuscleGroups,
@@ -1744,6 +1765,7 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       dayType: data.dayType.present ? data.dayType.value : this.dayType,
+      tags: data.tags.present ? data.tags.value : this.tags,
       primaryMuscleGroup: data.primaryMuscleGroup.present
           ? data.primaryMuscleGroup.value
           : this.primaryMuscleGroup,
@@ -1796,6 +1818,7 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('dayType: $dayType, ')
+          ..write('tags: $tags, ')
           ..write('primaryMuscleGroup: $primaryMuscleGroup, ')
           ..write('secondaryMuscleGroups: $secondaryMuscleGroups, ')
           ..write('movementPattern: $movementPattern, ')
@@ -1822,6 +1845,7 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
       id,
       name,
       dayType,
+      tags,
       primaryMuscleGroup,
       secondaryMuscleGroups,
       movementPattern,
@@ -1846,6 +1870,7 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
           other.id == this.id &&
           other.name == this.name &&
           other.dayType == this.dayType &&
+          other.tags == this.tags &&
           other.primaryMuscleGroup == this.primaryMuscleGroup &&
           other.secondaryMuscleGroups == this.secondaryMuscleGroups &&
           other.movementPattern == this.movementPattern &&
@@ -1869,6 +1894,7 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
   final Value<String> id;
   final Value<String> name;
   final Value<DayType> dayType;
+  final Value<String> tags;
   final Value<String> primaryMuscleGroup;
   final Value<String> secondaryMuscleGroups;
   final Value<String> movementPattern;
@@ -1891,6 +1917,7 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.dayType = const Value.absent(),
+    this.tags = const Value.absent(),
     this.primaryMuscleGroup = const Value.absent(),
     this.secondaryMuscleGroups = const Value.absent(),
     this.movementPattern = const Value.absent(),
@@ -1914,6 +1941,7 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
     required String id,
     required String name,
     required DayType dayType,
+    Value<String> tags = const Value.absent(),
     required String primaryMuscleGroup,
     this.secondaryMuscleGroups = const Value.absent(),
     this.movementPattern = const Value.absent(),
@@ -1935,6 +1963,7 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
   })  : id = Value(id),
         name = Value(name),
         dayType = Value(dayType),
+        tags = tags,
         primaryMuscleGroup = Value(primaryMuscleGroup),
         equipmentType = Value(equipmentType),
         createdAt = Value(createdAt),
@@ -1943,6 +1972,7 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
     Expression<String>? id,
     Expression<String>? name,
     Expression<String>? dayType,
+    Expression<String>? tags,
     Expression<String>? primaryMuscleGroup,
     Expression<String>? secondaryMuscleGroups,
     Expression<String>? movementPattern,
@@ -1966,6 +1996,7 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (dayType != null) 'day_type': dayType,
+      if (tags != null) 'tags': tags,
       if (primaryMuscleGroup != null)
         'primary_muscle_group': primaryMuscleGroup,
       if (secondaryMuscleGroups != null)
@@ -1999,6 +2030,7 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
       {Value<String>? id,
       Value<String>? name,
       Value<DayType>? dayType,
+      Value<String>? tags,
       Value<String>? primaryMuscleGroup,
       Value<String>? secondaryMuscleGroups,
       Value<String>? movementPattern,
@@ -2021,6 +2053,7 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
       id: id ?? this.id,
       name: name ?? this.name,
       dayType: dayType ?? this.dayType,
+      tags: tags ?? this.tags,
       primaryMuscleGroup: primaryMuscleGroup ?? this.primaryMuscleGroup,
       secondaryMuscleGroups:
           secondaryMuscleGroups ?? this.secondaryMuscleGroups,
@@ -2059,6 +2092,9 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
     if (dayType.present) {
       map['day_type'] = Variable<String>(
           $ExercisesTable.$converterdayType.toSql(dayType.value));
+    }
+    if (tags.present) {
+      map['tags'] = Variable<String>(tags.value);
     }
     if (primaryMuscleGroup.present) {
       map['primary_muscle_group'] = Variable<String>(primaryMuscleGroup.value);
@@ -2131,6 +2167,7 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('dayType: $dayType, ')
+          ..write('tags: $tags, ')
           ..write('primaryMuscleGroup: $primaryMuscleGroup, ')
           ..write('secondaryMuscleGroups: $secondaryMuscleGroups, ')
           ..write('movementPattern: $movementPattern, ')
@@ -2176,6 +2213,19 @@ class $WorkoutSessionsTable extends WorkoutSessions
       GeneratedColumn<String>('day_type', aliasedName, false,
               type: DriftSqlType.string, requiredDuringInsert: true)
           .withConverter<DayType>($WorkoutSessionsTable.$converterdayType);
+  static const VerificationMeta _sessionNameMeta =
+      const VerificationMeta('sessionName');
+  @override
+  late final GeneratedColumn<String> sessionName = GeneratedColumn<String>(
+      'session_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _tagsMeta = const VerificationMeta('tags');
+  @override
+  late final GeneratedColumn<String> tags = GeneratedColumn<String>(
+      'tags', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
   static const VerificationMeta _startedAtMeta =
       const VerificationMeta('startedAt');
   @override
@@ -2222,6 +2272,8 @@ class $WorkoutSessionsTable extends WorkoutSessions
         id,
         userProfileId,
         dayType,
+        sessionName,
+        tags,
         startedAt,
         endedAt,
         lastActivityAt,
@@ -2252,6 +2304,14 @@ class $WorkoutSessionsTable extends WorkoutSessions
               data['user_profile_id']!, _userProfileIdMeta));
     } else if (isInserting) {
       context.missing(_userProfileIdMeta);
+    }
+    if (data.containsKey('session_name')) {
+      context.handle(_sessionNameMeta,
+          sessionName.isAcceptableOrUnknown(data['session_name']!, _sessionNameMeta));
+    }
+    if (data.containsKey('tags')) {
+      context.handle(
+          _tagsMeta, tags.isAcceptableOrUnknown(data['tags']!, _tagsMeta));
     }
     if (data.containsKey('started_at')) {
       context.handle(_startedAtMeta,
@@ -2303,6 +2363,10 @@ class $WorkoutSessionsTable extends WorkoutSessions
       dayType: $WorkoutSessionsTable.$converterdayType.fromSql(attachedDatabase
           .typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}day_type'])!),
+      sessionName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}session_name']),
+      tags: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}tags'])!,
       startedAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}started_at'])!,
       endedAt: attachedDatabase.typeMapping
@@ -2338,6 +2402,8 @@ class WorkoutSessionRow extends DataClass
   final String id;
   final String userProfileId;
   final DayType dayType;
+  final String? sessionName;
+  final String tags;
   final DateTime startedAt;
   final DateTime? endedAt;
   final DateTime lastActivityAt;
@@ -2349,6 +2415,8 @@ class WorkoutSessionRow extends DataClass
       {required this.id,
       required this.userProfileId,
       required this.dayType,
+      this.sessionName,
+      required this.tags,
       required this.startedAt,
       this.endedAt,
       required this.lastActivityAt,
@@ -2365,6 +2433,10 @@ class WorkoutSessionRow extends DataClass
       map['day_type'] = Variable<String>(
           $WorkoutSessionsTable.$converterdayType.toSql(dayType));
     }
+    if (!nullToAbsent || sessionName != null) {
+      map['session_name'] = Variable<String>(sessionName);
+    }
+    map['tags'] = Variable<String>(tags);
     map['started_at'] = Variable<DateTime>(startedAt);
     if (!nullToAbsent || endedAt != null) {
       map['ended_at'] = Variable<DateTime>(endedAt);
@@ -2387,6 +2459,10 @@ class WorkoutSessionRow extends DataClass
       id: Value(id),
       userProfileId: Value(userProfileId),
       dayType: Value(dayType),
+      sessionName: sessionName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sessionName),
+      tags: Value(tags),
       startedAt: Value(startedAt),
       endedAt: endedAt == null && nullToAbsent
           ? const Value.absent()
@@ -2408,6 +2484,8 @@ class WorkoutSessionRow extends DataClass
       userProfileId: serializer.fromJson<String>(json['userProfileId']),
       dayType: $WorkoutSessionsTable.$converterdayType
           .fromJson(serializer.fromJson<String>(json['dayType'])),
+      sessionName: serializer.fromJson<String?>(json['sessionName']),
+      tags: serializer.fromJson<String?>(json['tags']) ?? '',
       startedAt: serializer.fromJson<DateTime>(json['startedAt']),
       endedAt: serializer.fromJson<DateTime?>(json['endedAt']),
       lastActivityAt: serializer.fromJson<DateTime>(json['lastActivityAt']),
@@ -2426,6 +2504,8 @@ class WorkoutSessionRow extends DataClass
       'userProfileId': serializer.toJson<String>(userProfileId),
       'dayType': serializer.toJson<String>(
           $WorkoutSessionsTable.$converterdayType.toJson(dayType)),
+      'sessionName': serializer.toJson<String?>(sessionName),
+      'tags': serializer.toJson<String>(tags),
       'startedAt': serializer.toJson<DateTime>(startedAt),
       'endedAt': serializer.toJson<DateTime?>(endedAt),
       'lastActivityAt': serializer.toJson<DateTime>(lastActivityAt),
@@ -2441,6 +2521,8 @@ class WorkoutSessionRow extends DataClass
           {String? id,
           String? userProfileId,
           DayType? dayType,
+          Value<String?> sessionName = const Value.absent(),
+          String? tags,
           DateTime? startedAt,
           Value<DateTime?> endedAt = const Value.absent(),
           DateTime? lastActivityAt,
@@ -2452,6 +2534,8 @@ class WorkoutSessionRow extends DataClass
         id: id ?? this.id,
         userProfileId: userProfileId ?? this.userProfileId,
         dayType: dayType ?? this.dayType,
+        sessionName: sessionName.present ? sessionName.value : this.sessionName,
+        tags: tags ?? this.tags,
         startedAt: startedAt ?? this.startedAt,
         endedAt: endedAt.present ? endedAt.value : this.endedAt,
         lastActivityAt: lastActivityAt ?? this.lastActivityAt,
@@ -2467,6 +2551,9 @@ class WorkoutSessionRow extends DataClass
           ? data.userProfileId.value
           : this.userProfileId,
       dayType: data.dayType.present ? data.dayType.value : this.dayType,
+      sessionName:
+          data.sessionName.present ? data.sessionName.value : this.sessionName,
+      tags: data.tags.present ? data.tags.value : this.tags,
       startedAt: data.startedAt.present ? data.startedAt.value : this.startedAt,
       endedAt: data.endedAt.present ? data.endedAt.value : this.endedAt,
       lastActivityAt: data.lastActivityAt.present
@@ -2485,6 +2572,8 @@ class WorkoutSessionRow extends DataClass
           ..write('id: $id, ')
           ..write('userProfileId: $userProfileId, ')
           ..write('dayType: $dayType, ')
+          ..write('sessionName: $sessionName, ')
+          ..write('tags: $tags, ')
           ..write('startedAt: $startedAt, ')
           ..write('endedAt: $endedAt, ')
           ..write('lastActivityAt: $lastActivityAt, ')
@@ -2506,6 +2595,8 @@ class WorkoutSessionRow extends DataClass
           other.id == this.id &&
           other.userProfileId == this.userProfileId &&
           other.dayType == this.dayType &&
+          other.sessionName == this.sessionName &&
+          other.tags == this.tags &&
           other.startedAt == this.startedAt &&
           other.endedAt == this.endedAt &&
           other.lastActivityAt == this.lastActivityAt &&
@@ -2519,6 +2610,8 @@ class WorkoutSessionsCompanion extends UpdateCompanion<WorkoutSessionRow> {
   final Value<String> id;
   final Value<String> userProfileId;
   final Value<DayType> dayType;
+  final Value<String?> sessionName;
+  final Value<String> tags;
   final Value<DateTime> startedAt;
   final Value<DateTime?> endedAt;
   final Value<DateTime> lastActivityAt;
@@ -2531,6 +2624,8 @@ class WorkoutSessionsCompanion extends UpdateCompanion<WorkoutSessionRow> {
     this.id = const Value.absent(),
     this.userProfileId = const Value.absent(),
     this.dayType = const Value.absent(),
+    this.sessionName = const Value.absent(),
+    this.tags = const Value.absent(),
     this.startedAt = const Value.absent(),
     this.endedAt = const Value.absent(),
     this.lastActivityAt = const Value.absent(),
@@ -2544,6 +2639,8 @@ class WorkoutSessionsCompanion extends UpdateCompanion<WorkoutSessionRow> {
     required String id,
     required String userProfileId,
     required DayType dayType,
+    this.sessionName = const Value.absent(),
+    Value<String> tags = const Value.absent(),
     required DateTime startedAt,
     this.endedAt = const Value.absent(),
     required DateTime lastActivityAt,
@@ -2555,6 +2652,7 @@ class WorkoutSessionsCompanion extends UpdateCompanion<WorkoutSessionRow> {
   })  : id = Value(id),
         userProfileId = Value(userProfileId),
         dayType = Value(dayType),
+        tags = tags,
         startedAt = Value(startedAt),
         lastActivityAt = Value(lastActivityAt),
         status = Value(status),
@@ -2564,6 +2662,8 @@ class WorkoutSessionsCompanion extends UpdateCompanion<WorkoutSessionRow> {
     Expression<String>? id,
     Expression<String>? userProfileId,
     Expression<String>? dayType,
+    Expression<String>? sessionName,
+    Expression<String>? tags,
     Expression<DateTime>? startedAt,
     Expression<DateTime>? endedAt,
     Expression<DateTime>? lastActivityAt,
@@ -2577,6 +2677,8 @@ class WorkoutSessionsCompanion extends UpdateCompanion<WorkoutSessionRow> {
       if (id != null) 'id': id,
       if (userProfileId != null) 'user_profile_id': userProfileId,
       if (dayType != null) 'day_type': dayType,
+      if (sessionName != null) 'session_name': sessionName,
+      if (tags != null) 'tags': tags,
       if (startedAt != null) 'started_at': startedAt,
       if (endedAt != null) 'ended_at': endedAt,
       if (lastActivityAt != null) 'last_activity_at': lastActivityAt,
@@ -2592,6 +2694,8 @@ class WorkoutSessionsCompanion extends UpdateCompanion<WorkoutSessionRow> {
       {Value<String>? id,
       Value<String>? userProfileId,
       Value<DayType>? dayType,
+      Value<String?>? sessionName,
+      Value<String>? tags,
       Value<DateTime>? startedAt,
       Value<DateTime?>? endedAt,
       Value<DateTime>? lastActivityAt,
@@ -2604,6 +2708,8 @@ class WorkoutSessionsCompanion extends UpdateCompanion<WorkoutSessionRow> {
       id: id ?? this.id,
       userProfileId: userProfileId ?? this.userProfileId,
       dayType: dayType ?? this.dayType,
+      sessionName: sessionName ?? this.sessionName,
+      tags: tags ?? this.tags,
       startedAt: startedAt ?? this.startedAt,
       endedAt: endedAt ?? this.endedAt,
       lastActivityAt: lastActivityAt ?? this.lastActivityAt,
@@ -2627,6 +2733,12 @@ class WorkoutSessionsCompanion extends UpdateCompanion<WorkoutSessionRow> {
     if (dayType.present) {
       map['day_type'] = Variable<String>(
           $WorkoutSessionsTable.$converterdayType.toSql(dayType.value));
+    }
+    if (sessionName.present) {
+      map['session_name'] = Variable<String>(sessionName.value);
+    }
+    if (tags.present) {
+      map['tags'] = Variable<String>(tags.value);
     }
     if (startedAt.present) {
       map['started_at'] = Variable<DateTime>(startedAt.value);
@@ -4483,6 +4595,149 @@ class RestTimerStatesCompanion extends UpdateCompanion<RestTimerStateRow> {
   }
 }
 
+
+class $ExerciseMuscleTargetsTable extends ExerciseMuscleTargets
+    with TableInfo<$ExerciseMuscleTargetsTable, ExerciseMuscleTargetRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ExerciseMuscleTargetsTable(this.attachedDatabase, [this._alias]);
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  @override
+  late final GeneratedColumn<String> exerciseId = GeneratedColumn<String>(
+      'exercise_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  @override
+  late final GeneratedColumnWithTypeConverter<MuscleGroup, String> muscleGroup =
+      GeneratedColumn<String>('muscle_group', aliasedName, false,
+              type: DriftSqlType.string, requiredDuringInsert: true)
+          .withConverter<MuscleGroup>($ExerciseMuscleTargetsTable.$convertermuscleGroup);
+  @override
+  late final GeneratedColumnWithTypeConverter<MuscleRole, String> role =
+      GeneratedColumn<String>('role', aliasedName, false,
+              type: DriftSqlType.string, requiredDuringInsert: true)
+          .withConverter<MuscleRole>($ExerciseMuscleTargetsTable.$converterrole);
+  @override
+  late final GeneratedColumn<double> contribution = GeneratedColumn<double>(
+      'contribution', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [id, exerciseId, muscleGroup, role, contribution];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'exercise_muscle_targets';
+  @override
+  String get tableName => _alias ?? $name;
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ExerciseMuscleTargetRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ExerciseMuscleTargetRow(
+      id: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      exerciseId: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}exercise_id'])!,
+      muscleGroup: $ExerciseMuscleTargetsTable.$convertermuscleGroup.fromSql(attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}muscle_group'])!),
+      role: $ExerciseMuscleTargetsTable.$converterrole.fromSql(attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}role'])!),
+      contribution: attachedDatabase.typeMapping.read(DriftSqlType.double, data['${effectivePrefix}contribution'])!,
+    );
+  }
+  @override
+  VerificationContext validateIntegrity(Insertable<ExerciseMuscleTargetRow> instance,
+      {bool isInserting = false}) => VerificationContext();
+  @override
+  $ExerciseMuscleTargetsTable createAlias(String alias) => $ExerciseMuscleTargetsTable(attachedDatabase, alias);
+  static JsonTypeConverter2<MuscleGroup, String, String> $convertermuscleGroup = const EnumNameConverter<MuscleGroup>(MuscleGroup.values);
+  static JsonTypeConverter2<MuscleRole, String, String> $converterrole = const EnumNameConverter<MuscleRole>(MuscleRole.values);
+}
+
+class ExerciseMuscleTargetRow extends DataClass implements Insertable<ExerciseMuscleTargetRow> {
+  final String id;
+  final String exerciseId;
+  final MuscleGroup muscleGroup;
+  final MuscleRole role;
+  final double contribution;
+  const ExerciseMuscleTargetRow({required this.id, required this.exerciseId, required this.muscleGroup, required this.role, required this.contribution});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) => {
+    'id': Variable<String>(id),
+    'exercise_id': Variable<String>(exerciseId),
+    'muscle_group': Variable<String>($ExerciseMuscleTargetsTable.$convertermuscleGroup.toSql(muscleGroup)),
+    'role': Variable<String>($ExerciseMuscleTargetsTable.$converterrole.toSql(role)),
+    'contribution': Variable<double>(contribution),
+  };
+  ExerciseMuscleTargetsCompanion toCompanion(bool nullToAbsent) => ExerciseMuscleTargetsCompanion.insert(id: id, exerciseId: exerciseId, muscleGroup: muscleGroup, role: role, contribution: contribution);
+}
+
+class ExerciseMuscleTargetsCompanion extends UpdateCompanion<ExerciseMuscleTargetRow> {
+  final Value<String> id;
+  final Value<String> exerciseId;
+  final Value<MuscleGroup> muscleGroup;
+  final Value<MuscleRole> role;
+  final Value<double> contribution;
+  final Value<int> rowid;
+  const ExerciseMuscleTargetsCompanion({this.id = const Value.absent(), this.exerciseId = const Value.absent(), this.muscleGroup = const Value.absent(), this.role = const Value.absent(), this.contribution = const Value.absent(), this.rowid = const Value.absent()});
+  ExerciseMuscleTargetsCompanion.insert({required String id, required String exerciseId, required MuscleGroup muscleGroup, required MuscleRole role, required double contribution, this.rowid = const Value.absent()}) : id = Value(id), exerciseId = Value(exerciseId), muscleGroup = Value(muscleGroup), role = Value(role), contribution = Value(contribution);
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) map['id'] = Variable<String>(id.value);
+    if (exerciseId.present) map['exercise_id'] = Variable<String>(exerciseId.value);
+    if (muscleGroup.present) map['muscle_group'] = Variable<String>($ExerciseMuscleTargetsTable.$convertermuscleGroup.toSql(muscleGroup.value));
+    if (role.present) map['role'] = Variable<String>($ExerciseMuscleTargetsTable.$converterrole.toSql(role.value));
+    if (contribution.present) map['contribution'] = Variable<double>(contribution.value);
+    if (rowid.present) map['rowid'] = Variable<int>(rowid.value);
+    return map;
+  }
+}
+
+class $WorkoutMuscleImpactsTable extends WorkoutMuscleImpacts
+    with TableInfo<$WorkoutMuscleImpactsTable, WorkoutMuscleImpactRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WorkoutMuscleImpactsTable(this.attachedDatabase, [this._alias]);
+  @override late final GeneratedColumn<String> id = GeneratedColumn<String>('id', aliasedName, false, type: DriftSqlType.string, requiredDuringInsert: true);
+  @override late final GeneratedColumn<String> sessionId = GeneratedColumn<String>('session_id', aliasedName, false, type: DriftSqlType.string, requiredDuringInsert: true);
+  @override late final GeneratedColumnWithTypeConverter<MuscleGroup, String> muscleGroup = GeneratedColumn<String>('muscle_group', aliasedName, false, type: DriftSqlType.string, requiredDuringInsert: true).withConverter<MuscleGroup>($WorkoutMuscleImpactsTable.$convertermuscleGroup);
+  @override late final GeneratedColumn<double> rawScore = GeneratedColumn<double>('raw_score', aliasedName, false, type: DriftSqlType.double, requiredDuringInsert: true);
+  @override late final GeneratedColumn<double> normalizedScore = GeneratedColumn<double>('normalized_score', aliasedName, false, type: DriftSqlType.double, requiredDuringInsert: true);
+  @override late final GeneratedColumn<int> workingSets = GeneratedColumn<int>('working_sets', aliasedName, false, type: DriftSqlType.int, requiredDuringInsert: true);
+  @override late final GeneratedColumn<double> volume = GeneratedColumn<double>('volume', aliasedName, false, type: DriftSqlType.double, requiredDuringInsert: true);
+  @override late final GeneratedColumnWithTypeConverter<MuscleRole, String> strongestRole = GeneratedColumn<String>('strongest_role', aliasedName, false, type: DriftSqlType.string, requiredDuringInsert: true).withConverter<MuscleRole>($WorkoutMuscleImpactsTable.$converterstrongestRole);
+  @override List<GeneratedColumn> get $columns => [id, sessionId, muscleGroup, rawScore, normalizedScore, workingSets, volume, strongestRole];
+  @override String get aliasedName => _alias ?? actualTableName;
+  @override String get actualTableName => $name;
+  static const String $name = 'workout_muscle_impacts';
+  @override String get tableName => _alias ?? $name;
+  @override Set<GeneratedColumn> get $primaryKey => {id};
+  @override WorkoutMuscleImpactRow map(Map<String, dynamic> data, {String? tablePrefix}) { final p = tablePrefix != null ? '$tablePrefix.' : ''; return WorkoutMuscleImpactRow(id: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${p}id'])!, sessionId: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${p}session_id'])!, muscleGroup: $WorkoutMuscleImpactsTable.$convertermuscleGroup.fromSql(attachedDatabase.typeMapping.read(DriftSqlType.string, data['${p}muscle_group'])!), rawScore: attachedDatabase.typeMapping.read(DriftSqlType.double, data['${p}raw_score'])!, normalizedScore: attachedDatabase.typeMapping.read(DriftSqlType.double, data['${p}normalized_score'])!, workingSets: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${p}working_sets'])!, volume: attachedDatabase.typeMapping.read(DriftSqlType.double, data['${p}volume'])!, strongestRole: $WorkoutMuscleImpactsTable.$converterstrongestRole.fromSql(attachedDatabase.typeMapping.read(DriftSqlType.string, data['${p}strongest_role'])!)); }
+  @override VerificationContext validateIntegrity(Insertable<WorkoutMuscleImpactRow> instance,{bool isInserting=false})=>VerificationContext();
+  @override $WorkoutMuscleImpactsTable createAlias(String alias) => $WorkoutMuscleImpactsTable(attachedDatabase, alias);
+  static JsonTypeConverter2<MuscleGroup, String, String> $convertermuscleGroup = const EnumNameConverter<MuscleGroup>(MuscleGroup.values);
+  static JsonTypeConverter2<MuscleRole, String, String> $converterstrongestRole = const EnumNameConverter<MuscleRole>(MuscleRole.values);
+}
+class WorkoutMuscleImpactRow extends DataClass implements Insertable<WorkoutMuscleImpactRow> { final String id; final String sessionId; final MuscleGroup muscleGroup; final double rawScore; final double normalizedScore; final int workingSets; final double volume; final MuscleRole strongestRole; const WorkoutMuscleImpactRow({required this.id, required this.sessionId, required this.muscleGroup, required this.rawScore, required this.normalizedScore, required this.workingSets, required this.volume, required this.strongestRole}); @override Map<String, Expression> toColumns(bool nullToAbsent)=>{'id':Variable<String>(id),'session_id':Variable<String>(sessionId),'muscle_group':Variable<String>($WorkoutMuscleImpactsTable.$convertermuscleGroup.toSql(muscleGroup)),'raw_score':Variable<double>(rawScore),'normalized_score':Variable<double>(normalizedScore),'working_sets':Variable<int>(workingSets),'volume':Variable<double>(volume),'strongest_role':Variable<String>($WorkoutMuscleImpactsTable.$converterstrongestRole.toSql(strongestRole))}; }
+class WorkoutMuscleImpactsCompanion extends UpdateCompanion<WorkoutMuscleImpactRow> { final Value<String> id; final Value<String> sessionId; final Value<MuscleGroup> muscleGroup; final Value<double> rawScore; final Value<double> normalizedScore; final Value<int> workingSets; final Value<double> volume; final Value<MuscleRole> strongestRole; final Value<int> rowid; const WorkoutMuscleImpactsCompanion({this.id=const Value.absent(),this.sessionId=const Value.absent(),this.muscleGroup=const Value.absent(),this.rawScore=const Value.absent(),this.normalizedScore=const Value.absent(),this.workingSets=const Value.absent(),this.volume=const Value.absent(),this.strongestRole=const Value.absent(),this.rowid=const Value.absent()}); WorkoutMuscleImpactsCompanion.insert({required String id, required String sessionId, required MuscleGroup muscleGroup, required double rawScore, required double normalizedScore, required int workingSets, required double volume, required MuscleRole strongestRole, this.rowid=const Value.absent()}): id=Value(id), sessionId=Value(sessionId), muscleGroup=Value(muscleGroup), rawScore=Value(rawScore), normalizedScore=Value(normalizedScore), workingSets=Value(workingSets), volume=Value(volume), strongestRole=Value(strongestRole); @override Map<String, Expression> toColumns(bool nullToAbsent){final m=<String,Expression>{}; if(id.present)m['id']=Variable<String>(id.value); if(sessionId.present)m['session_id']=Variable<String>(sessionId.value); if(muscleGroup.present)m['muscle_group']=Variable<String>($WorkoutMuscleImpactsTable.$convertermuscleGroup.toSql(muscleGroup.value)); if(rawScore.present)m['raw_score']=Variable<double>(rawScore.value); if(normalizedScore.present)m['normalized_score']=Variable<double>(normalizedScore.value); if(workingSets.present)m['working_sets']=Variable<int>(workingSets.value); if(volume.present)m['volume']=Variable<double>(volume.value); if(strongestRole.present)m['strongest_role']=Variable<String>($WorkoutMuscleImpactsTable.$converterstrongestRole.toSql(strongestRole.value)); if(rowid.present)m['rowid']=Variable<int>(rowid.value); return m;}}
+
+class $WorkoutRegionImpactsTable extends WorkoutRegionImpacts
+    with TableInfo<$WorkoutRegionImpactsTable, WorkoutRegionImpactRow> {
+  @override final GeneratedDatabase attachedDatabase; final String? _alias; $WorkoutRegionImpactsTable(this.attachedDatabase,[this._alias]);
+  @override late final GeneratedColumn<String> id=GeneratedColumn<String>('id',aliasedName,false,type:DriftSqlType.string,requiredDuringInsert:true);
+  @override late final GeneratedColumn<String> sessionId=GeneratedColumn<String>('session_id',aliasedName,false,type:DriftSqlType.string,requiredDuringInsert:true);
+  @override late final GeneratedColumnWithTypeConverter<MuscleRegion,String> region=GeneratedColumn<String>('region',aliasedName,false,type:DriftSqlType.string,requiredDuringInsert:true).withConverter<MuscleRegion>($WorkoutRegionImpactsTable.$converterregion);
+  @override late final GeneratedColumn<double> rawScore=GeneratedColumn<double>('raw_score',aliasedName,false,type:DriftSqlType.double,requiredDuringInsert:true);
+  @override late final GeneratedColumn<double> normalizedScore=GeneratedColumn<double>('normalized_score',aliasedName,false,type:DriftSqlType.double,requiredDuringInsert:true);
+  @override List<GeneratedColumn> get $columns=>[id,sessionId,region,rawScore,normalizedScore]; @override String get aliasedName=>_alias??actualTableName; @override String get actualTableName=>$name; static const String $name='workout_region_impacts'; @override String get tableName=>_alias??$name; @override Set<GeneratedColumn> get $primaryKey=>{id};
+  @override WorkoutRegionImpactRow map(Map<String,dynamic> data,{String? tablePrefix}){final p=tablePrefix!=null?'$tablePrefix.':''; return WorkoutRegionImpactRow(id:attachedDatabase.typeMapping.read(DriftSqlType.string,data['${p}id'])!,sessionId:attachedDatabase.typeMapping.read(DriftSqlType.string,data['${p}session_id'])!,region:$WorkoutRegionImpactsTable.$converterregion.fromSql(attachedDatabase.typeMapping.read(DriftSqlType.string,data['${p}region'])!),rawScore:attachedDatabase.typeMapping.read(DriftSqlType.double,data['${p}raw_score'])!,normalizedScore:attachedDatabase.typeMapping.read(DriftSqlType.double,data['${p}normalized_score'])!);} @override VerificationContext validateIntegrity(Insertable<WorkoutRegionImpactRow> instance,{bool isInserting=false})=>VerificationContext(); @override $WorkoutRegionImpactsTable createAlias(String alias)=>$WorkoutRegionImpactsTable(attachedDatabase,alias); static JsonTypeConverter2<MuscleRegion,String,String> $converterregion=const EnumNameConverter<MuscleRegion>(MuscleRegion.values);
+}
+class WorkoutRegionImpactRow extends DataClass implements Insertable<WorkoutRegionImpactRow>{final String id; final String sessionId; final MuscleRegion region; final double rawScore; final double normalizedScore; const WorkoutRegionImpactRow({required this.id,required this.sessionId,required this.region,required this.rawScore,required this.normalizedScore}); @override Map<String,Expression> toColumns(bool nullToAbsent)=>{'id':Variable<String>(id),'session_id':Variable<String>(sessionId),'region':Variable<String>($WorkoutRegionImpactsTable.$converterregion.toSql(region)),'raw_score':Variable<double>(rawScore),'normalized_score':Variable<double>(normalizedScore)};}
+class WorkoutRegionImpactsCompanion extends UpdateCompanion<WorkoutRegionImpactRow>{final Value<String> id; final Value<String> sessionId; final Value<MuscleRegion> region; final Value<double> rawScore; final Value<double> normalizedScore; final Value<int> rowid; const WorkoutRegionImpactsCompanion({this.id=const Value.absent(),this.sessionId=const Value.absent(),this.region=const Value.absent(),this.rawScore=const Value.absent(),this.normalizedScore=const Value.absent(),this.rowid=const Value.absent()}); WorkoutRegionImpactsCompanion.insert({required String id,required String sessionId,required MuscleRegion region,required double rawScore,required double normalizedScore,this.rowid=const Value.absent()}):id=Value(id),sessionId=Value(sessionId),region=Value(region),rawScore=Value(rawScore),normalizedScore=Value(normalizedScore); @override Map<String,Expression> toColumns(bool nullToAbsent){final m=<String,Expression>{}; if(id.present)m['id']=Variable<String>(id.value); if(sessionId.present)m['session_id']=Variable<String>(sessionId.value); if(region.present)m['region']=Variable<String>($WorkoutRegionImpactsTable.$converterregion.toSql(region.value)); if(rawScore.present)m['raw_score']=Variable<double>(rawScore.value); if(normalizedScore.present)m['normalized_score']=Variable<double>(normalizedScore.value); if(rowid.present)m['rowid']=Variable<int>(rowid.value); return m;}}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4495,6 +4750,12 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $WorkoutSetsTable workoutSets = $WorkoutSetsTable(this);
   late final $RestTimerStatesTable restTimerStates =
       $RestTimerStatesTable(this);
+  late final $ExerciseMuscleTargetsTable exerciseMuscleTargets =
+      $ExerciseMuscleTargetsTable(this);
+  late final $WorkoutMuscleImpactsTable workoutMuscleImpacts =
+      $WorkoutMuscleImpactsTable(this);
+  late final $WorkoutRegionImpactsTable workoutRegionImpacts =
+      $WorkoutRegionImpactsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4505,7 +4766,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         workoutSessions,
         workoutExercises,
         workoutSets,
-        restTimerStates
+        restTimerStates,
+        exerciseMuscleTargets,
+        workoutMuscleImpacts,
+        workoutRegionImpacts
       ];
 }
 
