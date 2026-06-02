@@ -244,9 +244,15 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(restTimerStates);
           }
           if (from < 3) {
-            await m.addColumn(exercises, exercises.tags);
-            await m.addColumn(workoutSessions, workoutSessions.sessionName);
-            await m.addColumn(workoutSessions, workoutSessions.tags);
+            await customStatement(
+              "ALTER TABLE exercises ADD COLUMN tags TEXT NOT NULL DEFAULT ''",
+            );
+            await customStatement(
+              'ALTER TABLE workout_sessions ADD COLUMN session_name TEXT NULL',
+            );
+            await customStatement(
+              "ALTER TABLE workout_sessions ADD COLUMN tags TEXT NOT NULL DEFAULT ''",
+            );
             await m.createTable(exerciseMuscleTargets);
             await m.createTable(workoutMuscleImpacts);
             await m.createTable(workoutRegionImpacts);

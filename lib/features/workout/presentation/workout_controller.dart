@@ -14,6 +14,7 @@ import '../domain/workout_session.dart';
 import '../../muscle/domain/muscle_recovery.dart';
 import '../domain/workout_set.dart';
 import 'rest_timer_controller.dart';
+import 'session_providers.dart';
 
 const _uuid = Uuid();
 
