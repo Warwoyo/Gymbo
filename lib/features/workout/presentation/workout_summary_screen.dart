@@ -30,12 +30,16 @@ class WorkoutSummaryScreen extends ConsumerWidget {
         data: (s) => ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            Text(s.dayType.label,
+            Text(s.session.sessionName ?? s.dayType?.label ?? 'Workout',
                 style: Theme.of(context).textTheme.headlineSmall),
             Text('${Format.dateTime(s.startedAt)} • ${Format.duration(s.duration)}'),
             const SizedBox(height: 16),
             _StatGrid(summary: s),
             const SizedBox(height: 16),
+            if (s.muscleImpacts.isNotEmpty) ...[
+              _MuscleImpactCard(summary: s),
+              const SizedBox(height: 16),
+            ],
             if (s.personalRecords.isNotEmpty) ...[
               Card(
                 color: Theme.of(context).colorScheme.tertiaryContainer,
@@ -70,6 +74,53 @@ class WorkoutSummaryScreen extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+
+
+class _MuscleImpactCard extends StatelessWidget {
+  const _MuscleImpactCard({required this.summary});
+  final WorkoutSummary summary;
+
+  @override
+  Widget build(BuildContext context) {
+    final primary = summary.muscleImpacts
+        .where((m) => m.strongestRole == MuscleRole.primary)
+        .map((m) => m.muscle.label)
+        .take(6)
+        .join(', ');
+    final secondary = summary.muscleImpacts
+        .where((m) => m.strongestRole != MuscleRole.primary)
+        .map((m) => m.muscle.label)
+        .take(6)
+        .join(', ');
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: const [
+            Icon(Icons.accessibility_new),
+            SizedBox(width: 8),
+            Text('Muscle Impact', style: TextStyle(fontWeight: FontWeight.bold)),
+          ]),
+          const SizedBox(height: 6),
+          Text('Heuristic training impact based on logged sets.'),
+          const SizedBox(height: 12),
+          for (final impact in summary.muscleImpacts.take(8)) ...[
+            Row(children: [
+              SizedBox(width: 100, child: Text(impact.muscle.label)),
+              Expanded(child: LinearProgressIndicator(value: impact.normalizedScore / 100)),
+              const SizedBox(width: 8),
+              Text('${impact.normalizedScore.round()}%'),
+            ]),
+            const SizedBox(height: 8),
+          ],
+          if (primary.isNotEmpty) Text('Primary muscles trained: $primary'),
+          if (secondary.isNotEmpty) Text('Secondary/supporting muscles: $secondary'),
+        ]),
       ),
     );
   }

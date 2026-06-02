@@ -1,4 +1,5 @@
 import '../../../core/enums.dart';
+import '../../muscle/domain/muscle_impact.dart';
 import 'workout_session.dart';
 import 'workout_set.dart';
 
@@ -60,12 +61,16 @@ class WorkoutSummary {
   const WorkoutSummary({
     required this.session,
     required this.exercises,
+    this.muscleImpacts = const [],
+    this.regionImpacts = const [],
   });
 
   final WorkoutSession session;
   final List<ExerciseSummary> exercises;
+  final List<MuscleImpact> muscleImpacts;
+  final List<MuscleRegionImpact> regionImpacts;
 
-  DayType get dayType => session.dayType;
+  DayType? get dayType => session.dayType;
   DateTime get startedAt => session.startedAt;
   DateTime? get endedAt => session.endedAt;
 

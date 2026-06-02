@@ -14,9 +14,10 @@ import 'set_log_sheet.dart';
 import 'workout_controller.dart';
 
 class ActiveWorkoutScreen extends ConsumerWidget {
-  const ActiveWorkoutScreen({super.key, required this.sessionId});
+  const ActiveWorkoutScreen({super.key, required this.sessionId, this.initialFilter = ExerciseFilter.all});
 
   final String sessionId;
+  final ExerciseFilter initialFilter;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,7 +29,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: asyncState.maybeWhen(
-          data: (s) => Text(s.session.dayType.label),
+          data: (s) => Text(s.session.sessionName ?? s.session.dayType?.label ?? 'Workout'),
           orElse: () => const Text('Workout'),
         ),
         actions: [
@@ -126,7 +127,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
     final result = await Navigator.of(context).push<String>(
       MaterialPageRoute(
         builder: (_) =>
-            ExerciseListScreen(dayType: state.session.dayType, pickMode: true),
+            ExerciseListScreen(initialFilter: initialFilter, pickMode: true),
       ),
     );
     if (result != null) {

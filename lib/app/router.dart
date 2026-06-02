@@ -1,11 +1,11 @@
 import 'package:go_router/go_router.dart';
 
-import '../core/enums.dart';
 import '../features/exercise_catalog/presentation/exercise_list_screen.dart';
 import '../features/history/presentation/exercise_progress_screen.dart';
 import '../features/history/presentation/history_screen.dart';
 import '../features/home/presentation/gate_screen.dart';
 import '../features/home/presentation/home_screen.dart';
+import '../features/muscle/presentation/recovery_screen.dart';
 import '../features/profile/presentation/edit_profile_screen.dart';
 import '../features/profile/presentation/onboarding_screen.dart';
 import '../features/profile/presentation/profile_selection_screen.dart';
@@ -13,8 +13,8 @@ import '../features/settings/presentation/settings_screen.dart';
 import '../features/workout/presentation/active_workout_screen.dart';
 import '../features/workout/presentation/workout_summary_screen.dart';
 
-DayType _parseDay(String? raw) =>
-    DayType.values.firstWhere((d) => d.name == raw, orElse: () => DayType.push);
+ExerciseFilter _parseFilter(String? raw) => ExerciseFilter.values.firstWhere((f) => f.name == raw, orElse: () => ExerciseFilter.all);
+
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -27,14 +27,18 @@ final appRouter = GoRouter(
         builder: (_, __) => const ProfileSelectionScreen()),
     GoRoute(path: '/home', builder: (_, __) => const HomeScreen()),
     GoRoute(
-      path: '/day/:day',
-      builder: (_, state) =>
-          ExerciseListScreen(dayType: _parseDay(state.pathParameters['day'])),
+      path: '/exercises',
+      builder: (_, state) => ExerciseListScreen(
+        initialFilter: _parseFilter(state.uri.queryParameters['filter']),
+      ),
     ),
     GoRoute(
       path: '/workout/:sessionId',
       builder: (_, state) =>
-          ActiveWorkoutScreen(sessionId: state.pathParameters['sessionId']!),
+          ActiveWorkoutScreen(
+        sessionId: state.pathParameters['sessionId']!,
+        initialFilter: _parseFilter(state.uri.queryParameters['filter']),
+      ),
     ),
     GoRoute(
       path: '/summary/:sessionId',
@@ -42,6 +46,7 @@ final appRouter = GoRouter(
           WorkoutSummaryScreen(sessionId: state.pathParameters['sessionId']!),
     ),
     GoRoute(path: '/history', builder: (_, __) => const HistoryScreen()),
+    GoRoute(path: '/recovery', builder: (_, __) => const RecoveryScreen()),
     GoRoute(
       path: '/progress/:exerciseId',
       builder: (_, state) => ExerciseProgressScreen(
