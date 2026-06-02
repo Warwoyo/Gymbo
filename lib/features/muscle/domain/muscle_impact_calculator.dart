@@ -4,7 +4,6 @@ import '../../../core/enums.dart';
 import '../../exercise_catalog/domain/exercise.dart';
 import '../../workout/domain/workout_set.dart';
 import 'muscle_impact.dart';
-import 'muscle_target.dart';
 
 class MuscleImpactCalculator {
   const MuscleImpactCalculator({this.estimatedBodyWeightKg});
