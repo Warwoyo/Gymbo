@@ -6,6 +6,9 @@ import '../../../app/providers.dart';
 import '../../../core/enums.dart';
 import '../../exercise_catalog/presentation/exercise_list_screen.dart';
 import '../../../core/utils/formatting.dart';
+import '../../muscle/domain/recovery_estimate.dart';
+import '../../muscle/presentation/human_muscle_map.dart';
+import '../../muscle/presentation/muscle_map_color_scale.dart';
 import '../../profile/presentation/profile_controller.dart';
 import '../../workout/presentation/session_providers.dart';
 
@@ -141,9 +144,96 @@ class HomeScreen extends ConsumerWidget {
                       ),
                     ),
             ),
+            const SizedBox(height: 24),
+
+            Text('Estimated Recovery',
+                style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 4),
+            Text('Based on your recent logged workouts.',
+                style: Theme.of(context).textTheme.bodySmall),
+            const SizedBox(height: 8),
+            const _RecoveryCard(),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _RecoveryCard extends ConsumerWidget {
+  const _RecoveryCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final recovery = ref.watch(recoveryByMuscleProvider);
+    return recovery.when(
+      loading: () => const Card(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      ),
+      error: (e, _) => Card(
+        child: Padding(padding: const EdgeInsets.all(16), child: Text('$e')),
+      ),
+      data: (map) {
+        final trained =
+            map.values.where((r) => r.lastTrainedAt != null).toList();
+        if (trained.isEmpty) {
+          return const Card(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Text('Complete a workout to see recovery estimates.'),
+            ),
+          );
+        }
+        final recent =
+            trained.where((r) => r.daysSinceLastTrained <= 7).toList();
+        final pool = recent.isEmpty ? trained : recent;
+        final overall =
+            (pool.fold<double>(0, (s, r) => s + r.recoveryPercent) / pool.length)
+                .round();
+        final mostFatigued = pool
+            .reduce((a, b) => a.recoveryPercent <= b.recoveryPercent ? a : b);
+        const estimate = RecoveryEstimate();
+        final ready = RecoveryEstimate.label(
+            estimate.timeToRecovered(mostFatigued));
+
+        return Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text('Overall: $overall%',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold)),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: () => context.push('/recovery'),
+                      child: const Text('View details'),
+                    ),
+                  ],
+                ),
+                Text(
+                    'Most fatigued: ${mostFatigued.muscle.label} • Estimated ready in: $ready'),
+                const SizedBox(height: 12),
+                HumanMuscleMap(
+                  mode: MuscleMapMode.recovery,
+                  height: 220,
+                  scores: {
+                    for (final r in map.values) r.muscle: r.recoveryPercent,
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
