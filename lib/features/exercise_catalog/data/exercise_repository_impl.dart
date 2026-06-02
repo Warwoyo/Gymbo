@@ -142,7 +142,7 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
           ExercisesCompanion.insert(
             id: _uuid.v4(),
             name: s.name,
-            dayType: Value(s.dayType),
+            dayType: Value(s.dayType ?? DayType.push),
             primaryMuscleGroup: s.primaryMuscleGroup,
             secondaryMuscleGroups:
                 Value(_encodeList(s.secondaryMuscleGroups)),
@@ -219,7 +219,7 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
           ExercisesCompanion.insert(
             id: exercise.id,
             name: exercise.name,
-            dayType: Value(exercise.dayType),
+            dayType: Value(exercise.dayType ?? DayType.push),
             primaryMuscleGroup: exercise.primaryMuscleGroup,
             secondaryMuscleGroups:
                 Value(_encodeList(exercise.secondaryMuscleGroups)),

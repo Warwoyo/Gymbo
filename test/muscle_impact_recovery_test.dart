@@ -36,7 +36,7 @@ void main() {
       );
 
   test('bench press impact makes chest primary highest and normalized to 100', () {
-    final bench = exercise('Dumbbell Bench Press', const [
+    final bench = exercise('Dumbbell Bench Press', [
       MuscleTarget(muscle: MuscleGroup.chest, role: MuscleRole.primary),
       MuscleTarget(muscle: MuscleGroup.shoulders, role: MuscleRole.secondary),
       MuscleTarget(muscle: MuscleGroup.triceps, role: MuscleRole.secondary),
@@ -52,7 +52,7 @@ void main() {
   });
 
   test('machine row impact makes back highest with biceps and traps secondary', () {
-    final row = exercise('Machine Row', const [
+    final row = exercise('Machine Row', [
       MuscleTarget(muscle: MuscleGroup.back, role: MuscleRole.primary),
       MuscleTarget(muscle: MuscleGroup.biceps, role: MuscleRole.secondary),
       MuscleTarget(muscle: MuscleGroup.traps, role: MuscleRole.secondary),
@@ -67,7 +67,7 @@ void main() {
   });
 
   test('warmup discount contributes less than working set', () {
-    final bench = exercise('Bench', const [
+    final bench = exercise('Bench', [
       MuscleTarget(muscle: MuscleGroup.chest, role: MuscleRole.primary),
     ]);
     final warm = const MuscleImpactCalculator().calculate([

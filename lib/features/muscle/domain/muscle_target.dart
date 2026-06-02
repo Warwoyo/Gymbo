@@ -1,7 +1,7 @@
 import '../../../core/enums.dart';
 
 class MuscleTarget {
-  const MuscleTarget({
+  MuscleTarget({
     required this.muscle,
     required this.role,
     double? contribution,

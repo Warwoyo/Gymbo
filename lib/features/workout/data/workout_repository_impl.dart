@@ -109,7 +109,7 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
           WorkoutSessionsCompanion.insert(
             id: session.id,
             userProfileId: session.userProfileId,
-            dayType: Value(session.dayType),
+            dayType: Value(session.dayType ?? DayType.push),
             tags: Value(_encodeList(session.tags)),
             startedAt: session.startedAt,
             lastActivityAt: session.lastActivityAt,
@@ -503,6 +503,72 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
       if (e > best) best = e;
     }
     return best;
+  }
+
+  @override
+  Future<List<MuscleImpact>> getMuscleImpacts(String sessionId) async {
+    final rows = await (_db.select(_db.workoutMuscleImpacts)
+          ..where((t) => t.sessionId.equals(sessionId)))
+        .get();
+    return rows
+        .map((r) => MuscleImpact(
+              muscle: r.muscleGroup,
+              rawScore: r.rawScore,
+              normalizedScore: r.normalizedScore,
+              workingSets: r.workingSets,
+              volume: r.volume,
+              strongestRole: r.strongestRole,
+            ))
+        .toList(growable: false);
+  }
+
+  @override
+  Future<List<MuscleRegionImpact>> getRegionImpacts(String sessionId) async {
+    final rows = await (_db.select(_db.workoutRegionImpacts)
+          ..where((t) => t.sessionId.equals(sessionId)))
+        .get();
+    return rows
+        .map((r) => MuscleRegionImpact(
+              region: r.region,
+              rawScore: r.rawScore,
+              normalizedScore: r.normalizedScore,
+            ))
+        .toList(growable: false);
+  }
+
+  @override
+  Future<Map<MuscleGroup, MuscleRecoveryState>> getRecoveryByMuscle(
+    String userProfileId, {
+    DateTime? now,
+  }) async {
+    final asOf = now ?? DateTime.now();
+    final sessions = await listHistory(userProfileId);
+    final byMuscle = <MuscleGroup, List<WorkoutImpactContribution>>{};
+
+    for (final session in sessions) {
+      final endedAt = session.endedAt;
+      if (endedAt == null) continue;
+      final impacts = await getMuscleImpacts(session.id);
+      for (final impact in impacts) {
+        byMuscle.putIfAbsent(impact.muscle, () => []).add(
+              WorkoutImpactContribution(
+                workoutSessionId: session.id,
+                workoutEndedAt: endedAt,
+                impact: impact,
+              ),
+            );
+      }
+    }
+
+    const calculator = RecoveryCalculator();
+    return {
+      for (final muscle in MuscleGroup.values)
+        muscle: calculator.calculateMuscle(
+          muscle: muscle,
+          now: asOf,
+          impacts: byMuscle[muscle] ?? const [],
+        ),
+    };
   }
 
   // ----------------------------- History -----------------------------
