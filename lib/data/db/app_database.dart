@@ -44,7 +44,8 @@ class UserProfiles extends Table {
 class Exercises extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
-  TextColumn get dayType => textEnum<DayType>()();
+  TextColumn get dayType => textEnum<DayType>().nullable()();
+  TextColumn get tags => text().withDefault(const Constant(''))();
   TextColumn get primaryMuscleGroup => text()();
   TextColumn get secondaryMuscleGroups => text().withDefault(const Constant(''))();
   TextColumn get movementPattern => text().withDefault(const Constant(''))();
@@ -71,7 +72,9 @@ class Exercises extends Table {
 class WorkoutSessions extends Table {
   TextColumn get id => text()();
   TextColumn get userProfileId => text()();
-  TextColumn get dayType => textEnum<DayType>()();
+  TextColumn get dayType => textEnum<DayType>().nullable()();
+  TextColumn get sessionName => text().nullable()();
+  TextColumn get tags => text().withDefault(const Constant(''))();
   DateTimeColumn get startedAt => dateTime()();
   DateTimeColumn get endedAt => dateTime().nullable()();
   DateTimeColumn get lastActivityAt => dateTime()();
@@ -142,6 +145,47 @@ class RestTimerStates extends Table {
   Set<Column> get primaryKey => {sessionId};
 }
 
+
+
+@DataClassName('ExerciseMuscleTargetRow')
+class ExerciseMuscleTargets extends Table {
+  TextColumn get id => text()();
+  TextColumn get exerciseId => text()();
+  TextColumn get muscleGroup => textEnum<MuscleGroup>()();
+  TextColumn get role => textEnum<MuscleRole>()();
+  RealColumn get contribution => real()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DataClassName('WorkoutMuscleImpactRow')
+class WorkoutMuscleImpacts extends Table {
+  TextColumn get id => text()();
+  TextColumn get sessionId => text()();
+  TextColumn get muscleGroup => textEnum<MuscleGroup>()();
+  RealColumn get rawScore => real()();
+  RealColumn get normalizedScore => real()();
+  IntColumn get workingSets => integer()();
+  RealColumn get volume => real()();
+  TextColumn get strongestRole => textEnum<MuscleRole>()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DataClassName('WorkoutRegionImpactRow')
+class WorkoutRegionImpacts extends Table {
+  TextColumn get id => text()();
+  TextColumn get sessionId => text()();
+  TextColumn get region => textEnum<MuscleRegion>()();
+  RealColumn get rawScore => real()();
+  RealColumn get normalizedScore => real()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 // ----------------------------- Database -----------------------------
 
 @DriftDatabase(tables: [
@@ -151,6 +195,9 @@ class RestTimerStates extends Table {
   WorkoutExercises,
   WorkoutSets,
   RestTimerStates,
+  ExerciseMuscleTargets,
+  WorkoutMuscleImpacts,
+  WorkoutRegionImpacts,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -159,7 +206,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -195,6 +242,14 @@ class AppDatabase extends _$AppDatabase {
             await m.addColumn(workoutSets, workoutSets.startedAt);
             await m.addColumn(workoutSets, workoutSets.completedAt);
             await m.createTable(restTimerStates);
+          }
+          if (from < 3) {
+            await m.addColumn(exercises, exercises.tags);
+            await m.addColumn(workoutSessions, workoutSessions.sessionName);
+            await m.addColumn(workoutSessions, workoutSessions.tags);
+            await m.createTable(exerciseMuscleTargets);
+            await m.createTable(workoutMuscleImpacts);
+            await m.createTable(workoutRegionImpacts);
           }
         },
       );

@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/providers.dart';
 import '../../profile/presentation/profile_controller.dart';
+import '../../../core/enums.dart';
+import '../../muscle/domain/muscle_recovery.dart';
 import '../domain/workout_repository.dart';
 import '../domain/workout_session.dart';
 import '../domain/workout_summary.dart';
@@ -42,4 +44,12 @@ final exerciseProgressProvider = FutureProvider.autoDispose
         userProfileId: profile.id,
         exerciseId: args.exerciseId,
       );
+});
+
+
+final recoveryByMuscleProvider =
+    FutureProvider.autoDispose<Map<MuscleGroup, MuscleRecoveryState>>((ref) async {
+  final profile = await ref.watch(activeProfileProvider.future);
+  if (profile == null) return const {};
+  return ref.watch(workoutRepositoryProvider).getRecoveryByMuscle(profile.id);
 });

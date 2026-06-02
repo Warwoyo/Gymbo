@@ -1,8 +1,16 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/enums.dart';
 import '../../../data/db/app_database.dart';
+import '../../muscle/domain/muscle_impact.dart';
+import '../../muscle/domain/muscle_impact_calculator.dart';
+import '../../muscle/domain/muscle_recovery.dart';
+import '../../exercise_catalog/domain/exercise.dart';
+import '../../muscle/domain/muscle_target.dart';
+import '../../muscle/domain/recovery_calculator.dart';
 import '../../recommendations/domain/evidence_recommendation_engine.dart';
 import '../domain/auto_end.dart';
 import '../domain/persisted_rest_timer.dart';
@@ -18,6 +26,18 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
   final AppDatabase _db;
   static const _uuid = Uuid();
 
+  static List<String> _decodeList(String raw) {
+    if (raw.isEmpty) return const [];
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is List) return decoded.map((e) => e.toString()).toList();
+    } catch (_) {}
+    return const [];
+  }
+
+  static String _encodeList(List<String> values) =>
+      values.isEmpty ? '' : jsonEncode(values);
+
   // ----------------------------- Mappers -----------------------------
 
   WorkoutSession _mapSession(WorkoutSessionRow r) => WorkoutSession(
@@ -28,6 +48,8 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
         endedAt: r.endedAt,
         lastActivityAt: r.lastActivityAt,
         status: r.status,
+        sessionName: r.sessionName,
+        tags: _decodeList(r.tags),
         notes: r.notes,
         createdAt: r.createdAt,
         updatedAt: r.updatedAt,
@@ -68,13 +90,15 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
   @override
   Future<WorkoutSession> startSession({
     required String userProfileId,
-    required DayType dayType,
+    DayType? dayType,
+    List<String> tags = const [],
   }) async {
     final now = DateTime.now();
     final session = WorkoutSession(
       id: _uuid.v4(),
       userProfileId: userProfileId,
       dayType: dayType,
+      tags: tags,
       startedAt: now,
       lastActivityAt: now,
       status: WorkoutSessionStatus.active,
@@ -85,7 +109,8 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
           WorkoutSessionsCompanion.insert(
             id: session.id,
             userProfileId: session.userProfileId,
-            dayType: session.dayType,
+            dayType: Value(session.dayType),
+            tags: Value(_encodeList(session.tags)),
             startedAt: session.startedAt,
             lastActivityAt: session.lastActivityAt,
             status: session.status,
@@ -156,7 +181,59 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
       status: const Value(WorkoutSessionStatus.completed),
       updatedAt: Value(now),
     ));
+    await _calculateAndStoreImpacts(sessionId);
     return (await getSession(sessionId))!;
+  }
+
+  Future<void> _calculateAndStoreImpacts(String sessionId) async {
+    final workoutExercises = await getSessionExercises(sessionId);
+    final inputs = <ExerciseSetInput>[];
+    for (final we in workoutExercises) {
+      final exRow = await (_db.select(_db.exercises)
+            ..where((t) => t.id.equals(we.exerciseId)))
+          .getSingleOrNull();
+      if (exRow == null) continue;
+      final targetRows = await (_db.select(_db.exerciseMuscleTargets)
+            ..where((t) => t.exerciseId.equals(we.exerciseId)))
+          .get();
+      final exercise = _exerciseFromRow(exRow, targetRows);
+      final sets = await getSets(we.id);
+      inputs.add(ExerciseSetInput(exercise: exercise, sets: sets));
+    }
+    final calc = const MuscleImpactCalculator();
+    final impacts = calc.calculate(inputs);
+    final regions = calc.aggregateRegions(impacts);
+    await (_db.delete(_db.workoutMuscleImpacts)
+          ..where((t) => t.sessionId.equals(sessionId)))
+        .go();
+    await (_db.delete(_db.workoutRegionImpacts)
+          ..where((t) => t.sessionId.equals(sessionId)))
+        .go();
+    for (final impact in impacts) {
+      await _db.into(_db.workoutMuscleImpacts).insert(
+            WorkoutMuscleImpactsCompanion.insert(
+              id: _uuid.v4(),
+              sessionId: sessionId,
+              muscleGroup: impact.muscle,
+              rawScore: impact.rawScore,
+              normalizedScore: impact.normalizedScore,
+              workingSets: impact.workingSets,
+              volume: impact.volume,
+              strongestRole: impact.strongestRole,
+            ),
+          );
+    }
+    for (final region in regions) {
+      await _db.into(_db.workoutRegionImpacts).insert(
+            WorkoutRegionImpactsCompanion.insert(
+              id: _uuid.v4(),
+              sessionId: sessionId,
+              region: region.region,
+              rawScore: region.rawScore,
+              normalizedScore: region.normalizedScore,
+            ),
+          );
+    }
   }
 
   @override
@@ -346,7 +423,49 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
       ));
     }
 
-    return WorkoutSummary(session: session, exercises: exerciseSummaries);
+    return WorkoutSummary(
+      session: session,
+      exercises: exerciseSummaries,
+      muscleImpacts: await getMuscleImpacts(sessionId),
+      regionImpacts: await getRegionImpacts(sessionId),
+    );
+  }
+
+
+  Exercise _exerciseFromRow(
+    ExerciseRow row,
+    List<ExerciseMuscleTargetRow> targets,
+  ) {
+    return Exercise(
+      id: row.id,
+      name: row.name,
+      dayType: row.dayType,
+      primaryMuscleGroup: row.primaryMuscleGroup,
+      secondaryMuscleGroups: _decodeList(row.secondaryMuscleGroups),
+      tags: _decodeList(row.tags),
+      muscleTargets: targets
+          .map((t) => MuscleTarget(
+                muscle: t.muscleGroup,
+                role: t.role,
+                contribution: t.contribution,
+              ))
+          .toList(growable: false),
+      movementPattern: row.movementPattern,
+      equipmentType: row.equipmentType,
+      exerciseCategory: row.exerciseCategory ?? ExerciseCategory.compoundUpper,
+      isBodyweight: row.isBodyweight,
+      isUnilateral: row.isUnilateral,
+      defaultIncrementKg: row.defaultIncrementKg,
+      minimumRecommendedReps: row.minimumRecommendedReps,
+      maximumRecommendedReps: row.maximumRecommendedReps,
+      defaultRestSeconds: row.defaultRestSeconds,
+      recommendedSetRangeMin: row.recommendedSetRangeMin,
+      recommendedSetRangeMax: row.recommendedSetRangeMax,
+      notes: row.notes,
+      isCustom: row.isCustom,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+    );
   }
 
   Future<String> _exerciseName(String exerciseId) async {

@@ -221,3 +221,161 @@ enum WorkoutSessionStatus {
     }
   }
 }
+
+/// Standardized primary muscle groups used for impact and recovery heuristics.
+enum MuscleGroup {
+  chest,
+  back,
+  shoulders,
+  biceps,
+  triceps,
+  forearms,
+  abs,
+  obliques,
+  quads,
+  hamstrings,
+  glutes,
+  calves,
+  traps,
+  lowerBack,
+  hipAdductors,
+  hipAbductors;
+
+  String get label {
+    switch (this) {
+      case MuscleGroup.chest:
+        return 'Chest';
+      case MuscleGroup.back:
+        return 'Back';
+      case MuscleGroup.shoulders:
+        return 'Shoulders';
+      case MuscleGroup.biceps:
+        return 'Biceps';
+      case MuscleGroup.triceps:
+        return 'Triceps';
+      case MuscleGroup.forearms:
+        return 'Forearms';
+      case MuscleGroup.abs:
+        return 'Abs';
+      case MuscleGroup.obliques:
+        return 'Obliques';
+      case MuscleGroup.quads:
+        return 'Quads';
+      case MuscleGroup.hamstrings:
+        return 'Hamstrings';
+      case MuscleGroup.glutes:
+        return 'Glutes';
+      case MuscleGroup.calves:
+        return 'Calves';
+      case MuscleGroup.traps:
+        return 'Traps';
+      case MuscleGroup.lowerBack:
+        return 'Lower back';
+      case MuscleGroup.hipAdductors:
+        return 'Hip adductors';
+      case MuscleGroup.hipAbductors:
+        return 'Hip abductors';
+    }
+  }
+}
+
+enum MuscleRegion {
+  chest,
+  back,
+  shoulders,
+  arms,
+  core,
+  legs;
+
+  String get label {
+    switch (this) {
+      case MuscleRegion.chest:
+        return 'Chest';
+      case MuscleRegion.back:
+        return 'Back';
+      case MuscleRegion.shoulders:
+        return 'Shoulders';
+      case MuscleRegion.arms:
+        return 'Arms';
+      case MuscleRegion.core:
+        return 'Core';
+      case MuscleRegion.legs:
+        return 'Legs';
+    }
+  }
+}
+
+enum MuscleRole {
+  primary,
+  secondary,
+  stabilizer;
+
+  String get label {
+    switch (this) {
+      case MuscleRole.primary:
+        return 'Primary';
+      case MuscleRole.secondary:
+        return 'Secondary';
+      case MuscleRole.stabilizer:
+        return 'Stabilizer';
+    }
+  }
+
+  double get defaultContribution {
+    switch (this) {
+      case MuscleRole.primary:
+        return 1.0;
+      case MuscleRole.secondary:
+        return 0.5;
+      case MuscleRole.stabilizer:
+        return 0.25;
+    }
+  }
+}
+
+enum RecoveryLevel {
+  recovered,
+  lightFatigue,
+  moderateFatigue,
+  fatigued;
+
+  String get label {
+    switch (this) {
+      case RecoveryLevel.recovered:
+        return 'Recovered';
+      case RecoveryLevel.lightFatigue:
+        return 'Light fatigue';
+      case RecoveryLevel.moderateFatigue:
+        return 'Moderate fatigue';
+      case RecoveryLevel.fatigued:
+        return 'Fatigued';
+    }
+  }
+}
+
+MuscleRegion regionForMuscle(MuscleGroup muscle) {
+  switch (muscle) {
+    case MuscleGroup.chest:
+      return MuscleRegion.chest;
+    case MuscleGroup.back:
+    case MuscleGroup.traps:
+    case MuscleGroup.lowerBack:
+      return MuscleRegion.back;
+    case MuscleGroup.shoulders:
+      return MuscleRegion.shoulders;
+    case MuscleGroup.biceps:
+    case MuscleGroup.triceps:
+    case MuscleGroup.forearms:
+      return MuscleRegion.arms;
+    case MuscleGroup.abs:
+    case MuscleGroup.obliques:
+      return MuscleRegion.core;
+    case MuscleGroup.quads:
+    case MuscleGroup.hamstrings:
+    case MuscleGroup.glutes:
+    case MuscleGroup.calves:
+    case MuscleGroup.hipAdductors:
+    case MuscleGroup.hipAbductors:
+      return MuscleRegion.legs;
+  }
+}

@@ -1,4 +1,5 @@
 import '../../../core/enums.dart';
+import '../../muscle/domain/muscle_target.dart';
 import '../../recommendations/domain/category_defaults.dart';
 
 /// A catalog exercise. Seeded generically and extensible by the user.
@@ -6,9 +7,11 @@ class Exercise {
   const Exercise({
     required this.id,
     required this.name,
-    required this.dayType,
+    this.dayType,
     required this.primaryMuscleGroup,
     this.secondaryMuscleGroups = const [],
+    this.tags = const [],
+    this.muscleTargets = const [],
     required this.movementPattern,
     required this.equipmentType,
     required this.exerciseCategory,
@@ -28,9 +31,11 @@ class Exercise {
 
   final String id;
   final String name;
-  final DayType dayType;
+  final DayType? dayType;
   final String primaryMuscleGroup;
   final List<String> secondaryMuscleGroups;
+  final List<String> tags;
+  final List<MuscleTarget> muscleTargets;
   final String movementPattern;
   final EquipmentType equipmentType;
   final ExerciseCategory exerciseCategory;

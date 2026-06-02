@@ -28,7 +28,7 @@ class HistoryScreen extends ConsumerWidget {
                   return Card(
                     child: ListTile(
                       leading: const Icon(Icons.event_available),
-                      title: Text(s.dayType.label),
+                      title: Text(s.sessionName ?? s.dayType?.label ?? 'Workout'),
                       subtitle: Text(
                         '${Format.dateTime(s.startedAt)} • ${Format.duration(s.duration)}'
                         '${s.status.isFinished && s.status.name == "autoCompleted" ? ' • auto-ended' : ''}',

@@ -9,9 +9,10 @@ class StartWorkoutSession {
   final WorkoutRepository _repo;
   Future<WorkoutSession> call({
     required String userProfileId,
-    required DayType dayType,
+    DayType? dayType,
+    List<String> tags = const [],
   }) =>
-      _repo.startSession(userProfileId: userProfileId, dayType: dayType);
+      _repo.startSession(userProfileId: userProfileId, dayType: dayType, tags: tags);
 }
 
 class GetActiveWorkoutSession {

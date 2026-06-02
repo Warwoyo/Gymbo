@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../core/enums.dart';
 import '../../../data/db/app_database.dart';
+import '../../muscle/domain/muscle_target.dart';
 import '../domain/exercise.dart';
 import '../domain/exercise_repository.dart';
 import 'seed_exercises.dart';
@@ -21,6 +22,8 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
         dayType: row.dayType,
         primaryMuscleGroup: row.primaryMuscleGroup,
         secondaryMuscleGroups: _decodeList(row.secondaryMuscleGroups),
+        tags: _decodeList(row.tags),
+        muscleTargets: const [],
         movementPattern: row.movementPattern,
         equipmentType: row.equipmentType,
         exerciseCategory:
@@ -38,6 +41,50 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
       );
+
+
+
+  Future<Exercise> _mapWithTargets(ExerciseRow row) async {
+    final base = _map(row);
+    final targets = await getTargets(base.id);
+    return Exercise(
+      id: base.id,
+      name: base.name,
+      dayType: base.dayType,
+      primaryMuscleGroup: base.primaryMuscleGroup,
+      secondaryMuscleGroups: base.secondaryMuscleGroups,
+      tags: base.tags,
+      muscleTargets: targets,
+      movementPattern: base.movementPattern,
+      equipmentType: base.equipmentType,
+      exerciseCategory: base.exerciseCategory,
+      isBodyweight: base.isBodyweight,
+      isUnilateral: base.isUnilateral,
+      defaultIncrementKg: base.defaultIncrementKg,
+      minimumRecommendedReps: base.minimumRecommendedReps,
+      maximumRecommendedReps: base.maximumRecommendedReps,
+      defaultRestSeconds: base.defaultRestSeconds,
+      recommendedSetRangeMin: base.recommendedSetRangeMin,
+      recommendedSetRangeMax: base.recommendedSetRangeMax,
+      notes: base.notes,
+      isCustom: base.isCustom,
+      createdAt: base.createdAt,
+      updatedAt: base.updatedAt,
+    );
+  }
+
+  Future<List<MuscleTarget>> getTargets(String exerciseId) async {
+    final rows = await (_db.select(_db.exerciseMuscleTargets)
+          ..where((t) => t.exerciseId.equals(exerciseId)))
+        .get();
+    return rows
+        .map((r) => MuscleTarget(
+              muscle: r.muscleGroup,
+              role: r.role,
+              contribution: r.contribution,
+            ))
+        .toList(growable: false);
+  }
 
   /// Fallback category for legacy rows migrated without one.
   static ExerciseCategory _deriveCategory(EquipmentType eq) {
@@ -83,7 +130,10 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
 
   @override
   Future<void> seedIfEmpty() async {
-    if (await count() > 0) return;
+    if (await count() > 0) {
+      await _seedMissingMuscleTargets();
+      return;
+    }
     final now = DateTime.now();
     await _db.batch((b) {
       for (final s in kSeedExercises) {
@@ -92,7 +142,7 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
           ExercisesCompanion.insert(
             id: _uuid.v4(),
             name: s.name,
-            dayType: s.dayType,
+            dayType: Value(s.dayType),
             primaryMuscleGroup: s.primaryMuscleGroup,
             secondaryMuscleGroups:
                 Value(_encodeList(s.secondaryMuscleGroups)),
@@ -102,6 +152,7 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
             isBodyweight: Value(s.isBodyweight),
             isUnilateral: Value(s.isUnilateral),
             defaultIncrementKg: Value(s.defaultIncrementKg),
+            tags: Value(_encodeList(tagsForSeed(s))),
             notes: Value(s.notes),
             isCustom: const Value(false),
             createdAt: now,
@@ -110,6 +161,31 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
         );
       }
     });
+    await _seedMissingMuscleTargets();
+  }
+
+  Future<void> _seedMissingMuscleTargets() async {
+    for (final seed in kSeedExercises) {
+      final row = await (_db.select(_db.exercises)
+            ..where((t) => t.name.equals(seed.name)))
+          .getSingleOrNull();
+      if (row == null) continue;
+      final existing = await (_db.select(_db.exerciseMuscleTargets)
+            ..where((t) => t.exerciseId.equals(row.id)))
+          .get();
+      if (existing.isNotEmpty) continue;
+      for (final target in muscleTargetsForSeed(seed)) {
+        await _db.into(_db.exerciseMuscleTargets).insert(
+              ExerciseMuscleTargetsCompanion.insert(
+                id: _uuid.v4(),
+                exerciseId: row.id,
+                muscleGroup: target.muscle,
+                role: target.role,
+                contribution: target.contribution,
+              ),
+            );
+      }
+    }
   }
 
   @override
@@ -118,7 +194,15 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
           ..where((t) => t.dayType.equalsValue(dayType))
           ..orderBy([(t) => OrderingTerm(expression: t.name)]))
         .get();
-    return rows.map(_map).toList();
+    return Future.wait(rows.map(_mapWithTargets));
+  }
+
+  @override
+  Future<List<Exercise>> listAll() async {
+    final rows = await (_db.select(_db.exercises)
+          ..orderBy([(t) => OrderingTerm(expression: t.name)]))
+        .get();
+    return Future.wait(rows.map(_mapWithTargets));
   }
 
   @override
@@ -126,7 +210,7 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
     final row = await (_db.select(_db.exercises)
           ..where((t) => t.id.equals(id)))
         .getSingleOrNull();
-    return row == null ? null : _map(row);
+    return row == null ? null : _mapWithTargets(row);
   }
 
   @override
@@ -135,10 +219,11 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
           ExercisesCompanion.insert(
             id: exercise.id,
             name: exercise.name,
-            dayType: exercise.dayType,
+            dayType: Value(exercise.dayType),
             primaryMuscleGroup: exercise.primaryMuscleGroup,
             secondaryMuscleGroups:
                 Value(_encodeList(exercise.secondaryMuscleGroups)),
+            tags: Value(_encodeList(exercise.tags)),
             movementPattern: Value(exercise.movementPattern),
             equipmentType: exercise.equipmentType,
             exerciseCategory: Value(exercise.exerciseCategory),
@@ -156,6 +241,20 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
             updatedAt: exercise.updatedAt,
           ),
         );
+    await (_db.delete(_db.exerciseMuscleTargets)
+          ..where((t) => t.exerciseId.equals(exercise.id)))
+        .go();
+    for (final target in exercise.muscleTargets) {
+      await _db.into(_db.exerciseMuscleTargets).insert(
+            ExerciseMuscleTargetsCompanion.insert(
+              id: _uuid.v4(),
+              exerciseId: exercise.id,
+              muscleGroup: target.muscle,
+              role: target.role,
+              contribution: target.contribution,
+            ),
+          );
+    }
     return exercise;
   }
 }
