@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/enums.dart';
 import '../../../core/utils/formatting.dart';
+import '../../muscle/presentation/human_muscle_map.dart';
+import '../../muscle/presentation/muscle_map_color_scale.dart';
 import '../domain/workout_summary.dart';
 import 'session_providers.dart';
 
@@ -107,7 +109,16 @@ class _MuscleImpactCard extends StatelessWidget {
             Text('Muscle Impact', style: TextStyle(fontWeight: FontWeight.bold)),
           ]),
           const SizedBox(height: 6),
-          Text('Heuristic training impact based on logged sets.'),
+          const Text(
+              'Estimated from logged sets, exercise muscle targets, volume and effort.'),
+          const SizedBox(height: 12),
+          HumanMuscleMap(
+            mode: MuscleMapMode.workoutImpact,
+            scores: {
+              for (final m in summary.muscleImpacts)
+                m.muscle: m.normalizedScore,
+            },
+          ),
           const SizedBox(height: 12),
           for (final impact in summary.muscleImpacts.take(8)) ...[
             Row(children: [

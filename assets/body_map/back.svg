@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 340" width="200" height="340">
+  <!-- Placeholder back body map. Same id contract as front.svg. -->
+  <g fill="#303030" stroke="#555555" stroke-width="1.2">
+    <ellipse id="head_back" cx="100" cy="26" rx="17" ry="21"/>
+    <rect id="traps" x="80" y="50" width="40" height="22" rx="6"/>
+    <ellipse id="rear_delt_left" cx="62" cy="74" rx="15" ry="13"/>
+    <ellipse id="rear_delt_right" cx="138" cy="74" rx="15" ry="13"/>
+    <rect id="upper_back" x="80" y="74" width="40" height="26" rx="6"/>
+    <rect id="lats_left" x="74" y="100" width="20" height="36" rx="6"/>
+    <rect id="lats_right" x="106" y="100" width="20" height="36" rx="6"/>
+    <ellipse id="triceps_left" cx="52" cy="108" rx="10" ry="20"/>
+    <ellipse id="triceps_right" cx="148" cy="108" rx="10" ry="20"/>
+    <ellipse id="forearm_back_left" cx="44" cy="150" rx="9" ry="22"/>
+    <ellipse id="forearm_back_right" cx="156" cy="150" rx="9" ry="22"/>
+    <rect id="lower_back" x="84" y="138" width="32" height="22" rx="5"/>
+    <ellipse id="glutes_left" cx="90" cy="176" rx="15" ry="15"/>
+    <ellipse id="glutes_right" cx="110" cy="176" rx="15" ry="15"/>
+    <rect id="hamstrings_left" x="80" y="192" width="18" height="56" rx="8"/>
+    <rect id="hamstrings_right" x="102" y="192" width="18" height="56" rx="8"/>
+    <rect id="calves_left" x="82" y="252" width="15" height="52" rx="7"/>
+    <rect id="calves_right" x="103" y="252" width="15" height="52" rx="7"/>
+  </g>
+</svg>
