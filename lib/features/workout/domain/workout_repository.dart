@@ -1,4 +1,6 @@
 import '../../../core/enums.dart';
+import '../../muscle/domain/muscle_impact.dart';
+import '../../muscle/domain/muscle_recovery.dart';
 import 'persisted_rest_timer.dart';
 import 'workout_exercise.dart';
 import 'workout_session.dart';
@@ -25,7 +27,8 @@ class ExerciseProgressPoint {
 abstract class WorkoutRepository {
   Future<WorkoutSession> startSession({
     required String userProfileId,
-    required DayType dayType,
+    DayType? dayType,
+    List<String> tags = const [],
   });
 
   Future<WorkoutSession?> getActiveSession(String userProfileId);
@@ -50,6 +53,9 @@ abstract class WorkoutRepository {
   Future<List<WorkoutSet>> getSets(String workoutExerciseId);
 
   Future<WorkoutSummary> getSummary(String sessionId);
+  Future<List<MuscleImpact>> getMuscleImpacts(String sessionId);
+  Future<List<MuscleRegionImpact>> getRegionImpacts(String sessionId);
+  Future<Map<MuscleGroup, MuscleRecoveryState>> getRecoveryByMuscle(String userProfileId, {DateTime? now});
   Future<List<WorkoutSession>> listHistory(String userProfileId);
   Future<WorkoutSession?> lastFinishedSession(String userProfileId);
 

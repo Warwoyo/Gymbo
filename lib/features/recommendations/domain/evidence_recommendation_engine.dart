@@ -66,6 +66,7 @@ class RecommendationContext {
     required this.currentSet,
     this.previousWorkingSets = const [],
     this.style = RecommendationStyle.balanced,
+    this.primaryMuscleRecoveryPercent,
   });
 
   final ExerciseCategory category;
@@ -77,6 +78,9 @@ class RecommendationContext {
   /// in chronological order (warm-ups excluded).
   final List<LoggedSetInput> previousWorkingSets;
   final RecommendationStyle style;
+
+  /// Lowest estimated recovery percent across primary target muscles, if known.
+  final double? primaryMuscleRecoveryPercent;
 }
 
 /// The engine's recommendation for the next set + set-count guidance.
@@ -179,6 +183,8 @@ class EvidenceRecommendationEngine {
     var repMax = effMax;
     final warnings = <String>[];
     String explanation;
+    final lowRecovery = ctx.primaryMuscleRecoveryPercent != null && ctx.primaryMuscleRecoveryPercent! < 35;
+    final moderateRecovery = ctx.primaryMuscleRecoveryPercent != null && ctx.primaryMuscleRecoveryPercent! >= 35 && ctx.primaryMuscleRecoveryPercent! < 60;
 
     if (drops >= 2) {
       label = RecommendationLabel.finishExercise;
@@ -270,6 +276,17 @@ class EvidenceRecommendationEngine {
     if (restKnown && !restAdequate && label != RecommendationLabel.restMore) {
       warnings.add('Rest was shorter than recommended for this category.');
     }
+    if (lowRecovery) {
+      if (label == RecommendationLabel.increaseLoad ||
+          label == RecommendationLabel.increaseDifficulty) {
+        label = RecommendationLabel.holdSteady;
+        recWeight = cur.weightKg;
+      }
+      warnings.add('Primary target muscles are estimated to be fatigued from recent workouts. Consider longer rest or lighter loading.');
+      explanation = 'Estimated recovery for a primary target muscle is low, so the app suggests avoiding an aggressive load jump today.';
+    } else if (moderateRecovery) {
+      warnings.add('Primary target muscles show moderate likely fatigue, so confidence is lower.');
+    }
 
     // Set-count guidance (Rule G).
     final completed =
@@ -283,11 +300,16 @@ class EvidenceRecommendationEngine {
 
     // Confidence.
     final hasEffort = cur.rpe != null || cur.rir != null;
-    final confidence = (hasEffort && restKnown)
+    final baseConfidence = (hasEffort && restKnown)
         ? RecommendationConfidence.high
         : (hasEffort || restKnown)
             ? RecommendationConfidence.medium
             : RecommendationConfidence.low;
+    final confidence = lowRecovery
+        ? RecommendationConfidence.low
+        : moderateRecovery && baseConfidence == RecommendationConfidence.high
+            ? RecommendationConfidence.medium
+            : baseConfidence;
 
     final restSeconds = label == RecommendationLabel.restMore
         ? spec.restMax

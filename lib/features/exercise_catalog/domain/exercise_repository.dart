@@ -5,6 +5,7 @@ abstract class ExerciseRepository {
   /// Seeds the generic catalog on first run (idempotent).
   Future<void> seedIfEmpty();
   Future<List<Exercise>> listByDayType(DayType dayType);
+  Future<List<Exercise>> listAll();
   Future<Exercise?> getById(String id);
   Future<Exercise> createCustom(Exercise exercise);
   Future<int> count();

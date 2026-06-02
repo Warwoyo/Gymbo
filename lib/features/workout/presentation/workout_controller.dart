@@ -11,6 +11,7 @@ import '../../recommendations/domain/evidence_recommendation_engine.dart';
 import '../domain/workout_exercise.dart';
 import '../domain/workout_repository.dart';
 import '../domain/workout_session.dart';
+import '../../muscle/domain/muscle_recovery.dart';
 import '../domain/workout_set.dart';
 import 'rest_timer_controller.dart';
 
@@ -194,7 +195,20 @@ class WorkoutController
       currentSet: current,
       previousWorkingSets: previous,
       style: _style,
+      primaryMuscleRecoveryPercent: _primaryRecoveryPercent(view.exercise),
     ));
+  }
+
+  double? _primaryRecoveryPercent(Exercise exercise) {
+    final recovery = ref.read(recoveryByMuscleProvider).valueOrNull ??
+        const <MuscleGroup, MuscleRecoveryState>{};
+    final primary = exercise.muscleTargets
+        .where((t) => t.role == MuscleRole.primary)
+        .map((t) => recovery[t.muscle]?.recoveryPercent)
+        .whereType<double>()
+        .toList();
+    if (primary.isEmpty) return null;
+    return primary.reduce((a, b) => a < b ? a : b);
   }
 
   LoggedSetInput _toInput(WorkoutSet s) => LoggedSetInput(
