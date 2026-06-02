@@ -1841,29 +1841,28 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
   }
 
   @override
-  int get hashCode => Object.hashAll([
-        id,
-        name,
-        dayType,
-        tags,
-        primaryMuscleGroup,
-        secondaryMuscleGroups,
-        movementPattern,
-        equipmentType,
-        exerciseCategory,
-        isBodyweight,
-        isUnilateral,
-        defaultIncrementKg,
-        minimumRecommendedReps,
-        maximumRecommendedReps,
-        defaultRestSeconds,
-        recommendedSetRangeMin,
-        recommendedSetRangeMax,
-        notes,
-        isCustom,
-        createdAt,
-        updatedAt,
-      ]);
+  int get hashCode => Object.hash(
+      id,
+      name,
+      dayType,
+      tags,
+      primaryMuscleGroup,
+      secondaryMuscleGroups,
+      movementPattern,
+      equipmentType,
+      exerciseCategory,
+      isBodyweight,
+      isUnilateral,
+      defaultIncrementKg,
+      minimumRecommendedReps,
+      maximumRecommendedReps,
+      defaultRestSeconds,
+      recommendedSetRangeMin,
+      recommendedSetRangeMax,
+      notes,
+      isCustom,
+      createdAt,
+      updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -4671,19 +4670,6 @@ class ExerciseMuscleTargetRow extends DataClass implements Insertable<ExerciseMu
     'role': Variable<String>($ExerciseMuscleTargetsTable.$converterrole.toSql(role)),
     'contribution': Variable<double>(contribution),
   };
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<String>(id),
-      'exerciseId': serializer.toJson<String>(exerciseId),
-      'muscleGroup': serializer.toJson<String>(
-          $ExerciseMuscleTargetsTable.$convertermuscleGroup.toJson(muscleGroup)),
-      'role': serializer.toJson<String>(
-          $ExerciseMuscleTargetsTable.$converterrole.toJson(role)),
-      'contribution': serializer.toJson<double>(contribution),
-    };
-  }
   ExerciseMuscleTargetsCompanion toCompanion(bool nullToAbsent) => ExerciseMuscleTargetsCompanion.insert(id: id, exerciseId: exerciseId, muscleGroup: muscleGroup, role: role, contribution: contribution);
 }
 
@@ -4735,44 +4721,7 @@ class $WorkoutMuscleImpactsTable extends WorkoutMuscleImpacts
   static JsonTypeConverter2<MuscleGroup, String, String> $convertermuscleGroup = const EnumNameConverter<MuscleGroup>(MuscleGroup.values);
   static JsonTypeConverter2<MuscleRole, String, String> $converterstrongestRole = const EnumNameConverter<MuscleRole>(MuscleRole.values);
 }
-class WorkoutMuscleImpactRow extends DataClass implements Insertable<WorkoutMuscleImpactRow> {
-  final String id;
-  final String sessionId;
-  final MuscleGroup muscleGroup;
-  final double rawScore;
-  final double normalizedScore;
-  final int workingSets;
-  final double volume;
-  final MuscleRole strongestRole;
-  const WorkoutMuscleImpactRow({required this.id, required this.sessionId, required this.muscleGroup, required this.rawScore, required this.normalizedScore, required this.workingSets, required this.volume, required this.strongestRole});
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) => {
-    'id': Variable<String>(id),
-    'session_id': Variable<String>(sessionId),
-    'muscle_group': Variable<String>($WorkoutMuscleImpactsTable.$convertermuscleGroup.toSql(muscleGroup)),
-    'raw_score': Variable<double>(rawScore),
-    'normalized_score': Variable<double>(normalizedScore),
-    'working_sets': Variable<int>(workingSets),
-    'volume': Variable<double>(volume),
-    'strongest_role': Variable<String>($WorkoutMuscleImpactsTable.$converterstrongestRole.toSql(strongestRole)),
-  };
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<String>(id),
-      'sessionId': serializer.toJson<String>(sessionId),
-      'muscleGroup': serializer.toJson<String>(
-          $WorkoutMuscleImpactsTable.$convertermuscleGroup.toJson(muscleGroup)),
-      'rawScore': serializer.toJson<double>(rawScore),
-      'normalizedScore': serializer.toJson<double>(normalizedScore),
-      'workingSets': serializer.toJson<int>(workingSets),
-      'volume': serializer.toJson<double>(volume),
-      'strongestRole': serializer.toJson<String>(
-          $WorkoutMuscleImpactsTable.$converterstrongestRole.toJson(strongestRole)),
-    };
-  }
-}
+class WorkoutMuscleImpactRow extends DataClass implements Insertable<WorkoutMuscleImpactRow> { final String id; final String sessionId; final MuscleGroup muscleGroup; final double rawScore; final double normalizedScore; final int workingSets; final double volume; final MuscleRole strongestRole; const WorkoutMuscleImpactRow({required this.id, required this.sessionId, required this.muscleGroup, required this.rawScore, required this.normalizedScore, required this.workingSets, required this.volume, required this.strongestRole}); @override Map<String, Expression> toColumns(bool nullToAbsent)=>{'id':Variable<String>(id),'session_id':Variable<String>(sessionId),'muscle_group':Variable<String>($WorkoutMuscleImpactsTable.$convertermuscleGroup.toSql(muscleGroup)),'raw_score':Variable<double>(rawScore),'normalized_score':Variable<double>(normalizedScore),'working_sets':Variable<int>(workingSets),'volume':Variable<double>(volume),'strongest_role':Variable<String>($WorkoutMuscleImpactsTable.$converterstrongestRole.toSql(strongestRole))}; }
 class WorkoutMuscleImpactsCompanion extends UpdateCompanion<WorkoutMuscleImpactRow> { final Value<String> id; final Value<String> sessionId; final Value<MuscleGroup> muscleGroup; final Value<double> rawScore; final Value<double> normalizedScore; final Value<int> workingSets; final Value<double> volume; final Value<MuscleRole> strongestRole; final Value<int> rowid; const WorkoutMuscleImpactsCompanion({this.id=const Value.absent(),this.sessionId=const Value.absent(),this.muscleGroup=const Value.absent(),this.rawScore=const Value.absent(),this.normalizedScore=const Value.absent(),this.workingSets=const Value.absent(),this.volume=const Value.absent(),this.strongestRole=const Value.absent(),this.rowid=const Value.absent()}); WorkoutMuscleImpactsCompanion.insert({required String id, required String sessionId, required MuscleGroup muscleGroup, required double rawScore, required double normalizedScore, required int workingSets, required double volume, required MuscleRole strongestRole, this.rowid=const Value.absent()}): id=Value(id), sessionId=Value(sessionId), muscleGroup=Value(muscleGroup), rawScore=Value(rawScore), normalizedScore=Value(normalizedScore), workingSets=Value(workingSets), volume=Value(volume), strongestRole=Value(strongestRole); @override Map<String, Expression> toColumns(bool nullToAbsent){final m=<String,Expression>{}; if(id.present)m['id']=Variable<String>(id.value); if(sessionId.present)m['session_id']=Variable<String>(sessionId.value); if(muscleGroup.present)m['muscle_group']=Variable<String>($WorkoutMuscleImpactsTable.$convertermuscleGroup.toSql(muscleGroup.value)); if(rawScore.present)m['raw_score']=Variable<double>(rawScore.value); if(normalizedScore.present)m['normalized_score']=Variable<double>(normalizedScore.value); if(workingSets.present)m['working_sets']=Variable<int>(workingSets.value); if(volume.present)m['volume']=Variable<double>(volume.value); if(strongestRole.present)m['strongest_role']=Variable<String>($WorkoutMuscleImpactsTable.$converterstrongestRole.toSql(strongestRole.value)); if(rowid.present)m['rowid']=Variable<int>(rowid.value); return m;}}
 
 class $WorkoutRegionImpactsTable extends WorkoutRegionImpacts
@@ -4786,34 +4735,7 @@ class $WorkoutRegionImpactsTable extends WorkoutRegionImpacts
   @override List<GeneratedColumn> get $columns=>[id,sessionId,region,rawScore,normalizedScore]; @override String get aliasedName=>_alias??actualTableName; @override String get actualTableName=>$name; static const String $name='workout_region_impacts'; @override String get tableName=>_alias??$name; @override Set<GeneratedColumn> get $primaryKey=>{id};
   @override WorkoutRegionImpactRow map(Map<String,dynamic> data,{String? tablePrefix}){final p=tablePrefix!=null?'$tablePrefix.':''; return WorkoutRegionImpactRow(id:attachedDatabase.typeMapping.read(DriftSqlType.string,data['${p}id'])!,sessionId:attachedDatabase.typeMapping.read(DriftSqlType.string,data['${p}session_id'])!,region:$WorkoutRegionImpactsTable.$converterregion.fromSql(attachedDatabase.typeMapping.read(DriftSqlType.string,data['${p}region'])!),rawScore:attachedDatabase.typeMapping.read(DriftSqlType.double,data['${p}raw_score'])!,normalizedScore:attachedDatabase.typeMapping.read(DriftSqlType.double,data['${p}normalized_score'])!);} @override VerificationContext validateIntegrity(Insertable<WorkoutRegionImpactRow> instance,{bool isInserting=false})=>VerificationContext(); @override $WorkoutRegionImpactsTable createAlias(String alias)=>$WorkoutRegionImpactsTable(attachedDatabase,alias); static JsonTypeConverter2<MuscleRegion,String,String> $converterregion=const EnumNameConverter<MuscleRegion>(MuscleRegion.values);
 }
-class WorkoutRegionImpactRow extends DataClass implements Insertable<WorkoutRegionImpactRow> {
-  final String id;
-  final String sessionId;
-  final MuscleRegion region;
-  final double rawScore;
-  final double normalizedScore;
-  const WorkoutRegionImpactRow({required this.id, required this.sessionId, required this.region, required this.rawScore, required this.normalizedScore});
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) => {
-    'id': Variable<String>(id),
-    'session_id': Variable<String>(sessionId),
-    'region': Variable<String>($WorkoutRegionImpactsTable.$converterregion.toSql(region)),
-    'raw_score': Variable<double>(rawScore),
-    'normalized_score': Variable<double>(normalizedScore),
-  };
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<String>(id),
-      'sessionId': serializer.toJson<String>(sessionId),
-      'region': serializer.toJson<String>(
-          $WorkoutRegionImpactsTable.$converterregion.toJson(region)),
-      'rawScore': serializer.toJson<double>(rawScore),
-      'normalizedScore': serializer.toJson<double>(normalizedScore),
-    };
-  }
-}
+class WorkoutRegionImpactRow extends DataClass implements Insertable<WorkoutRegionImpactRow>{final String id; final String sessionId; final MuscleRegion region; final double rawScore; final double normalizedScore; const WorkoutRegionImpactRow({required this.id,required this.sessionId,required this.region,required this.rawScore,required this.normalizedScore}); @override Map<String,Expression> toColumns(bool nullToAbsent)=>{'id':Variable<String>(id),'session_id':Variable<String>(sessionId),'region':Variable<String>($WorkoutRegionImpactsTable.$converterregion.toSql(region)),'raw_score':Variable<double>(rawScore),'normalized_score':Variable<double>(normalizedScore)};}
 class WorkoutRegionImpactsCompanion extends UpdateCompanion<WorkoutRegionImpactRow>{final Value<String> id; final Value<String> sessionId; final Value<MuscleRegion> region; final Value<double> rawScore; final Value<double> normalizedScore; final Value<int> rowid; const WorkoutRegionImpactsCompanion({this.id=const Value.absent(),this.sessionId=const Value.absent(),this.region=const Value.absent(),this.rawScore=const Value.absent(),this.normalizedScore=const Value.absent(),this.rowid=const Value.absent()}); WorkoutRegionImpactsCompanion.insert({required String id,required String sessionId,required MuscleRegion region,required double rawScore,required double normalizedScore,this.rowid=const Value.absent()}):id=Value(id),sessionId=Value(sessionId),region=Value(region),rawScore=Value(rawScore),normalizedScore=Value(normalizedScore); @override Map<String,Expression> toColumns(bool nullToAbsent){final m=<String,Expression>{}; if(id.present)m['id']=Variable<String>(id.value); if(sessionId.present)m['session_id']=Variable<String>(sessionId.value); if(region.present)m['region']=Variable<String>($WorkoutRegionImpactsTable.$converterregion.toSql(region.value)); if(rawScore.present)m['raw_score']=Variable<double>(rawScore.value); if(normalizedScore.present)m['normalized_score']=Variable<double>(normalizedScore.value); if(rowid.present)m['rowid']=Variable<int>(rowid.value); return m;}}
 
 abstract class _$AppDatabase extends GeneratedDatabase {

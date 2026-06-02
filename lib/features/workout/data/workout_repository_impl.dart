@@ -109,7 +109,7 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
           WorkoutSessionsCompanion.insert(
             id: session.id,
             userProfileId: session.userProfileId,
-            dayType: session.dayType ?? DayType.push,
+            dayType: Value(session.dayType ?? DayType.push),
             tags: Value(_encodeList(session.tags)),
             startedAt: session.startedAt,
             lastActivityAt: session.lastActivityAt,
