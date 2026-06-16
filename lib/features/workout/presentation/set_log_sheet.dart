@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/enums.dart';
 import '../../../core/widgets/stepper_field.dart';
+import '../../exercise_catalog/domain/exercise.dart';
 
 class SetLogResult {
   SetLogResult({
@@ -28,6 +30,7 @@ Future<SetLogResult?> showSetLogSheet(
   required double initialWeight,
   required int initialReps,
   required double increment,
+  required Exercise exercise,
   bool showRpeRir = true,
 }) {
   return showModalBottomSheet<SetLogResult>(
@@ -38,6 +41,7 @@ Future<SetLogResult?> showSetLogSheet(
       initialWeight: initialWeight,
       initialReps: initialReps,
       increment: increment,
+      exercise: exercise,
       showRpeRir: showRpeRir,
     ),
   );
@@ -48,12 +52,14 @@ class _SetLogSheet extends StatefulWidget {
     required this.initialWeight,
     required this.initialReps,
     required this.increment,
+    required this.exercise,
     required this.showRpeRir,
   });
 
   final double initialWeight;
   final int initialReps;
   final double increment;
+  final Exercise exercise;
   final bool showRpeRir;
 
   @override
@@ -75,7 +81,10 @@ class _SetLogSheetState extends State<_SetLogSheet> {
     super.initState();
     final w = widget.initialWeight;
     _weight = TextEditingController(
-        text: w <= 0 ? '' : (w == w.roundToDouble() ? w.toStringAsFixed(0) : '$w'));
+      text: w <= 0
+          ? ''
+          : (w == w.roundToDouble() ? w.toStringAsFixed(0) : '$w'),
+    );
     _reps = TextEditingController(text: widget.initialReps.toString());
     _rpe = TextEditingController();
     _rir = TextEditingController();
@@ -93,8 +102,33 @@ class _SetLogSheetState extends State<_SetLogSheet> {
   }
 
   void _error(String msg) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(msg)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+  }
+
+  String? _weightHelperText() {
+    final equipmentType = widget.exercise.equipmentType;
+    final exerciseCategory = widget.exercise.exerciseCategory;
+
+    if (equipmentType == EquipmentType.dumbbell) {
+      return 'Enter weight per hand.';
+    }
+    if (equipmentType == EquipmentType.assistedBodyweight ||
+        exerciseCategory == ExerciseCategory.assistedBodyweight) {
+      return 'Enter assistance weight. Lower is harder.';
+    }
+    if (equipmentType == EquipmentType.bodyweight ||
+        exerciseCategory == ExerciseCategory.bodyweight ||
+        exerciseCategory == ExerciseCategory.core) {
+      return 'Use 0 kg for bodyweight only, or added load if weighted.';
+    }
+    if (equipmentType == EquipmentType.machine ||
+        equipmentType == EquipmentType.cable ||
+        equipmentType == EquipmentType.smithMachine ||
+        equipmentType == EquipmentType.plateLoaded) {
+      return 'Enter stack weight shown on the machine.';
+    }
+
+    return null;
   }
 
   void _save() {
@@ -155,6 +189,7 @@ class _SetLogSheetState extends State<_SetLogSheet> {
               controller: _weight,
               step: widget.increment,
               suffix: 'kg',
+              helperText: _weightHelperText(),
             ),
             const SizedBox(height: 16),
             StepperField(

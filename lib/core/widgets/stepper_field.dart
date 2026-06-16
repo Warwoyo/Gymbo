@@ -10,6 +10,7 @@ class StepperField extends StatelessWidget {
     required this.step,
     this.allowDecimal = true,
     this.suffix,
+    this.helperText,
     this.min = 0,
   });
 
@@ -18,6 +19,7 @@ class StepperField extends StatelessWidget {
   final double step;
   final bool allowDecimal;
   final String? suffix;
+  final String? helperText;
   final double min;
 
   double get _value => double.tryParse(controller.text) ?? 0;
@@ -52,13 +54,17 @@ class StepperField extends StatelessWidget {
                 controller: controller,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.headlineSmall,
-                keyboardType: TextInputType.numberWithOptions(
-                    decimal: allowDecimal),
+                keyboardType:
+                    TextInputType.numberWithOptions(decimal: allowDecimal),
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(
-                      RegExp(allowDecimal ? r'[0-9.]' : r'[0-9]')),
+                    RegExp(allowDecimal ? r'[0-9.]' : r'[0-9]'),
+                  ),
                 ],
-                decoration: InputDecoration(suffixText: suffix),
+                decoration: InputDecoration(
+                  suffixText: suffix,
+                  helperText: helperText,
+                ),
               ),
             ),
             const SizedBox(width: 8),

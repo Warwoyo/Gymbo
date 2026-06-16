@@ -295,6 +295,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
       initialWeight: initialWeight,
       initialReps: initialReps,
       increment: increment,
+      exercise: selected.exercise,
       showRpeRir: showRpeRir,
     );
     if (result == null) return;
