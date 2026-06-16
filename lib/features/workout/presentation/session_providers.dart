@@ -1,12 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/providers.dart';
-import '../../profile/presentation/profile_controller.dart';
 import '../../../core/enums.dart';
 import '../../muscle/domain/muscle_recovery.dart';
+import '../../profile/presentation/profile_controller.dart';
 import '../domain/workout_repository.dart';
 import '../domain/workout_session.dart';
 import '../domain/workout_summary.dart';
+
+class ExerciseUsage {
+  const ExerciseUsage({
+    required this.lastUsedAt,
+    required this.useCount,
+  });
+
+  final DateTime lastUsedAt;
+  final int useCount;
+}
 
 /// The currently open session for the active profile, if any.
 final activeSessionProvider =
@@ -30,6 +40,32 @@ final workoutHistoryProvider =
   return ref.watch(workoutRepositoryProvider).listHistory(profile.id);
 });
 
+final exerciseUsageHistoryProvider =
+    FutureProvider.autoDispose<Map<String, ExerciseUsage>>((ref) async {
+  final profile = await ref.watch(activeProfileProvider.future);
+  if (profile == null) return const {};
+
+  final repository = ref.watch(workoutRepositoryProvider);
+  final history = await repository.listHistory(profile.id);
+  final usageByExercise = <String, ExerciseUsage>{};
+
+  for (final session in history) {
+    final sessionExercises = await repository.getSessionExercises(session.id);
+    final usedAt = session.endedAt ?? session.startedAt;
+    for (final workoutExercise in sessionExercises) {
+      final current = usageByExercise[workoutExercise.exerciseId];
+      usageByExercise[workoutExercise.exerciseId] = ExerciseUsage(
+        lastUsedAt: current == null || usedAt.isAfter(current.lastUsedAt)
+            ? usedAt
+            : current.lastUsedAt,
+        useCount: (current?.useCount ?? 0) + 1,
+      );
+    }
+  }
+
+  return usageByExercise;
+});
+
 final workoutSummaryProvider =
     FutureProvider.autoDispose.family<WorkoutSummary, String>((ref, sessionId) {
   return ref.watch(workoutRepositoryProvider).getSummary(sessionId);
@@ -46,9 +82,9 @@ final exerciseProgressProvider = FutureProvider.autoDispose
       );
 });
 
-
 final recoveryByMuscleProvider =
-    FutureProvider.autoDispose<Map<MuscleGroup, MuscleRecoveryState>>((ref) async {
+    FutureProvider.autoDispose<Map<MuscleGroup, MuscleRecoveryState>>(
+        (ref) async {
   final profile = await ref.watch(activeProfileProvider.future);
   if (profile == null) return const {};
   return ref.watch(workoutRepositoryProvider).getRecoveryByMuscle(profile.id);

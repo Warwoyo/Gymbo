@@ -7,6 +7,16 @@ import '../../workout/presentation/session_providers.dart';
 import '../domain/exercise.dart';
 import 'exercise_providers.dart';
 
+enum ExerciseSort {
+  recommended('Recommended'),
+  name('Name'),
+  recentlyUsed('Recently used'),
+  leastFatigued('Least fatigued');
+
+  const ExerciseSort(this.label);
+  final String label;
+}
+
 enum ExerciseFilter {
   all('All'),
   push('Push'),
@@ -40,6 +50,8 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
   EquipmentType? _equipmentFilter;
   MuscleGroup? _muscleFilter;
   RecoveryLevel? _recoveryFilter;
+  late ExerciseSort _sort =
+      widget.pickMode ? ExerciseSort.leastFatigued : ExerciseSort.recommended;
   final TextEditingController _searchController = TextEditingController();
   String _query = '';
 
@@ -54,10 +66,27 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
     final exercises = ref.watch(allExercisesProvider);
     final recovery = ref.watch(recoveryByMuscleProvider).valueOrNull ??
         const <MuscleGroup, MuscleRecoveryState>{};
+    final usageHistory = ref.watch(exerciseUsageHistoryProvider).valueOrNull ??
+        const <String, ExerciseUsage>{};
 
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.pickMode ? 'Add exercise' : 'Exercises'),
+        actions: [
+          PopupMenuButton<ExerciseSort>(
+            tooltip: 'Sort exercises',
+            initialValue: _sort,
+            icon: const Icon(Icons.sort),
+            onSelected: (value) => setState(() => _sort = value),
+            itemBuilder: (context) => [
+              for (final sort in ExerciseSort.values)
+                PopupMenuItem(
+                  value: sort,
+                  child: Text(sort.label),
+                ),
+            ],
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -110,6 +139,16 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
               data: (list) {
                 final filtered =
                     list.where((e) => _matches(e, recovery)).toList();
+                if (_sort != ExerciseSort.recommended) {
+                  filtered.sort(
+                    (a, b) => _compareExercises(
+                      a,
+                      b,
+                      recoveryByMuscle: recovery,
+                      usageHistory: usageHistory,
+                    ),
+                  );
+                }
                 return ListView.separated(
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 96),
                   itemCount: filtered.length,
@@ -175,6 +214,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
         if (_equipmentFilter != null) 'Equipment: ${_equipmentFilter!.label}',
         if (_muscleFilter != null) 'Muscle: ${_muscleFilter!.label}',
         if (_recoveryFilter != null) 'Recovery: ${_recoveryFilter!.label}',
+        if (_sort != ExerciseSort.recommended) 'Sort: ${_sort.label}',
       ];
 
   void _clearFilters() => setState(() {
@@ -182,7 +222,78 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
         _equipmentFilter = null;
         _muscleFilter = null;
         _recoveryFilter = null;
+        _sort = widget.pickMode
+            ? ExerciseSort.leastFatigued
+            : ExerciseSort.recommended;
       });
+
+  int _compareExercises(
+    Exercise a,
+    Exercise b, {
+    required Map<MuscleGroup, MuscleRecoveryState> recoveryByMuscle,
+    required Map<String, ExerciseUsage> usageHistory,
+  }) {
+    final result = switch (_sort) {
+      ExerciseSort.recommended => 0,
+      ExerciseSort.name => _compareNames(a, b),
+      ExerciseSort.recentlyUsed => _compareRecentlyUsed(a, b, usageHistory),
+      ExerciseSort.leastFatigued =>
+        _compareLeastFatigued(a, b, recoveryByMuscle),
+    };
+
+    return result == 0 ? _compareNames(a, b) : result;
+  }
+
+  int _compareNames(Exercise a, Exercise b) =>
+      a.name.toLowerCase().compareTo(b.name.toLowerCase());
+
+  int _compareRecentlyUsed(
+    Exercise a,
+    Exercise b,
+    Map<String, ExerciseUsage> usageHistory,
+  ) {
+    final aUsedAt = usageHistory[a.id]?.lastUsedAt;
+    final bUsedAt = usageHistory[b.id]?.lastUsedAt;
+    if (aUsedAt == null && bUsedAt == null) return 0;
+    if (aUsedAt == null) return 1;
+    if (bUsedAt == null) return -1;
+    return bUsedAt.compareTo(aUsedAt);
+  }
+
+  int _compareLeastFatigued(
+    Exercise a,
+    Exercise b,
+    Map<MuscleGroup, MuscleRecoveryState> recoveryByMuscle,
+  ) {
+    final aRecovery = _primaryMuscleRecovery(a, recoveryByMuscle);
+    final bRecovery = _primaryMuscleRecovery(b, recoveryByMuscle);
+    return bRecovery.compareTo(aRecovery);
+  }
+
+  double _primaryMuscleRecovery(
+    Exercise exercise,
+    Map<MuscleGroup, MuscleRecoveryState> recoveryByMuscle,
+  ) {
+    final primaryMuscle = _primaryMuscle(exercise);
+    if (primaryMuscle == null) return 0;
+    return recoveryByMuscle[primaryMuscle]?.recoveryPercent ?? 0;
+  }
+
+  MuscleGroup? _primaryMuscle(Exercise exercise) {
+    for (final target in exercise.muscleTargets) {
+      if (target.role == MuscleRole.primary) return target.muscle;
+    }
+
+    final normalizedPrimary = _normalize(exercise.primaryMuscleGroup);
+    for (final muscle in MuscleGroup.values) {
+      if (_normalize(muscle.label) == normalizedPrimary ||
+          _normalize(muscle.name) == normalizedPrimary) {
+        return muscle;
+      }
+    }
+
+    return null;
+  }
 
   bool _targetsMuscle(Exercise e, MuscleGroup muscle) {
     final normalizedFilter = _normalize(muscle.label);
@@ -211,6 +322,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
     var selectedEquipment = _equipmentFilter;
     var selectedMuscle = _muscleFilter;
     var selectedRecovery = _recoveryFilter;
+    var selectedSort = _sort;
 
     await showModalBottomSheet<void>(
       context: context,
@@ -253,7 +365,8 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                   selected: selectedMuscle,
                   labelFor: (value) => value.label,
                   onSelected: (value) => setSheetState(
-                    () => selectedMuscle = selectedMuscle == value ? null : value,
+                    () => selectedMuscle =
+                        selectedMuscle == value ? null : value,
                   ),
                 ),
                 _FilterSection<RecoveryLevel>(
@@ -266,6 +379,14 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                         selectedRecovery == value ? null : value,
                   ),
                 ),
+                _FilterSection<ExerciseSort>(
+                  title: 'Sort by',
+                  values: ExerciseSort.values,
+                  selected: selectedSort,
+                  labelFor: (value) => value.label,
+                  onSelected: (value) =>
+                      setSheetState(() => selectedSort = value),
+                ),
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -275,6 +396,9 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                         selectedEquipment = null;
                         selectedMuscle = null;
                         selectedRecovery = null;
+                        selectedSort = widget.pickMode
+                            ? ExerciseSort.leastFatigued
+                            : ExerciseSort.recommended;
                       }),
                       child: const Text('Clear all'),
                     ),
@@ -286,6 +410,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                           _equipmentFilter = selectedEquipment;
                           _muscleFilter = selectedMuscle;
                           _recoveryFilter = selectedRecovery;
+                          _sort = selectedSort;
                         });
                         Navigator.of(context).pop();
                       },
