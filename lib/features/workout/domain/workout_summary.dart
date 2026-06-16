@@ -115,4 +115,29 @@ class WorkoutSummary {
 
   List<ExerciseSummary> get personalRecords =>
       exercises.where((e) => e.isPersonalRecord).toList(growable: false);
+
+  List<MuscleImpact> get primaryMuscleImpacts => muscleImpacts
+      .where((m) => m.strongestRole == MuscleRole.primary)
+      .toList(growable: false);
+
+  MuscleImpact? get topMuscleImpact =>
+      muscleImpacts.isEmpty ? null : muscleImpacts.first;
+
+  ExerciseSummary? get bestExercise {
+    ExerciseSummary? best;
+    for (final exercise in exercises) {
+      if (best == null || exercise.totalVolume > best.totalVolume) {
+        best = exercise;
+      }
+    }
+    return best;
+  }
+
+  String get mainNextSessionAdvice {
+    if (personalRecords.isNotEmpty) {
+      return personalRecords.first.nextTimeAdvice;
+    }
+    final best = bestExercise;
+    return best?.nextTimeAdvice ?? 'Log an exercise to build your next plan.';
+  }
 }
