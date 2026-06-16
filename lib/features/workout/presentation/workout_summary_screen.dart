@@ -34,7 +34,11 @@ class WorkoutSummaryScreen extends ConsumerWidget {
           children: [
             Text(s.session.sessionName ?? s.dayType?.label ?? 'Workout',
                 style: Theme.of(context).textTheme.headlineSmall),
-            Text('${Format.dateTime(s.startedAt)} • ${Format.duration(s.duration)}'),
+            Text(
+              '${Format.dateTime(s.startedAt)} • ${Format.duration(s.duration)}',
+            ),
+            const SizedBox(height: 16),
+            _SessionHighlightsCard(summary: s),
             const SizedBox(height: 16),
             _StatGrid(summary: s),
             const SizedBox(height: 16),
@@ -69,10 +73,74 @@ class WorkoutSummaryScreen extends ConsumerWidget {
             Text('Exercises', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
             for (final ex in s.exercises) _ExerciseCard(ex: ex),
+            const SizedBox(height: 16),
+            _NextTimePlanCard(summary: s),
             const SizedBox(height: 24),
-            FilledButton(
-              onPressed: () => context.go('/home'),
-              child: const Text('Done'),
+            _SummaryActions(summary: s),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SessionHighlightsCard extends StatelessWidget {
+  const _SessionHighlightsCard({required this.summary});
+
+  final WorkoutSummary summary;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final topMuscles = summary.primaryMuscleImpacts.isNotEmpty
+        ? summary.primaryMuscleImpacts
+            .map((m) => m.muscle.label)
+            .take(3)
+            .join(', ')
+        : summary.muscleImpacts.map((m) => m.muscle.label).take(3).join(', ');
+    final bestExercise = summary.bestExercise;
+
+    return Card(
+      color: theme.colorScheme.primaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.insights,
+                  color: theme.colorScheme.onPrimaryContainer,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Session highlights',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: theme.colorScheme.onPrimaryContainer,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            _HighlightRow(
+              label: 'PRs',
+              value: '${summary.personalRecords.length}',
+            ),
+            _HighlightRow(
+              label: 'Main muscles',
+              value: topMuscles.isEmpty ? 'No muscle impact yet' : topMuscles,
+            ),
+            _HighlightRow(
+              label: 'Best exercise',
+              value: bestExercise == null
+                  ? 'No exercise logged'
+                  : '${bestExercise.exerciseName} • ${Format.kg(bestExercise.totalVolume)} volume',
+            ),
+            _HighlightRow(
+              label: 'Next session',
+              value: summary.mainNextSessionAdvice,
             ),
           ],
         ),
@@ -81,7 +149,115 @@ class WorkoutSummaryScreen extends ConsumerWidget {
   }
 }
 
+class _HighlightRow extends StatelessWidget {
+  const _HighlightRow({required this.label, required this.value});
 
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 112,
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+          ),
+          Expanded(child: Text(value)),
+        ],
+      ),
+    );
+  }
+}
+
+class _NextTimePlanCard extends StatelessWidget {
+  const _NextTimePlanCard({required this.summary});
+
+  final WorkoutSummary summary;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(children: const [
+              Icon(Icons.next_plan_outlined),
+              SizedBox(width: 8),
+              Text(
+                'Next time plan',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ]),
+            const SizedBox(height: 8),
+            if (summary.exercises.isEmpty)
+              const Text('Complete exercises to generate a plan for next time.')
+            else
+              for (final ex in summary.exercises) ...[
+                Text(ex.exerciseName,
+                    style: const TextStyle(fontWeight: FontWeight.w600)),
+                Text(ex.nextTimeAdvice,
+                    style: Theme.of(context).textTheme.bodySmall),
+                const SizedBox(height: 8),
+              ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SummaryActions extends StatelessWidget {
+  const _SummaryActions({required this.summary});
+
+  final WorkoutSummary summary;
+
+  @override
+  Widget build(BuildContext context) {
+    final progressExercise = summary.bestExercise ??
+        (summary.exercises.isEmpty ? null : summary.exercises.first);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        OutlinedButton(
+          onPressed: progressExercise == null
+              ? null
+              : () => context.go(
+                    '/progress/${progressExercise.exerciseId}?name=${Uri.encodeComponent(progressExercise.exerciseName)}',
+                  ),
+          child: const Text('View progress'),
+        ),
+        const SizedBox(height: 8),
+        OutlinedButton(
+          onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Template saving is not available yet.'),
+              ),
+            );
+          },
+          child: const Text('Save as template'),
+        ),
+        const SizedBox(height: 8),
+        FilledButton(
+          onPressed: () => context.go('/home'),
+          child: const Text('Done'),
+        ),
+      ],
+    );
+  }
+}
 
 class _MuscleImpactCard extends StatelessWidget {
   const _MuscleImpactCard({required this.summary});
