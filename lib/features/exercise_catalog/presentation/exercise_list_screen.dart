@@ -37,6 +37,9 @@ class ExerciseListScreen extends ConsumerStatefulWidget {
 
 class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
   late ExerciseFilter _filter = widget.initialFilter;
+  EquipmentType? _equipmentFilter;
+  MuscleGroup? _muscleFilter;
+  RecoveryLevel? _recoveryFilter;
   final TextEditingController _searchController = TextEditingController();
   String _query = '';
 
@@ -49,10 +52,13 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
   @override
   Widget build(BuildContext context) {
     final exercises = ref.watch(allExercisesProvider);
-    final recovery = ref.watch(recoveryByMuscleProvider).valueOrNull ?? const <MuscleGroup, MuscleRecoveryState>{};
+    final recovery = ref.watch(recoveryByMuscleProvider).valueOrNull ??
+        const <MuscleGroup, MuscleRecoveryState>{};
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.pickMode ? 'Add exercise' : 'Exercises')),
+      appBar: AppBar(
+        title: Text(widget.pickMode ? 'Add exercise' : 'Exercises'),
+      ),
       body: Column(
         children: [
           Padding(
@@ -78,21 +84,23 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
               onChanged: (value) => setState(() => _query = value),
             ),
           ),
-          SizedBox(
-            height: 48,
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              scrollDirection: Axis.horizontal,
-              itemBuilder: (_, i) {
-                final f = ExerciseFilter.values[i];
-                return ChoiceChip(
-                  label: Text(f.label),
-                  selected: f == _filter,
-                  onSelected: (_) => setState(() => _filter = f),
-                );
-              },
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
-              itemCount: ExerciseFilter.values.length,
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _ActiveFilterChips(
+                    filters: _activeFilterLabels,
+                    onClearAll: _clearFilters,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                FilledButton.icon(
+                  onPressed: _showFilterSheet,
+                  icon: const Icon(Icons.tune),
+                  label: const Text('Filter'),
+                ),
+              ],
             ),
           ),
           Expanded(
@@ -100,7 +108,8 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Center(child: Text('$e')),
               data: (list) {
-                final filtered = list.where(_matches).toList();
+                final filtered =
+                    list.where((e) => _matches(e, recovery)).toList();
                 return ListView.separated(
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 96),
                   itemCount: filtered.length,
@@ -125,14 +134,30 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
     );
   }
 
-  bool _matches(Exercise e) {
-    final matchesFilter = switch (_filter) {
+  bool _matches(
+    Exercise e,
+    Map<MuscleGroup, MuscleRecoveryState> recoveryByMuscle,
+  ) {
+    final matchesSplit = switch (_filter) {
       ExerciseFilter.all => true,
       ExerciseFilter.custom => e.isCustom,
       ExerciseFilter.legs => e.tags.contains('leg') || e.dayType?.name == 'leg',
       _ => e.tags.contains(_filter.name) || e.dayType?.name == _filter.name,
     };
-    if (!matchesFilter) return false;
+    if (!matchesSplit) return false;
+
+    if (_equipmentFilter != null && e.equipmentType != _equipmentFilter) {
+      return false;
+    }
+
+    if (_muscleFilter != null && !_targetsMuscle(e, _muscleFilter!)) return false;
+
+    if (_recoveryFilter != null) {
+      final levels = _targetMuscles(e)
+          .map((m) => recoveryByMuscle[m]?.level)
+          .whereType<RecoveryLevel>();
+      if (!levels.contains(_recoveryFilter)) return false;
+    }
 
     final query = _query.trim().toLowerCase();
     if (query.isEmpty) return true;
@@ -143,6 +168,137 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
         e.primaryMuscleGroup.toLowerCase().contains(query) ||
         e.movementPattern.toLowerCase().contains(query) ||
         e.tags.any((tag) => tag.toLowerCase().contains(query));
+  }
+
+  List<String> get _activeFilterLabels => [
+        if (_filter != ExerciseFilter.all) 'Split: ${_filter.label}',
+        if (_equipmentFilter != null) 'Equipment: ${_equipmentFilter!.label}',
+        if (_muscleFilter != null) 'Muscle: ${_muscleFilter!.label}',
+        if (_recoveryFilter != null) 'Recovery: ${_recoveryFilter!.label}',
+      ];
+
+  void _clearFilters() => setState(() {
+        _filter = ExerciseFilter.all;
+        _equipmentFilter = null;
+        _muscleFilter = null;
+        _recoveryFilter = null;
+      });
+
+  bool _targetsMuscle(Exercise e, MuscleGroup muscle) {
+    final normalizedFilter = _normalize(muscle.label);
+    return e.muscleTargets.any((target) => target.muscle == muscle) ||
+        _normalize(e.primaryMuscleGroup) == normalizedFilter ||
+        e.secondaryMuscleGroups
+            .any((group) => _normalize(group) == normalizedFilter);
+  }
+
+  Iterable<MuscleGroup> _targetMuscles(Exercise e) sync* {
+    if (e.muscleTargets.isNotEmpty) {
+      yield* e.muscleTargets.map((target) => target.muscle);
+      return;
+    }
+
+    for (final muscle in MuscleGroup.values) {
+      if (_targetsMuscle(e, muscle)) yield muscle;
+    }
+  }
+
+  String _normalize(String value) =>
+      value.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
+
+  Future<void> _showFilterSheet() async {
+    var selectedSplit = _filter;
+    var selectedEquipment = _equipmentFilter;
+    var selectedMuscle = _muscleFilter;
+    var selectedRecovery = _recoveryFilter;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setSheetState) => SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Filter exercises',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 16),
+                _FilterSection<ExerciseFilter>(
+                  title: 'Split',
+                  values: ExerciseFilter.values,
+                  selected: selectedSplit,
+                  labelFor: (value) => value.label,
+                  onSelected: (value) =>
+                      setSheetState(() => selectedSplit = value),
+                ),
+                _FilterSection<EquipmentType>(
+                  title: 'Equipment',
+                  values: EquipmentType.values,
+                  selected: selectedEquipment,
+                  labelFor: (value) => value.label,
+                  onSelected: (value) => setSheetState(
+                    () => selectedEquipment =
+                        selectedEquipment == value ? null : value,
+                  ),
+                ),
+                _FilterSection<MuscleGroup>(
+                  title: 'Muscle group',
+                  values: MuscleGroup.values,
+                  selected: selectedMuscle,
+                  labelFor: (value) => value.label,
+                  onSelected: (value) => setSheetState(
+                    () => selectedMuscle = selectedMuscle == value ? null : value,
+                  ),
+                ),
+                _FilterSection<RecoveryLevel>(
+                  title: 'Recovery status',
+                  values: RecoveryLevel.values,
+                  selected: selectedRecovery,
+                  labelFor: (value) => value.label,
+                  onSelected: (value) => setSheetState(
+                    () => selectedRecovery =
+                        selectedRecovery == value ? null : value,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    TextButton(
+                      onPressed: () => setSheetState(() {
+                        selectedSplit = ExerciseFilter.all;
+                        selectedEquipment = null;
+                        selectedMuscle = null;
+                        selectedRecovery = null;
+                      }),
+                      child: const Text('Clear all'),
+                    ),
+                    const Spacer(),
+                    FilledButton(
+                      onPressed: () {
+                        setState(() {
+                          _filter = selectedSplit;
+                          _equipmentFilter = selectedEquipment;
+                          _muscleFilter = selectedMuscle;
+                          _recoveryFilter = selectedRecovery;
+                        });
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Apply'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   void _showInfo(BuildContext context, Exercise e) {
@@ -163,7 +319,12 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
             _info('Pattern', e.movementPattern),
             _info('Equipment', e.equipmentType.label),
             if (e.muscleTargets.isNotEmpty)
-              _info('Impact targets', e.muscleTargets.map((t) => '${t.muscle.label} (${t.role.label})').join(', ')),
+              _info(
+                'Impact targets',
+                e.muscleTargets
+                    .map((t) => '${t.muscle.label} (${t.role.label})')
+                    .join(', '),
+              ),
           ],
         ),
       ),
@@ -173,14 +334,98 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
   Widget _info(String k, String v) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 4),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          SizedBox(width: 130, child: Text(k, style: const TextStyle(fontWeight: FontWeight.w600))),
+          SizedBox(
+            width: 130,
+            child: Text(
+              k,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
           Expanded(child: Text(v)),
         ]),
       );
 }
 
+class _ActiveFilterChips extends StatelessWidget {
+  const _ActiveFilterChips({required this.filters, required this.onClearAll});
+
+  final List<String> filters;
+  final VoidCallback onClearAll;
+
+  @override
+  Widget build(BuildContext context) {
+    if (filters.isEmpty) {
+      return const Text('All exercises', style: TextStyle(color: Colors.grey));
+    }
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          for (final filter in filters) ...[
+            Chip(label: Text(filter), visualDensity: VisualDensity.compact),
+            const SizedBox(width: 6),
+          ],
+          ActionChip(
+            label: const Text('Clear'),
+            visualDensity: VisualDensity.compact,
+            onPressed: onClearAll,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FilterSection<T> extends StatelessWidget {
+  const _FilterSection({
+    required this.title,
+    required this.values,
+    required this.selected,
+    required this.labelFor,
+    required this.onSelected,
+  });
+
+  final String title;
+  final List<T> values;
+  final T? selected;
+  final String Function(T value) labelFor;
+  final ValueChanged<T> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: values
+                .map(
+                  (value) => ChoiceChip(
+                    label: Text(labelFor(value)),
+                    selected: value == selected,
+                    onSelected: (_) => onSelected(value),
+                  ),
+                )
+                .toList(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _ExerciseTile extends StatelessWidget {
-  const _ExerciseTile({required this.exercise, required this.onTap, required this.recoveryByMuscle});
+  const _ExerciseTile({
+    required this.exercise,
+    required this.onTap,
+    required this.recoveryByMuscle,
+  });
 
   final Exercise exercise;
   final VoidCallback onTap;
@@ -188,17 +433,33 @@ class _ExerciseTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final primary = exercise.muscleTargets.where((t) => t.role == MuscleRole.primary).map((t) => t.muscle).toList();
-    final fatigue = primary.map((m) => recoveryByMuscle[m]).whereType<MuscleRecoveryState>().where((r) => r.recoveryPercent < 35).toList();
+    final primary = exercise.muscleTargets
+        .where((t) => t.role == MuscleRole.primary)
+        .map((t) => t.muscle)
+        .toList();
+    final fatigue = primary
+        .map((m) => recoveryByMuscle[m])
+        .whereType<MuscleRecoveryState>()
+        .where((r) => r.recoveryPercent < 35)
+        .toList();
     final statuses = primary.map((m) {
       final r = recoveryByMuscle[m];
       return r == null ? m.label : '${m.label}: ${r.level.label}';
     }).join(' • ');
     return Card(
       child: ListTile(
-        leading: fatigue.isEmpty ? null : const Icon(Icons.warning_amber_rounded, color: Colors.orange),
-        title: Text(exercise.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-        subtitle: Text(statuses.isEmpty ? '${exercise.primaryMuscleGroup} • ${exercise.equipmentType.label}' : statuses),
+        leading: fatigue.isEmpty
+            ? null
+            : const Icon(Icons.warning_amber_rounded, color: Colors.orange),
+        title: Text(
+          exercise.name,
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+        subtitle: Text(
+          statuses.isEmpty
+              ? '${exercise.primaryMuscleGroup} • ${exercise.equipmentType.label}'
+              : statuses,
+        ),
         trailing: const Icon(Icons.chevron_right),
         onTap: onTap,
       ),
