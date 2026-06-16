@@ -45,6 +45,7 @@ class UserProfiles extends Table {
 class Exercises extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
+  TextColumn get userProfileId => text().nullable()();
   TextColumn get dayType => textEnum<DayType>().nullable()();
   TextColumn get tags => text().withDefault(const Constant(''))();
   TextColumn get primaryMuscleGroup => text()();
@@ -209,7 +210,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -262,6 +263,9 @@ class AppDatabase extends _$AppDatabase {
           }
           if (from < 4) {
             await m.addColumn(workoutSets, workoutSets.loadType);
+          }
+          if (from < 5) {
+            await m.addColumn(exercises, exercises.userProfileId);
           }
         },
       );

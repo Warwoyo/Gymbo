@@ -7,6 +7,7 @@ class Exercise {
   const Exercise({
     required this.id,
     required this.name,
+    this.userProfileId,
     this.dayType,
     required this.primaryMuscleGroup,
     this.secondaryMuscleGroups = const [],
@@ -31,6 +32,7 @@ class Exercise {
 
   final String id;
   final String name;
+  final String? userProfileId;
   final DayType? dayType;
   final String primaryMuscleGroup;
   final List<String> secondaryMuscleGroups;

@@ -19,6 +19,7 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
   Exercise _map(ExerciseRow row) => Exercise(
         id: row.id,
         name: row.name,
+        userProfileId: row.userProfileId,
         dayType: row.dayType,
         primaryMuscleGroup: row.primaryMuscleGroup,
         secondaryMuscleGroups: _decodeList(row.secondaryMuscleGroups),
@@ -50,6 +51,7 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
     return Exercise(
       id: base.id,
       name: base.name,
+      userProfileId: base.userProfileId,
       dayType: base.dayType,
       primaryMuscleGroup: base.primaryMuscleGroup,
       secondaryMuscleGroups: base.secondaryMuscleGroups,
@@ -196,18 +198,31 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
     }
   }
 
+  Expression<bool> _profileScope($ExercisesTable t, String? userProfileId) {
+    final global = t.userProfileId.isNull();
+    return userProfileId == null
+        ? global
+        : global | t.userProfileId.equals(userProfileId);
+  }
+
   @override
-  Future<List<Exercise>> listByDayType(DayType dayType) async {
+  Future<List<Exercise>> listByDayType(
+    DayType dayType, {
+    String? userProfileId,
+  }) async {
     final rows = await (_db.select(_db.exercises)
-          ..where((t) => t.dayType.equalsValue(dayType))
+          ..where(
+            (t) => t.dayType.equalsValue(dayType) & _profileScope(t, userProfileId),
+          )
           ..orderBy([(t) => OrderingTerm(expression: t.name)]))
         .get();
     return Future.wait(rows.map(_mapWithTargets));
   }
 
   @override
-  Future<List<Exercise>> listAll() async {
+  Future<List<Exercise>> listAll({String? userProfileId}) async {
     final rows = await (_db.select(_db.exercises)
+          ..where((t) => _profileScope(t, userProfileId))
           ..orderBy([(t) => OrderingTerm(expression: t.name)]))
         .get();
     return Future.wait(rows.map(_mapWithTargets));
@@ -223,10 +238,12 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
 
   @override
   Future<Exercise> createCustom(Exercise exercise) async {
+    await _validateCustomExercise(exercise);
     await _db.into(_db.exercises).insertOnConflictUpdate(
           ExercisesCompanion.insert(
             id: exercise.id,
-            name: exercise.name,
+            name: exercise.name.trim(),
+            userProfileId: Value(exercise.userProfileId),
             dayType: Value(exercise.dayType ?? DayType.push),
             primaryMuscleGroup: exercise.primaryMuscleGroup,
             secondaryMuscleGroups:
@@ -249,6 +266,95 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
             updatedAt: exercise.updatedAt,
           ),
         );
+    await _replaceTargets(exercise);
+    return exercise;
+  }
+
+  @override
+  Future<bool> nameExists(
+    String name, {
+    String? userProfileId,
+    String? excludingId,
+  }) async {
+    final normalized = name.trim().toLowerCase();
+    if (normalized.isEmpty) return false;
+    final rows = await (_db.select(_db.exercises)
+          ..where((t) => _profileScope(t, userProfileId)))
+        .get();
+    return rows.any(
+      (row) =>
+          row.name.trim().toLowerCase() == normalized && row.id != excludingId,
+    );
+  }
+
+  @override
+  Future<Exercise> updateCustom(Exercise exercise) async {
+    final existing = await (_db.select(_db.exercises)
+          ..where((t) => t.id.equals(exercise.id) & t.isCustom.equals(true)))
+        .getSingleOrNull();
+    if (existing == null) {
+      throw StateError('Custom exercise not found.');
+    }
+
+    await _validateCustomExercise(exercise, excludingId: exercise.id);
+    await (_db.update(_db.exercises)..where((t) => t.id.equals(exercise.id)))
+        .write(
+      ExercisesCompanion(
+        name: Value(exercise.name.trim()),
+        userProfileId: Value(exercise.userProfileId),
+        dayType: Value(exercise.dayType),
+        primaryMuscleGroup: Value(exercise.primaryMuscleGroup),
+        secondaryMuscleGroups:
+            Value(_encodeList(exercise.secondaryMuscleGroups)),
+        tags: Value(_encodeList(exercise.tags)),
+        movementPattern: Value(exercise.movementPattern),
+        equipmentType: Value(exercise.equipmentType),
+        exerciseCategory: Value(exercise.exerciseCategory),
+        isBodyweight: Value(exercise.isBodyweight),
+        isUnilateral: Value(exercise.isUnilateral),
+        defaultIncrementKg: Value(exercise.defaultIncrementKg),
+        minimumRecommendedReps: Value(exercise.minimumRecommendedReps),
+        maximumRecommendedReps: Value(exercise.maximumRecommendedReps),
+        defaultRestSeconds: Value(exercise.defaultRestSeconds),
+        recommendedSetRangeMin: Value(exercise.recommendedSetRangeMin),
+        recommendedSetRangeMax: Value(exercise.recommendedSetRangeMax),
+        notes: Value(exercise.notes),
+        isCustom: const Value(true),
+        updatedAt: Value(exercise.updatedAt),
+      ),
+    );
+    await _replaceTargets(exercise);
+    return exercise;
+  }
+
+  @override
+  Future<void> deleteCustom(String id) async {
+    await (_db.delete(_db.exerciseMuscleTargets)
+          ..where((t) => t.exerciseId.equals(id)))
+        .go();
+    await (_db.delete(_db.exercises)
+          ..where((t) => t.id.equals(id) & t.isCustom.equals(true)))
+        .go();
+  }
+
+  Future<void> _validateCustomExercise(
+    Exercise exercise, {
+    String? excludingId,
+  }) async {
+    if (exercise.name.trim().isEmpty) {
+      throw ArgumentError.value(exercise.name, 'name', 'Name cannot be empty.');
+    }
+    final duplicate = await nameExists(
+      exercise.name,
+      userProfileId: exercise.userProfileId,
+      excludingId: excludingId,
+    );
+    if (duplicate) {
+      throw StateError('Exercise name already exists for this profile.');
+    }
+  }
+
+  Future<void> _replaceTargets(Exercise exercise) async {
     await (_db.delete(_db.exerciseMuscleTargets)
           ..where((t) => t.exerciseId.equals(exercise.id)))
         .go();
@@ -263,6 +369,5 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
             ),
           );
     }
-    return exercise;
   }
 }
