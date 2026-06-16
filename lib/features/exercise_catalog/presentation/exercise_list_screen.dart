@@ -37,6 +37,14 @@ class ExerciseListScreen extends ConsumerStatefulWidget {
 
 class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
   late ExerciseFilter _filter = widget.initialFilter;
+  final TextEditingController _searchController = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +55,29 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
       appBar: AppBar(title: Text(widget.pickMode ? 'Add exercise' : 'Exercises')),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+            child: TextField(
+              controller: _searchController,
+              textInputAction: TextInputAction.search,
+              decoration: InputDecoration(
+                hintText: 'Search exercises',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: _query.isEmpty
+                    ? null
+                    : IconButton(
+                        tooltip: 'Clear search',
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() => _query = '');
+                        },
+                      ),
+                border: const OutlineInputBorder(),
+              ),
+              onChanged: (value) => setState(() => _query = value),
+            ),
+          ),
           SizedBox(
             height: 48,
             child: ListView.separated(
@@ -95,10 +126,23 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
   }
 
   bool _matches(Exercise e) {
-    if (_filter == ExerciseFilter.all) return true;
-    if (_filter == ExerciseFilter.custom) return e.isCustom;
-    final name = _filter == ExerciseFilter.legs ? 'leg' : _filter.name;
-    return e.tags.contains(name) || e.dayType?.name == name;
+    final matchesFilter = switch (_filter) {
+      ExerciseFilter.all => true,
+      ExerciseFilter.custom => e.isCustom,
+      ExerciseFilter.legs => e.tags.contains('leg') || e.dayType?.name == 'leg',
+      _ => e.tags.contains(_filter.name) || e.dayType?.name == _filter.name,
+    };
+    if (!matchesFilter) return false;
+
+    final query = _query.trim().toLowerCase();
+    if (query.isEmpty) return true;
+
+    return e.name.toLowerCase().contains(query) ||
+        e.equipmentType.label.toLowerCase().contains(query) ||
+        e.equipmentType.name.toLowerCase().contains(query) ||
+        e.primaryMuscleGroup.toLowerCase().contains(query) ||
+        e.movementPattern.toLowerCase().contains(query) ||
+        e.tags.any((tag) => tag.toLowerCase().contains(query));
   }
 
   void _showInfo(BuildContext context, Exercise e) {
