@@ -256,13 +256,64 @@ Future<void> startWorkoutFromHome(BuildContext context, WidgetRef ref,
     {ExerciseFilter filter = ExerciseFilter.all}) async {
   final profile = ref.read(activeProfileProvider).valueOrNull;
   if (profile == null) return;
-  final session = await ref
-      .read(workoutRepositoryProvider)
-      .startSession(userProfileId: profile.id);
+
+  final activeSession = await ref.read(activeSessionProvider.future);
+  final repository = ref.read(workoutRepositoryProvider);
+
+  if (activeSession != null) {
+    if (!context.mounted) return;
+
+    final action = await showDialog<_ActiveWorkoutAction>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Workout already in progress'),
+        content: const Text(
+          'You have an active workout. What would you like to do?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () =>
+                Navigator.of(context).pop(_ActiveWorkoutAction.cancel),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () =>
+                Navigator.of(context).pop(_ActiveWorkoutAction.startNew),
+            child: const Text('End current and start new'),
+          ),
+          FilledButton(
+            onPressed: () =>
+                Navigator.of(context).pop(_ActiveWorkoutAction.resume),
+            child: const Text('Resume current workout'),
+          ),
+        ],
+      ),
+    );
+
+    switch (action) {
+      case _ActiveWorkoutAction.resume:
+        if (context.mounted) {
+          context.push('/workout/${activeSession.id}');
+        }
+        return;
+      case _ActiveWorkoutAction.startNew:
+        await repository.endSession(activeSession.id);
+        break;
+      case _ActiveWorkoutAction.cancel:
+      case null:
+        return;
+    }
+  }
+
+  final session = await repository.startSession(userProfileId: profile.id);
+  ref.invalidate(activeSessionProvider);
+  ref.invalidate(lastFinishedSessionProvider);
   if (context.mounted) {
     context.push('/workout/${session.id}?filter=${filter.name}');
   }
 }
+
+enum _ActiveWorkoutAction { resume, startNew, cancel }
 
 class _QuickFilter extends ConsumerWidget {
   const _QuickFilter({required this.label, required this.filter});
