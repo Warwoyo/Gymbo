@@ -190,6 +190,34 @@ class WorkoutRegionImpacts extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@DataClassName('WorkoutTemplateRow')
+class WorkoutTemplates extends Table {
+  TextColumn get id => text()();
+  TextColumn get userProfileId => text()();
+  TextColumn get name => text()();
+  TextColumn get dayType => textEnum<DayType>().nullable()();
+  TextColumn get notes => text().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DataClassName('WorkoutTemplateExerciseRow')
+class WorkoutTemplateExercises extends Table {
+  TextColumn get id => text()();
+  TextColumn get templateId => text()();
+  TextColumn get exerciseId => text()();
+  IntColumn get orderIndex => integer()();
+  IntColumn get targetSets => integer().nullable()();
+  IntColumn get targetReps => integer().nullable()();
+  TextColumn get notes => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 // ----------------------------- Database -----------------------------
 
 @DriftDatabase(tables: [
@@ -202,6 +230,8 @@ class WorkoutRegionImpacts extends Table {
   ExerciseMuscleTargets,
   WorkoutMuscleImpacts,
   WorkoutRegionImpacts,
+  WorkoutTemplates,
+  WorkoutTemplateExercises,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -216,6 +246,28 @@ class AppDatabase extends _$AppDatabase {
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (m) async {
           await m.createAll();
+          await customStatement('''
+            CREATE TABLE IF NOT EXISTS workout_templates (
+              id TEXT NOT NULL PRIMARY KEY,
+              user_profile_id TEXT NOT NULL,
+              name TEXT NOT NULL,
+              day_type TEXT NULL,
+              notes TEXT NULL,
+              created_at INTEGER NOT NULL,
+              updated_at INTEGER NOT NULL
+            )
+          ''');
+          await customStatement('''
+            CREATE TABLE IF NOT EXISTS workout_template_exercises (
+              id TEXT NOT NULL PRIMARY KEY,
+              template_id TEXT NOT NULL,
+              exercise_id TEXT NOT NULL,
+              order_index INTEGER NOT NULL,
+              target_sets INTEGER NULL,
+              target_reps INTEGER NULL,
+              notes TEXT NULL
+            )
+          ''');
         },
         onUpgrade: (m, from, to) async {
           // v2: evidence-informed fields + persisted rest timer.
@@ -265,7 +317,28 @@ class AppDatabase extends _$AppDatabase {
             await m.addColumn(workoutSets, workoutSets.loadType);
           }
           if (from < 5) {
-            await m.addColumn(exercises, exercises.userProfileId);
+            await customStatement('''
+              CREATE TABLE IF NOT EXISTS workout_templates (
+                id TEXT NOT NULL PRIMARY KEY,
+                user_profile_id TEXT NOT NULL,
+                name TEXT NOT NULL,
+                day_type TEXT NULL,
+                notes TEXT NULL,
+                created_at INTEGER NOT NULL,
+                updated_at INTEGER NOT NULL
+              )
+            ''');
+            await customStatement('''
+              CREATE TABLE IF NOT EXISTS workout_template_exercises (
+                id TEXT NOT NULL PRIMARY KEY,
+                template_id TEXT NOT NULL,
+                exercise_id TEXT NOT NULL,
+                order_index INTEGER NOT NULL,
+                target_sets INTEGER NULL,
+                target_reps INTEGER NULL,
+                notes TEXT NULL
+              )
+            ''');
           }
         },
       );

@@ -110,6 +110,26 @@ class HomeScreen extends ConsumerWidget {
               onPressed: () => startWorkoutFromHome(context, ref),
             ),
             const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.list_alt_outlined),
+                    label: const Text('Start from template'),
+                    onPressed: () => context.push('/templates'),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.add),
+                    label: const Text('Create template'),
+                    onPressed: () => context.push('/templates/new'),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
             Wrap(
               spacing: 8,
               runSpacing: 8,

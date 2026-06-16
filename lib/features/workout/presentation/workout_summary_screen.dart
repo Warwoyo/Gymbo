@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/providers.dart';
 import '../../../core/enums.dart';
 import '../../../core/utils/formatting.dart';
 import '../../muscle/presentation/human_muscle_map.dart';
@@ -217,13 +218,13 @@ class _NextTimePlanCard extends StatelessWidget {
   }
 }
 
-class _SummaryActions extends StatelessWidget {
+class _SummaryActions extends ConsumerWidget {
   const _SummaryActions({required this.summary});
 
   final WorkoutSummary summary;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final progressExercise = summary.bestExercise ??
         (summary.exercises.isEmpty ? null : summary.exercises.first);
 
@@ -240,13 +241,9 @@ class _SummaryActions extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         OutlinedButton(
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Template saving is not available yet.'),
-              ),
-            );
-          },
+          onPressed: summary.exercises.isEmpty
+              ? null
+              : () => _saveAsTemplate(context, ref),
           child: const Text('Save as template'),
         ),
         const SizedBox(height: 8),
@@ -257,6 +254,44 @@ class _SummaryActions extends StatelessWidget {
       ],
     );
   }
+
+  Future<void> _saveAsTemplate(BuildContext context, WidgetRef ref) async {
+    final controller = TextEditingController(
+      text: summary.session.sessionName ?? summary.dayType?.label ?? 'Workout template',
+    );
+    final name = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Save as template'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(labelText: 'Template name'),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(controller.text),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (name == null || name.trim().isEmpty) return;
+    final template = await ref.read(workoutTemplateRepositoryProvider).saveSessionAsTemplate(
+          sessionId: summary.session.id,
+          name: name,
+        );
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Saved ${template.name} as a template.')),
+    );
+  }
+
 }
 
 class _MuscleImpactCard extends StatelessWidget {
@@ -311,6 +346,7 @@ class _MuscleImpactCard extends StatelessWidget {
       ),
     );
   }
+
 }
 
 class _StatGrid extends StatelessWidget {
