@@ -1152,6 +1152,12 @@ class $ExercisesTable extends Exercises
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
       'name', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _userProfileIdMeta =
+      const VerificationMeta('userProfileId');
+  @override
+  late final GeneratedColumn<String> userProfileId = GeneratedColumn<String>(
+      'user_profile_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   @override
   late final GeneratedColumnWithTypeConverter<DayType?, String> dayType =
       GeneratedColumn<String>('day_type', aliasedName, true,
@@ -1287,6 +1293,7 @@ class $ExercisesTable extends Exercises
   List<GeneratedColumn> get $columns => [
         id,
         name,
+        userProfileId,
         dayType,
         tags,
         primaryMuscleGroup,
@@ -1433,6 +1440,8 @@ class $ExercisesTable extends Exercises
           .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      userProfileId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}user_profile_id']),
       dayType: $ExercisesTable.$converterdayTypen.fromSql(attachedDatabase
           .typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}day_type'])),
@@ -1503,6 +1512,7 @@ class $ExercisesTable extends Exercises
 class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
   final String id;
   final String name;
+  final String? userProfileId;
   final DayType? dayType;
   final String tags;
   final String primaryMuscleGroup;
@@ -1525,6 +1535,7 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
   const ExerciseRow(
       {required this.id,
       required this.name,
+      this.userProfileId,
       this.dayType,
       required this.tags,
       required this.primaryMuscleGroup,
@@ -1549,6 +1560,9 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
     map['name'] = Variable<String>(name);
+    if (!nullToAbsent || userProfileId != null) {
+      map['user_profile_id'] = Variable<String>(userProfileId);
+    }
     if (!nullToAbsent || dayType != null) {
       map['day_type'] =
           Variable<String>($ExercisesTable.$converterdayTypen.toSql(dayType));
@@ -1598,6 +1612,9 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
     return ExercisesCompanion(
       id: Value(id),
       name: Value(name),
+      userProfileId: userProfileId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(userProfileId),
       dayType: dayType == null && nullToAbsent
           ? const Value.absent()
           : Value(dayType),
@@ -1643,6 +1660,7 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
     return ExerciseRow(
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
+      userProfileId: serializer.fromJson<String?>(json['userProfileId']),
       dayType: $ExercisesTable.$converterdayTypen
           .fromJson(serializer.fromJson<String?>(json['dayType'])),
       tags: serializer.fromJson<String>(json['tags']),
@@ -1680,6 +1698,7 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
+      'userProfileId': serializer.toJson<String?>(userProfileId),
       'dayType': serializer
           .toJson<String?>($ExercisesTable.$converterdayTypen.toJson(dayType)),
       'tags': serializer.toJson<String>(tags),
@@ -1708,6 +1727,7 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
   ExerciseRow copyWith(
           {String? id,
           String? name,
+          Value<String?> userProfileId = const Value.absent(),
           Value<DayType?> dayType = const Value.absent(),
           String? tags,
           String? primaryMuscleGroup,
@@ -1730,6 +1750,7 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
       ExerciseRow(
         id: id ?? this.id,
         name: name ?? this.name,
+        userProfileId: userProfileId.present ? userProfileId.value : this.userProfileId,
         dayType: dayType.present ? dayType.value : this.dayType,
         tags: tags ?? this.tags,
         primaryMuscleGroup: primaryMuscleGroup ?? this.primaryMuscleGroup,
@@ -1769,6 +1790,9 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
     return ExerciseRow(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
+      userProfileId: data.userProfileId.present
+          ? data.userProfileId.value
+          : this.userProfileId,
       dayType: data.dayType.present ? data.dayType.value : this.dayType,
       tags: data.tags.present ? data.tags.value : this.tags,
       primaryMuscleGroup: data.primaryMuscleGroup.present
@@ -1822,6 +1846,7 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
     return (StringBuffer('ExerciseRow(')
           ..write('id: $id, ')
           ..write('name: $name, ')
+          ..write('userProfileId: $userProfileId, ')
           ..write('dayType: $dayType, ')
           ..write('tags: $tags, ')
           ..write('primaryMuscleGroup: $primaryMuscleGroup, ')
@@ -1849,6 +1874,7 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
   int get hashCode => Object.hashAll([
         id,
         name,
+        userProfileId,
         dayType,
         tags,
         primaryMuscleGroup,
@@ -1875,6 +1901,7 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
       (other is ExerciseRow &&
           other.id == this.id &&
           other.name == this.name &&
+          other.userProfileId == this.userProfileId &&
           other.dayType == this.dayType &&
           other.tags == this.tags &&
           other.primaryMuscleGroup == this.primaryMuscleGroup &&
@@ -1899,6 +1926,7 @@ class ExerciseRow extends DataClass implements Insertable<ExerciseRow> {
 class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
   final Value<String> id;
   final Value<String> name;
+  final Value<String?> userProfileId;
   final Value<DayType?> dayType;
   final Value<String> tags;
   final Value<String> primaryMuscleGroup;
@@ -1922,6 +1950,7 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
   const ExercisesCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
+    this.userProfileId = const Value.absent(),
     this.dayType = const Value.absent(),
     this.tags = const Value.absent(),
     this.primaryMuscleGroup = const Value.absent(),
@@ -1946,6 +1975,7 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
   ExercisesCompanion.insert({
     required String id,
     required String name,
+    this.userProfileId = const Value.absent(),
     this.dayType = const Value.absent(),
     this.tags = const Value.absent(),
     required String primaryMuscleGroup,
@@ -1975,6 +2005,7 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
   static Insertable<ExerciseRow> custom({
     Expression<String>? id,
     Expression<String>? name,
+    Expression<String>? userProfileId,
     Expression<String>? dayType,
     Expression<String>? tags,
     Expression<String>? primaryMuscleGroup,
@@ -1999,6 +2030,7 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
+      if (userProfileId != null) 'user_profile_id': userProfileId,
       if (dayType != null) 'day_type': dayType,
       if (tags != null) 'tags': tags,
       if (primaryMuscleGroup != null)
@@ -2033,6 +2065,7 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
   ExercisesCompanion copyWith(
       {Value<String>? id,
       Value<String>? name,
+      Value<String?>? userProfileId,
       Value<DayType?>? dayType,
       Value<String>? tags,
       Value<String>? primaryMuscleGroup,
@@ -2056,6 +2089,7 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
     return ExercisesCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
+      userProfileId: userProfileId ?? this.userProfileId,
       dayType: dayType ?? this.dayType,
       tags: tags ?? this.tags,
       primaryMuscleGroup: primaryMuscleGroup ?? this.primaryMuscleGroup,
@@ -2092,6 +2126,9 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseRow> {
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
+    }
+    if (userProfileId.present) {
+      map['user_profile_id'] = Variable<String>(userProfileId.value);
     }
     if (dayType.present) {
       map['day_type'] = Variable<String>(
@@ -3054,7 +3091,8 @@ class WorkoutExerciseRow extends DataClass
 
   @override
   int get hashCode => Object.hash(
-      id, sessionId, exerciseId, orderIndex, startedAt, endedAt, notes);
+      id,
+      userProfileId, sessionId, exerciseId, orderIndex, startedAt, endedAt, notes);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||

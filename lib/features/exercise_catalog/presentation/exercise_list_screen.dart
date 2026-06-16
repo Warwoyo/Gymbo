@@ -5,6 +5,7 @@ import '../../../core/enums.dart';
 import '../../muscle/domain/muscle_recovery.dart';
 import '../../workout/presentation/session_providers.dart';
 import '../domain/exercise.dart';
+import 'custom_exercise_form_screen.dart';
 import 'exercise_providers.dart';
 
 enum ExerciseSort {
@@ -88,6 +89,13 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
           ),
         ],
       ),
+      floatingActionButton: widget.pickMode
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: _openCreateForm,
+              icon: const Icon(Icons.add),
+              label: const Text('Custom'),
+            ),
       body: Column(
         children: [
           Padding(
@@ -426,6 +434,51 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
     );
   }
 
+  Future<void> _openCreateForm() async {
+    final created = await Navigator.of(context).push<Exercise>(
+      MaterialPageRoute(builder: (_) => const CustomExerciseFormScreen()),
+    );
+    if (created != null) ref.invalidate(allExercisesProvider);
+  }
+
+  Future<void> _openEditForm(Exercise exercise) async {
+    Navigator.of(context).pop();
+    final updated = await Navigator.of(context).push<Exercise>(
+      MaterialPageRoute(
+        builder: (_) => CustomExerciseFormScreen(exercise: exercise),
+      ),
+    );
+    if (updated != null) ref.invalidate(allExercisesProvider);
+  }
+
+  Future<void> _deleteCustomExercise(Exercise exercise) async {
+    Navigator.of(context).pop();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete custom exercise?'),
+        content: Text('This removes "${exercise.name}" from your catalog.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    await ref.read(exerciseRepositoryProvider).deleteCustom(exercise.id);
+    ref.invalidate(allExercisesProvider);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Deleted ${exercise.name}.')),
+    );
+  }
+
   void _showInfo(BuildContext context, Exercise e) {
     showModalBottomSheet<void>(
       context: context,
@@ -436,13 +489,47 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(e.name, style: Theme.of(context).textTheme.headlineSmall),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    e.name,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                ),
+                if (e.isCustom) ...[
+                  IconButton(
+                    tooltip: 'Edit custom exercise',
+                    onPressed: () => _openEditForm(e),
+                    icon: const Icon(Icons.edit),
+                  ),
+                  IconButton(
+                    tooltip: 'Delete custom exercise',
+                    onPressed: () => _deleteCustomExercise(e),
+                    icon: const Icon(Icons.delete_outline),
+                  ),
+                ],
+              ],
+            ),
             const SizedBox(height: 12),
             _info('Primary muscle', e.primaryMuscleGroup),
             if (e.secondaryMuscleGroups.isNotEmpty)
               _info('Secondary', e.secondaryMuscleGroups.join(', ')),
             _info('Pattern', e.movementPattern),
             _info('Equipment', e.equipmentType.label),
+            _info('Category', e.exerciseCategory.label),
+            if (e.minimumRecommendedReps != null ||
+                e.maximumRecommendedReps != null)
+              _info(
+                'Recommended reps',
+                '${e.minimumRecommendedReps ?? '-'}-${e.maximumRecommendedReps ?? '-'}',
+              ),
+            if (e.recommendedSetRangeMin != null ||
+                e.recommendedSetRangeMax != null)
+              _info(
+                'Recommended sets',
+                '${e.recommendedSetRangeMin ?? '-'}-${e.recommendedSetRangeMax ?? '-'}',
+              ),
             if (e.muscleTargets.isNotEmpty)
               _info(
                 'Impact targets',

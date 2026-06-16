@@ -45,6 +45,7 @@ class UserProfiles extends Table {
 class Exercises extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
+  TextColumn get userProfileId => text().nullable()();
   TextColumn get dayType => textEnum<DayType>().nullable()();
   TextColumn get tags => text().withDefault(const Constant(''))();
   TextColumn get primaryMuscleGroup => text()();
