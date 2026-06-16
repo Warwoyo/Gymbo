@@ -15,6 +15,11 @@ class SeedExercise {
     this.isUnilateral = false,
     this.defaultIncrementKg,
     this.muscleTargets = const [],
+    this.minimumRecommendedReps,
+    this.maximumRecommendedReps,
+    this.recommendedSetRangeMin,
+    this.recommendedSetRangeMax,
+    this.defaultRestSeconds,
     this.tags = const [],
     this.notes,
   });
@@ -30,6 +35,11 @@ class SeedExercise {
   final bool isUnilateral;
   final double? defaultIncrementKg;
   final List<MuscleTarget> muscleTargets;
+  final int? minimumRecommendedReps;
+  final int? maximumRecommendedReps;
+  final int? recommendedSetRangeMin;
+  final int? recommendedSetRangeMax;
+  final int? defaultRestSeconds;
   final List<String> tags;
   final String? notes;
 }
@@ -139,6 +149,45 @@ const List<SeedExercise> kSeedExercises = [
     exerciseCategory: ExerciseCategory.isolation,
     isUnilateral: true,
     defaultIncrementKg: 1.0,
+  ),
+
+  SeedExercise(
+    name: 'Low Incline Dumbbell Press',
+    dayType: DayType.push,
+    primaryMuscleGroup: 'Upper Chest',
+    secondaryMuscleGroups: ['Front Delts', 'Triceps'],
+    movementPattern: 'Incline Push',
+    equipmentType: EquipmentType.dumbbell,
+    exerciseCategory: ExerciseCategory.compoundUpper,
+    defaultIncrementKg: 2.0,
+  ),
+  SeedExercise(
+    name: 'Landmine Press',
+    dayType: DayType.push,
+    primaryMuscleGroup: 'Shoulders',
+    secondaryMuscleGroups: ['Upper Chest', 'Triceps', 'Core'],
+    movementPattern: 'Angled Push',
+    equipmentType: EquipmentType.barbell,
+    exerciseCategory: ExerciseCategory.compoundUpper,
+    isUnilateral: true,
+    defaultIncrementKg: 2.5,
+  ),
+  SeedExercise(
+    name: 'Machine Lateral Raise',
+    dayType: DayType.push,
+    primaryMuscleGroup: 'Side Delts',
+    movementPattern: 'Lateral Raise',
+    equipmentType: EquipmentType.machine,
+    exerciseCategory: ExerciseCategory.machineIsolation,
+  ),
+  SeedExercise(
+    name: 'Lean-Away Cable Lateral Raise',
+    dayType: DayType.push,
+    primaryMuscleGroup: 'Side Delts',
+    movementPattern: 'Lateral Raise',
+    equipmentType: EquipmentType.cable,
+    exerciseCategory: ExerciseCategory.isolation,
+    isUnilateral: true,
   ),
   SeedExercise(
     name: 'Triceps Pushdown',
@@ -267,6 +316,53 @@ const List<SeedExercise> kSeedExercises = [
     equipmentType: EquipmentType.machine,
     exerciseCategory: ExerciseCategory.machineCompound,
   ),
+
+  SeedExercise(
+    name: 'One-Arm Cable Row',
+    dayType: DayType.pull,
+    primaryMuscleGroup: 'Lats',
+    secondaryMuscleGroups: ['Mid Back', 'Biceps'],
+    movementPattern: 'Horizontal Pull',
+    equipmentType: EquipmentType.cable,
+    exerciseCategory: ExerciseCategory.compoundUpper,
+    isUnilateral: true,
+  ),
+  SeedExercise(
+    name: 'Neutral-Grip Lat Pulldown',
+    dayType: DayType.pull,
+    primaryMuscleGroup: 'Lats',
+    secondaryMuscleGroups: ['Biceps', 'Mid Back'],
+    movementPattern: 'Vertical Pull',
+    equipmentType: EquipmentType.cable,
+    exerciseCategory: ExerciseCategory.compoundUpper,
+  ),
+  SeedExercise(
+    name: 'Wide-Grip Lat Pulldown',
+    dayType: DayType.pull,
+    primaryMuscleGroup: 'Lats',
+    secondaryMuscleGroups: ['Biceps', 'Upper Back'],
+    movementPattern: 'Vertical Pull',
+    equipmentType: EquipmentType.cable,
+    exerciseCategory: ExerciseCategory.compoundUpper,
+  ),
+  SeedExercise(
+    name: 'Straight-Arm Pulldown',
+    dayType: DayType.pull,
+    primaryMuscleGroup: 'Lats',
+    secondaryMuscleGroups: ['Triceps'],
+    movementPattern: 'Shoulder Extension',
+    equipmentType: EquipmentType.cable,
+    exerciseCategory: ExerciseCategory.isolation,
+  ),
+  SeedExercise(
+    name: 'Machine Rear Delt Fly',
+    dayType: DayType.pull,
+    primaryMuscleGroup: 'Rear Delts',
+    secondaryMuscleGroups: ['Upper Back'],
+    movementPattern: 'Horizontal Abduction',
+    equipmentType: EquipmentType.machine,
+    exerciseCategory: ExerciseCategory.machineIsolation,
+  ),
   SeedExercise(
     name: 'Face Pull',
     dayType: DayType.pull,
@@ -369,6 +465,27 @@ const List<SeedExercise> kSeedExercises = [
     exerciseCategory: ExerciseCategory.compoundLower,
     defaultIncrementKg: 5.0,
   ),
+
+  SeedExercise(
+    name: 'High-Foot Leg Press',
+    dayType: DayType.leg,
+    primaryMuscleGroup: 'Glutes',
+    secondaryMuscleGroups: ['Hamstrings', 'Quads'],
+    movementPattern: 'Squat',
+    equipmentType: EquipmentType.plateLoaded,
+    exerciseCategory: ExerciseCategory.compoundLower,
+    defaultIncrementKg: 5.0,
+  ),
+  SeedExercise(
+    name: 'Narrow-Stance Leg Press',
+    dayType: DayType.leg,
+    primaryMuscleGroup: 'Quads',
+    secondaryMuscleGroups: ['Glutes'],
+    movementPattern: 'Squat',
+    equipmentType: EquipmentType.plateLoaded,
+    exerciseCategory: ExerciseCategory.compoundLower,
+    defaultIncrementKg: 5.0,
+  ),
   SeedExercise(
     name: 'Hack Squat',
     dayType: DayType.leg,
@@ -388,6 +505,17 @@ const List<SeedExercise> kSeedExercises = [
     equipmentType: EquipmentType.barbell,
     exerciseCategory: ExerciseCategory.compoundLower,
     defaultIncrementKg: 2.5,
+  ),
+
+  SeedExercise(
+    name: 'Dumbbell Romanian Deadlift',
+    dayType: DayType.leg,
+    primaryMuscleGroup: 'Hamstrings',
+    secondaryMuscleGroups: ['Glutes', 'Spinal Erectors'],
+    movementPattern: 'Hip Hinge',
+    equipmentType: EquipmentType.dumbbell,
+    exerciseCategory: ExerciseCategory.compoundLower,
+    defaultIncrementKg: 2.0,
   ),
   SeedExercise(
     name: 'Deadlift',
@@ -422,6 +550,16 @@ const List<SeedExercise> kSeedExercises = [
     movementPattern: 'Knee Flexion',
     equipmentType: EquipmentType.machine,
     exerciseCategory: ExerciseCategory.machineIsolation,
+  ),
+
+  SeedExercise(
+    name: 'Single-Leg Leg Curl',
+    dayType: DayType.leg,
+    primaryMuscleGroup: 'Hamstrings',
+    movementPattern: 'Knee Flexion',
+    equipmentType: EquipmentType.machine,
+    exerciseCategory: ExerciseCategory.machineIsolation,
+    isUnilateral: true,
   ),
   SeedExercise(
     name: 'Walking Lunge',
@@ -471,8 +609,173 @@ const List<SeedExercise> kSeedExercises = [
     equipmentType: EquipmentType.machine,
     exerciseCategory: ExerciseCategory.machineIsolation,
   ),
+  SeedExercise(
+    name: 'Leg Press Calf Raise',
+    dayType: DayType.leg,
+    primaryMuscleGroup: 'Calves',
+    movementPattern: 'Ankle Plantarflexion',
+    equipmentType: EquipmentType.plateLoaded,
+    exerciseCategory: ExerciseCategory.machineIsolation,
+    defaultIncrementKg: 5.0,
+  ),
+
+  // ---------------- Core / Conditioning ----------------
+  SeedExercise(
+    name: 'Cable Crunch',
+    dayType: DayType.pull,
+    primaryMuscleGroup: 'Abs',
+    secondaryMuscleGroups: ['Obliques'],
+    movementPattern: 'Spinal Flexion',
+    equipmentType: EquipmentType.cable,
+    exerciseCategory: ExerciseCategory.core,
+    tags: ['core', 'upper'],
+  ),
+  SeedExercise(
+    name: 'Hanging Knee Raise',
+    dayType: DayType.pull,
+    primaryMuscleGroup: 'Abs',
+    secondaryMuscleGroups: ['Hip Flexors'],
+    movementPattern: 'Hip Flexion',
+    equipmentType: EquipmentType.bodyweight,
+    exerciseCategory: ExerciseCategory.core,
+    isBodyweight: true,
+    tags: ['core', 'upper'],
+  ),
+  SeedExercise(
+    name: 'Plank',
+    dayType: DayType.push,
+    primaryMuscleGroup: 'Abs',
+    secondaryMuscleGroups: ['Obliques', 'Shoulders'],
+    movementPattern: 'Anti-Extension',
+    equipmentType: EquipmentType.bodyweight,
+    exerciseCategory: ExerciseCategory.core,
+    isBodyweight: true,
+    tags: ['core', 'upper'],
+  ),
+  SeedExercise(
+    name: 'Side Plank',
+    dayType: DayType.push,
+    primaryMuscleGroup: 'Obliques',
+    secondaryMuscleGroups: ['Abs', 'Shoulders'],
+    movementPattern: 'Anti-Lateral Flexion',
+    equipmentType: EquipmentType.bodyweight,
+    exerciseCategory: ExerciseCategory.core,
+    isBodyweight: true,
+    isUnilateral: true,
+    tags: ['core', 'upper'],
+  ),
+  SeedExercise(
+    name: 'Pallof Press',
+    dayType: DayType.push,
+    primaryMuscleGroup: 'Obliques',
+    secondaryMuscleGroups: ['Abs', 'Shoulders'],
+    movementPattern: 'Anti-Rotation',
+    equipmentType: EquipmentType.cable,
+    exerciseCategory: ExerciseCategory.core,
+    isUnilateral: true,
+    tags: ['core', 'upper'],
+  ),
+  SeedExercise(
+    name: 'Ab Wheel Rollout',
+    dayType: DayType.push,
+    primaryMuscleGroup: 'Abs',
+    secondaryMuscleGroups: ['Lats', 'Shoulders'],
+    movementPattern: 'Anti-Extension',
+    equipmentType: EquipmentType.other,
+    exerciseCategory: ExerciseCategory.core,
+    tags: ['core', 'upper'],
+  ),
+  SeedExercise(
+    name: 'Farmer Carry',
+    dayType: DayType.leg,
+    primaryMuscleGroup: 'Traps',
+    secondaryMuscleGroups: ['Forearms', 'Core', 'Glutes'],
+    movementPattern: 'Loaded Carry',
+    equipmentType: EquipmentType.dumbbell,
+    exerciseCategory: ExerciseCategory.compoundLower,
+    tags: ['upper', 'lower', 'core', 'conditioning'],
+  ),
+  SeedExercise(
+    name: 'Kettlebell Swing',
+    dayType: DayType.leg,
+    primaryMuscleGroup: 'Glutes',
+    secondaryMuscleGroups: ['Hamstrings', 'Lower Back', 'Core'],
+    movementPattern: 'Hip Hinge',
+    equipmentType: EquipmentType.kettlebell,
+    exerciseCategory: ExerciseCategory.compoundLower,
+    tags: ['lower', 'core', 'conditioning'],
+  ),
+  SeedExercise(
+    name: 'Sled Push',
+    dayType: DayType.leg,
+    primaryMuscleGroup: 'Quads',
+    secondaryMuscleGroups: ['Glutes', 'Calves', 'Core'],
+    movementPattern: 'Loaded March',
+    equipmentType: EquipmentType.other,
+    exerciseCategory: ExerciseCategory.compoundLower,
+    tags: ['lower', 'core', 'conditioning'],
+  ),
+
 ];
 
+
+
+int minimumRecommendedRepsForSeed(SeedExercise seed) {
+  if (seed.minimumRecommendedReps != null) return seed.minimumRecommendedReps!;
+  switch (seed.exerciseCategory) {
+    case ExerciseCategory.compoundUpper:
+    case ExerciseCategory.compoundLower:
+    case ExerciseCategory.machineCompound:
+      return 6;
+    case ExerciseCategory.isolation:
+    case ExerciseCategory.machineIsolation:
+      return 10;
+    case ExerciseCategory.bodyweight:
+    case ExerciseCategory.assistedBodyweight:
+    case ExerciseCategory.core:
+      return 8;
+  }
+}
+
+int maximumRecommendedRepsForSeed(SeedExercise seed) {
+  if (seed.maximumRecommendedReps != null) return seed.maximumRecommendedReps!;
+  switch (seed.exerciseCategory) {
+    case ExerciseCategory.compoundUpper:
+    case ExerciseCategory.compoundLower:
+    case ExerciseCategory.machineCompound:
+      return 12;
+    case ExerciseCategory.isolation:
+    case ExerciseCategory.machineIsolation:
+      return 20;
+    case ExerciseCategory.bodyweight:
+    case ExerciseCategory.assistedBodyweight:
+    case ExerciseCategory.core:
+      return 15;
+  }
+}
+
+int recommendedSetRangeMinForSeed(SeedExercise seed) =>
+    seed.recommendedSetRangeMin ?? 2;
+
+int recommendedSetRangeMaxForSeed(SeedExercise seed) =>
+    seed.recommendedSetRangeMax ?? 4;
+
+int defaultRestSecondsForSeed(SeedExercise seed) {
+  if (seed.defaultRestSeconds != null) return seed.defaultRestSeconds!;
+  switch (seed.exerciseCategory) {
+    case ExerciseCategory.compoundUpper:
+    case ExerciseCategory.compoundLower:
+    case ExerciseCategory.machineCompound:
+      return 120;
+    case ExerciseCategory.isolation:
+    case ExerciseCategory.machineIsolation:
+    case ExerciseCategory.core:
+      return 60;
+    case ExerciseCategory.bodyweight:
+    case ExerciseCategory.assistedBodyweight:
+      return 90;
+  }
+}
 
 List<MuscleTarget> muscleTargetsForSeed(SeedExercise seed) {
   final explicit = seed.muscleTargets;

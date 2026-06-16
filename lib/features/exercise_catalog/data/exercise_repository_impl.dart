@@ -130,38 +130,46 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
 
   @override
   Future<void> seedIfEmpty() async {
-    if (await count() > 0) {
-      await _seedMissingMuscleTargets();
-      return;
-    }
-    final now = DateTime.now();
-    await _db.batch((b) {
-      for (final s in kSeedExercises) {
-        b.insert(
-          _db.exercises,
-          ExercisesCompanion.insert(
-            id: _uuid.v4(),
-            name: s.name,
-            dayType: Value(s.dayType),
-            primaryMuscleGroup: s.primaryMuscleGroup,
-            secondaryMuscleGroups:
-                Value(_encodeList(s.secondaryMuscleGroups)),
-            movementPattern: Value(s.movementPattern),
-            equipmentType: s.equipmentType,
-            exerciseCategory: Value(s.exerciseCategory),
-            isBodyweight: Value(s.isBodyweight),
-            isUnilateral: Value(s.isUnilateral),
-            defaultIncrementKg: Value(s.defaultIncrementKg),
-            tags: Value(_encodeList(tagsForSeed(s))),
-            notes: Value(s.notes),
-            isCustom: const Value(false),
-            createdAt: now,
-            updatedAt: now,
-          ),
-        );
-      }
-    });
+    await _seedMissingExercises();
     await _seedMissingMuscleTargets();
+  }
+
+  Future<void> _seedMissingExercises() async {
+    final now = DateTime.now();
+    for (final seed in kSeedExercises) {
+      final existing = await (_db.select(_db.exercises)
+            ..where((t) => t.name.equals(seed.name)))
+          .getSingleOrNull();
+      if (existing != null) continue;
+
+      await _db.into(_db.exercises).insert(_companionForSeed(seed, now));
+    }
+  }
+
+  ExercisesCompanion _companionForSeed(SeedExercise seed, DateTime now) {
+    return ExercisesCompanion.insert(
+      id: _uuid.v4(),
+      name: seed.name,
+      dayType: Value(seed.dayType),
+      primaryMuscleGroup: seed.primaryMuscleGroup,
+      secondaryMuscleGroups: Value(_encodeList(seed.secondaryMuscleGroups)),
+      movementPattern: Value(seed.movementPattern),
+      equipmentType: seed.equipmentType,
+      exerciseCategory: Value(seed.exerciseCategory),
+      isBodyweight: Value(seed.isBodyweight),
+      isUnilateral: Value(seed.isUnilateral),
+      defaultIncrementKg: Value(seed.defaultIncrementKg),
+      minimumRecommendedReps: Value(minimumRecommendedRepsForSeed(seed)),
+      maximumRecommendedReps: Value(maximumRecommendedRepsForSeed(seed)),
+      defaultRestSeconds: Value(defaultRestSecondsForSeed(seed)),
+      recommendedSetRangeMin: Value(recommendedSetRangeMinForSeed(seed)),
+      recommendedSetRangeMax: Value(recommendedSetRangeMaxForSeed(seed)),
+      tags: Value(_encodeList(tagsForSeed(seed))),
+      notes: Value(seed.notes),
+      isCustom: const Value(false),
+      createdAt: now,
+      updatedAt: now,
+    );
   }
 
   Future<void> _seedMissingMuscleTargets() async {
