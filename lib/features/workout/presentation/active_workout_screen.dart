@@ -94,6 +94,20 @@ class ActiveWorkoutScreen extends ConsumerWidget {
                         ),
                       )
                     else ...[
+                      if (selected.lastWorkingSet != null) ...[
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: OutlinedButton.icon(
+                            onPressed: () => _repeatLastWorkingSet(
+                              controller,
+                              selected.lastWorkingSet!,
+                            ),
+                            icon: const Icon(Icons.replay),
+                            label: const Text('Repeat last set'),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
                       _SetsList(
                         sets: selected.sets,
                         onDelete: controller.deleteSet,
@@ -292,6 +306,40 @@ class ActiveWorkoutScreen extends ConsumerWidget {
       rpe: result.rpe,
       rir: result.rir,
       notes: result.notes,
+    );
+
+    if (!context.mounted || result.isWarmup) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Logged ${Format.kg(result.weightKg)} × ${result.reps} reps',
+        ),
+        action: SnackBarAction(
+          label: 'Log same again',
+          onPressed: () => controller.logSet(
+            weightKg: result.weightKg,
+            reps: result.reps,
+            isFailure: result.isFailure,
+            rpe: result.rpe,
+            rir: result.rir,
+            notes: result.notes,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _repeatLastWorkingSet(
+    WorkoutController controller,
+    WorkoutSet set,
+  ) {
+    return controller.logSet(
+      weightKg: set.weightKg,
+      reps: set.reps,
+      isFailure: set.isFailure,
+      rpe: set.rpe,
+      rir: set.rir,
+      notes: set.notes,
     );
   }
 
