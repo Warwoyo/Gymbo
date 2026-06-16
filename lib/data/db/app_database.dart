@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
 import '../../core/enums.dart';
+import '../../features/workout/domain/workout_set.dart';
 
 part 'app_database.g.dart';
 
@@ -108,6 +109,8 @@ class WorkoutSets extends Table {
   IntColumn get setNumber => integer()();
   RealColumn get weightKg => real()();
   IntColumn get reps => integer()();
+  TextColumn get loadType => textEnum<WorkoutSetLoadType>()
+      .withDefault(Constant(WorkoutSetLoadType.externalLoad.name))();
   RealColumn get rpe => real().nullable()();
   IntColumn get rir => integer().nullable()();
   BoolColumn get isWarmup => boolean().withDefault(const Constant(false))();
@@ -206,7 +209,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -256,6 +259,9 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(exerciseMuscleTargets);
             await m.createTable(workoutMuscleImpacts);
             await m.createTable(workoutRegionImpacts);
+          }
+          if (from < 4) {
+            await m.addColumn(workoutSets, workoutSets.loadType);
           }
         },
       );

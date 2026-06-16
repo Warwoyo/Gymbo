@@ -1,4 +1,5 @@
 import '../../../core/enums.dart';
+import '../../workout/domain/workout_set.dart';
 import '../../../core/utils/rounding.dart';
 import 'category_defaults.dart';
 
@@ -44,6 +45,7 @@ class LoggedSetInput {
     this.isFailure = false,
     this.isWarmup = false,
     this.restBeforeSetSeconds,
+    this.loadType = WorkoutSetLoadType.externalLoad,
   });
 
   final double weightKg;
@@ -53,6 +55,7 @@ class LoggedSetInput {
   final bool isFailure;
   final bool isWarmup;
   final int? restBeforeSetSeconds;
+  final WorkoutSetLoadType loadType;
 
   double get performanceScore => weightKg * reps;
 }
@@ -143,7 +146,8 @@ class EvidenceRecommendationEngine {
     final spec = CategoryDefaults.of(ctx.category, ctx.goal);
     final cur = ctx.currentSet;
     final increment = ctx.incrementKg <= 0 ? 1.0 : ctx.incrementKg;
-    final isAssisted = ctx.category.isAssisted;
+    final isAssisted = cur.loadType == WorkoutSetLoadType.assistance ||
+        ctx.category.isAssisted;
     final isIsolation = ctx.category.isIsolation;
     final e1rm = epleyE1rm(cur.weightKg, cur.reps);
 

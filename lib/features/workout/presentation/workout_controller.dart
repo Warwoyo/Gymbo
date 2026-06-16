@@ -220,6 +220,7 @@ class WorkoutController
         isFailure: s.isFailure,
         isWarmup: s.isWarmup,
         restBeforeSetSeconds: s.restBeforeSetSeconds,
+        loadType: s.loadType,
       );
 
   Future<void> logSet({
@@ -227,6 +228,7 @@ class WorkoutController
     required int reps,
     bool isWarmup = false,
     bool isFailure = false,
+    WorkoutSetLoadType loadType = WorkoutSetLoadType.externalLoad,
     double? rpe,
     int? rir,
     String? notes,
@@ -260,6 +262,7 @@ class WorkoutController
       rir: rir,
       isWarmup: isWarmup,
       isFailure: isFailure,
+      loadType: loadType,
       estimatedOneRepMaxKg: e1rm,
       restBeforeSetSeconds: restBefore,
       startedAt: now,
@@ -289,7 +292,11 @@ class WorkoutController
             category: selected.exercise.exerciseCategory,
             goal: _goal,
             incrementKg: _incrementFor(selected.exercise),
-            currentSet: LoggedSetInput(weightKg: weightKg, reps: reps),
+            currentSet: LoggedSetInput(
+              weightKg: weightKg,
+              reps: reps,
+              loadType: loadType,
+            ),
           )).recommendedRestSeconds;
       await ref.read(restTimerProvider.notifier).start(
             seconds,

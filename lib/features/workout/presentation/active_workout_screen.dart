@@ -304,6 +304,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
       reps: result.reps,
       isWarmup: result.isWarmup,
       isFailure: result.isFailure,
+      loadType: result.loadType,
       rpe: result.rpe,
       rir: result.rir,
       notes: result.notes,
@@ -321,6 +322,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
             weightKg: result.weightKg,
             reps: result.reps,
             isFailure: result.isFailure,
+            loadType: result.loadType,
             rpe: result.rpe,
             rir: result.rir,
             notes: result.notes,
@@ -671,6 +673,9 @@ class _SetsList extends StatelessWidget {
   String _subtitle(WorkoutSet s) {
     if (s.isWarmup) return 'Warm-up';
     final parts = <String>[];
+    if (s.loadType != WorkoutSetLoadType.externalLoad) {
+      parts.add(s.loadType.label);
+    }
     if (s.estimatedOneRepMaxKg != null) {
       parts.add('e1RM ${Format.kg(s.estimatedOneRepMaxKg!)}');
     }
