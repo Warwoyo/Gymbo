@@ -111,11 +111,24 @@ class HomeScreen extends ConsumerWidget {
             const SizedBox(height: 10),
             Wrap(
               spacing: 8,
+              runSpacing: 8,
               children: [
-                _QuickFilter(label: 'Push', filter: ExerciseFilter.push),
-                _QuickFilter(label: 'Pull', filter: ExerciseFilter.pull),
-                _QuickFilter(label: 'Legs', filter: ExerciseFilter.legs),
-                _QuickFilter(label: 'Full Body', filter: ExerciseFilter.all),
+                _QuickFilter(
+                  label: 'Start Push',
+                  filter: ExerciseFilter.push,
+                ),
+                _QuickFilter(
+                  label: 'Start Pull',
+                  filter: ExerciseFilter.pull,
+                ),
+                _QuickFilter(
+                  label: 'Start Legs',
+                  filter: ExerciseFilter.legs,
+                ),
+                _QuickFilter(
+                  label: 'Start Full Body',
+                  filter: ExerciseFilter.all,
+                ),
               ],
             ),
             const SizedBox(height: 24),
@@ -259,7 +272,8 @@ class _QuickFilter extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ActionChip(
+    return FilledButton.tonalIcon(
+      icon: const Icon(Icons.play_arrow),
       label: Text(label),
       onPressed: () async {
         await startWorkoutFromHome(context, ref, filter: filter);
