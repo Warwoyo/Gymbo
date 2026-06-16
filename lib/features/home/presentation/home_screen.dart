@@ -10,6 +10,7 @@ import '../../muscle/domain/recovery_estimate.dart';
 import '../../muscle/presentation/human_muscle_map.dart';
 import '../../muscle/presentation/muscle_map_color_scale.dart';
 import '../../profile/presentation/profile_controller.dart';
+import '../../workout/domain/workout_session.dart';
 import '../../workout/presentation/session_providers.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -131,6 +132,8 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 16),
+            const _RecommendedTodayCard(),
             const SizedBox(height: 24),
 
             Text('Last workout',
@@ -171,6 +174,249 @@ class HomeScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+class _RecommendedTodayCard extends ConsumerWidget {
+  const _RecommendedTodayCard();
+
+  static const _readyThreshold = 60.0;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profile = ref.watch(activeProfileProvider).valueOrNull;
+    final recovery = ref.watch(recoveryByMuscleProvider);
+    final lastSession = ref.watch(lastFinishedSessionProvider);
+
+    if (profile == null) {
+      return const Card(
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Text(
+            'Create or select a profile to get today\'s workout recommendation.',
+          ),
+        ),
+      );
+    }
+
+    return recovery.when(
+      loading: () => const Card(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      ),
+      error: (e, _) => Card(
+        child: Padding(padding: const EdgeInsets.all(16), child: Text('$e')),
+      ),
+      data: (recoveryMap) {
+        final session = lastSession.valueOrNull;
+        final recommendation = _WorkoutSplitRecommendation.from(
+          recovery: recoveryMap,
+          lastSession: session,
+          goal: profile.primaryGoal,
+        );
+
+        return Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.auto_awesome),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Recommended today: ${recommendation.label}',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(recommendation.reason),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                FilledButton.icon(
+                  icon: const Icon(Icons.play_arrow),
+                  label: Text('Start ${recommendation.label} Workout'),
+                  onPressed: () => startWorkoutFromHome(
+                    context,
+                    ref,
+                    filter: recommendation.filter,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _WorkoutSplitRecommendation {
+  const _WorkoutSplitRecommendation({
+    required this.filter,
+    required this.label,
+    required this.reason,
+  });
+
+  final ExerciseFilter filter;
+  final String label;
+  final String reason;
+
+  static _WorkoutSplitRecommendation from({
+    required Map<MuscleGroup, MuscleRecoveryState> recovery,
+    required WorkoutSession? lastSession,
+    required TrainingGoal goal,
+  }) {
+    if (recovery.values.every((state) => state.lastTrainedAt == null)) {
+      return const _WorkoutSplitRecommendation(
+        filter: ExerciseFilter.all,
+        label: 'Full Body',
+        reason:
+            'Log a few workouts and Gymbo will tailor this around your recovery. For now, start balanced and keep the effort moderate.',
+      );
+    }
+
+    const splitMuscles = <ExerciseFilter, List<MuscleGroup>>{
+      ExerciseFilter.push: [
+        MuscleGroup.chest,
+        MuscleGroup.shoulders,
+        MuscleGroup.triceps,
+      ],
+      ExerciseFilter.pull: [
+        MuscleGroup.back,
+        MuscleGroup.biceps,
+        MuscleGroup.traps,
+        MuscleGroup.forearms,
+      ],
+      ExerciseFilter.legs: [
+        MuscleGroup.quads,
+        MuscleGroup.hamstrings,
+        MuscleGroup.glutes,
+        MuscleGroup.calves,
+      ],
+      ExerciseFilter.all: [
+        MuscleGroup.chest,
+        MuscleGroup.back,
+        MuscleGroup.shoulders,
+        MuscleGroup.biceps,
+        MuscleGroup.triceps,
+        MuscleGroup.quads,
+        MuscleGroup.hamstrings,
+        MuscleGroup.glutes,
+      ],
+    };
+
+    final lastFilter = switch (lastSession?.dayType) {
+      DayType.push => ExerciseFilter.push,
+      DayType.pull => ExerciseFilter.pull,
+      DayType.leg => ExerciseFilter.legs,
+      null => null,
+    };
+    final goalBias = switch (goal) {
+      TrainingGoal.strength => ExerciseFilter.all,
+      TrainingGoal.hypertrophy => null,
+      TrainingGoal.muscularEndurance => ExerciseFilter.all,
+      TrainingGoal.generalFitness => ExerciseFilter.all,
+    };
+
+    double score(ExerciseFilter split) {
+      final muscles = splitMuscles[split]!;
+      final states = muscles
+          .map((m) => recovery[m])
+          .whereType<MuscleRecoveryState>()
+          .toList();
+      if (states.isEmpty) return split == ExerciseFilter.all ? 58 : 50;
+      final avgRecovery = states.fold<double>(
+            0,
+            (sum, state) => sum + state.recoveryPercent,
+          ) /
+          states.length;
+      final lowRecoveryPenalty = states
+              .where((state) =>
+                  state.recoveryPercent < _RecommendedTodayCard._readyThreshold)
+              .length *
+          18;
+      final recency = states
+              .map((state) => state.daysSinceLastTrained)
+              .fold<int>(0, (max, days) => days > max ? days : max)
+              .clamp(0, 7)
+              .toDouble() *
+          2;
+      final lastPenalty = split == lastFilter ? 18 : 0;
+      final goalBonus = split == goalBias ? 8 : 0;
+      final fullBodyFatiguePenalty = split == ExerciseFilter.all &&
+              states.any((state) => state.recoveryPercent < 50)
+          ? 16
+          : 0;
+      return avgRecovery +
+          recency +
+          goalBonus -
+          lowRecoveryPenalty -
+          lastPenalty -
+          fullBodyFatiguePenalty;
+    }
+
+    final candidates = splitMuscles.keys.toList()
+      ..sort((a, b) => score(b).compareTo(score(a)));
+    final best = candidates.first;
+    final muscles = splitMuscles[best]!;
+    final ready = muscles
+        .map((m) => recovery[m])
+        .whereType<MuscleRecoveryState>()
+        .where((state) =>
+            state.recoveryPercent >= _RecommendedTodayCard._readyThreshold)
+        .toList()
+      ..sort((a, b) => b.recoveryPercent.compareTo(a.recoveryPercent));
+    final stillRecovering = recovery.values
+        .where((state) =>
+            state.recoveryPercent < _RecommendedTodayCard._readyThreshold)
+        .toList()
+      ..sort((a, b) => a.recoveryPercent.compareTo(b.recoveryPercent));
+
+    final readyText = ready
+        .take(2)
+        .map((state) => state.muscle.label.toLowerCase())
+        .join(' and ');
+    final recoveringText = stillRecovering
+        .take(2)
+        .map((state) => state.muscle.label.toLowerCase())
+        .join(' and ');
+    final reason = [
+      if (readyText.isNotEmpty) '${_capitalize(readyText)} look ready.',
+      if (lastFilter == best) 'This still scores best despite being recent.',
+      if (lastFilter != null && lastFilter != best)
+        'You trained ${lastFilter.label.toLowerCase()} most recently.',
+      if (recoveringText.isNotEmpty)
+        '${_capitalize(recoveringText)} '
+        '${stillRecovering.length == 1 ? 'is' : 'are'} still recovering.',
+      if (goalBias == best) 'This fits your ${goal.label.toLowerCase()} goal.',
+    ].join(' ');
+
+    return _WorkoutSplitRecommendation(
+      filter: best,
+      label: best == ExerciseFilter.all ? 'Full Body' : best.label,
+      reason: reason.isEmpty
+          ? 'This split balances readiness, recent training, and your '
+              '${goal.label.toLowerCase()} goal.'
+          : reason,
+    );
+  }
+
+  static String _capitalize(String value) =>
+      value.isEmpty ? value : '${value[0].toUpperCase()}${value.substring(1)}';
 }
 
 class _RecoveryCard extends ConsumerWidget {
@@ -250,7 +496,6 @@ class _RecoveryCard extends ConsumerWidget {
     );
   }
 }
-
 
 Future<void> startWorkoutFromHome(BuildContext context, WidgetRef ref,
     {ExerciseFilter filter = ExerciseFilter.all}) async {
