@@ -8,6 +8,8 @@ import '../features/profile/data/profile_repository_impl.dart';
 import '../features/profile/domain/profile_repository.dart';
 import '../features/recommendations/domain/evidence_recommendation_engine.dart';
 import '../features/recommendations/domain/recommendation_engine.dart';
+import '../features/templates/data/workout_template_repository_impl.dart';
+import '../features/templates/domain/workout_template_repository.dart';
 import '../features/workout/data/workout_repository_impl.dart';
 import '../features/workout/domain/workout_repository.dart';
 
@@ -40,4 +42,12 @@ final exerciseRepositoryProvider = Provider<ExerciseRepository>((ref) {
 
 final workoutRepositoryProvider = Provider<WorkoutRepository>((ref) {
   return WorkoutRepositoryImpl(ref.watch(databaseProvider));
+});
+
+
+final workoutTemplateRepositoryProvider = Provider<WorkoutTemplateRepository>((ref) {
+  return WorkoutTemplateRepositoryImpl(
+    ref.watch(databaseProvider),
+    ref.watch(workoutRepositoryProvider),
+  );
 });

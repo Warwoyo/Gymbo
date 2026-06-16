@@ -10,6 +10,9 @@ import '../features/profile/presentation/edit_profile_screen.dart';
 import '../features/profile/presentation/onboarding_screen.dart';
 import '../features/profile/presentation/profile_selection_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
+import '../features/templates/presentation/template_detail_screen.dart';
+import '../features/templates/presentation/template_editor_screen.dart';
+import '../features/templates/presentation/template_list_screen.dart';
 import '../features/workout/presentation/active_workout_screen.dart';
 import '../features/workout/presentation/workout_summary_screen.dart';
 
@@ -46,6 +49,14 @@ final appRouter = GoRouter(
           WorkoutSummaryScreen(sessionId: state.pathParameters['sessionId']!),
     ),
     GoRoute(path: '/history', builder: (_, __) => const HistoryScreen()),
+    GoRoute(path: '/templates', builder: (_, __) => const TemplateListScreen()),
+    GoRoute(path: '/templates/new', builder: (_, __) => const TemplateEditorScreen()),
+    GoRoute(
+      path: '/templates/:templateId',
+      builder: (_, state) => TemplateDetailScreen(
+        templateId: state.pathParameters['templateId']!,
+      ),
+    ),
     GoRoute(path: '/recovery', builder: (_, __) => const RecoveryScreen()),
     GoRoute(
       path: '/progress/:exerciseId',
