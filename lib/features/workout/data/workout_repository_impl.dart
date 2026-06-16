@@ -71,6 +71,7 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
         setNumber: r.setNumber,
         weightKg: r.weightKg,
         reps: r.reps,
+        loadType: r.loadType,
         rpe: r.rpe,
         rir: r.rir,
         isWarmup: r.isWarmup,
@@ -331,6 +332,7 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
             setNumber: set.setNumber,
             weightKg: set.weightKg,
             reps: set.reps,
+            loadType: Value(set.loadType),
             rpe: Value(set.rpe),
             rir: Value(set.rir),
             isWarmup: Value(set.isWarmup),
@@ -354,6 +356,7 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
         .write(WorkoutSetsCompanion(
       weightKg: Value(set.weightKg),
       reps: Value(set.reps),
+      loadType: Value(set.loadType),
       rpe: Value(set.rpe),
       rir: Value(set.rir),
       isWarmup: Value(set.isWarmup),
@@ -409,7 +412,7 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
       final isPr = best > 0 && best > allTimeBest;
 
       final trend = EvidenceRecommendationEngine.trendOf(working
-          .map((s) => LoggedSetInput(weightKg: s.weightKg, reps: s.reps))
+          .map((s) => LoggedSetInput(weightKg: s.weightKg, reps: s.reps, loadType: s.loadType))
           .toList());
 
       exerciseSummaries.add(ExerciseSummary(

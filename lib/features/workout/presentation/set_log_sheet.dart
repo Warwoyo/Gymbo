@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import '../../../core/enums.dart';
 import '../../../core/widgets/stepper_field.dart';
 import '../../exercise_catalog/domain/exercise.dart';
+import '../domain/workout_set.dart';
 
 class SetLogResult {
   SetLogResult({
     required this.weightKg,
     required this.reps,
+    required this.loadType,
     required this.isWarmup,
     required this.isFailure,
     this.rpe,
@@ -17,6 +19,7 @@ class SetLogResult {
 
   final double weightKg;
   final int reps;
+  final WorkoutSetLoadType loadType;
   final bool isWarmup;
   final bool isFailure;
   final double? rpe;
@@ -72,6 +75,7 @@ class _SetLogSheetState extends State<_SetLogSheet> {
   late final TextEditingController _rpe;
   late final TextEditingController _rir;
   late final TextEditingController _notes;
+  late WorkoutSetLoadType _loadType;
   bool _warmup = false;
   bool _failure = false;
   bool _showExtras = false;
@@ -89,6 +93,7 @@ class _SetLogSheetState extends State<_SetLogSheet> {
     _rpe = TextEditingController();
     _rir = TextEditingController();
     _notes = TextEditingController();
+    _loadType = _defaultLoadType();
   }
 
   @override
@@ -105,10 +110,59 @@ class _SetLogSheetState extends State<_SetLogSheet> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
+  WorkoutSetLoadType _defaultLoadType() {
+    final equipmentType = widget.exercise.equipmentType;
+    final exerciseCategory = widget.exercise.exerciseCategory;
+    if (equipmentType == EquipmentType.assistedBodyweight ||
+        exerciseCategory == ExerciseCategory.assistedBodyweight) {
+      return WorkoutSetLoadType.assistance;
+    }
+    if (equipmentType == EquipmentType.bodyweight ||
+        exerciseCategory == ExerciseCategory.bodyweight ||
+        exerciseCategory == ExerciseCategory.core) {
+      return WorkoutSetLoadType.bodyweight;
+    }
+    if (equipmentType == EquipmentType.machine ||
+        equipmentType == EquipmentType.cable ||
+        equipmentType == EquipmentType.smithMachine ||
+        equipmentType == EquipmentType.plateLoaded) {
+      return WorkoutSetLoadType.machineStack;
+    }
+    return WorkoutSetLoadType.externalLoad;
+  }
+
+  bool get _canChooseLoadType {
+    final equipmentType = widget.exercise.equipmentType;
+    final exerciseCategory = widget.exercise.exerciseCategory;
+    return equipmentType == EquipmentType.assistedBodyweight ||
+        equipmentType == EquipmentType.bodyweight ||
+        exerciseCategory == ExerciseCategory.assistedBodyweight ||
+        exerciseCategory == ExerciseCategory.bodyweight ||
+        exerciseCategory == ExerciseCategory.core;
+  }
+
+  List<WorkoutSetLoadType> get _loadTypeOptions {
+    if (!_canChooseLoadType) return [_loadType];
+    return const [
+      WorkoutSetLoadType.bodyweight,
+      WorkoutSetLoadType.externalLoad,
+      WorkoutSetLoadType.assistance,
+    ];
+  }
+
   String? _weightHelperText() {
     final equipmentType = widget.exercise.equipmentType;
     final exerciseCategory = widget.exercise.exerciseCategory;
 
+    if (_loadType == WorkoutSetLoadType.bodyweight) {
+      return 'Use 0 kg for bodyweight only.';
+    }
+    if (_loadType == WorkoutSetLoadType.assistance) {
+      return 'Enter assistance weight. Lower is harder.';
+    }
+    if (_loadType == WorkoutSetLoadType.externalLoad && _canChooseLoadType) {
+      return 'Enter added external load; 0 kg means bodyweight only.';
+    }
     if (equipmentType == EquipmentType.dumbbell) {
       return 'Enter weight per hand.';
     }
@@ -164,6 +218,7 @@ class _SetLogSheetState extends State<_SetLogSheet> {
     Navigator.of(context).pop(SetLogResult(
       weightKg: weight,
       reps: reps,
+      loadType: _loadType,
       isWarmup: _warmup,
       isFailure: _failure,
       rpe: rpe,
@@ -184,6 +239,21 @@ class _SetLogSheetState extends State<_SetLogSheet> {
           children: [
             Text('Log set', style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 16),
+            if (_canChooseLoadType) ...[
+              SegmentedButton<WorkoutSetLoadType>(
+                segments: [
+                  for (final type in _loadTypeOptions)
+                    ButtonSegment(
+                      value: type,
+                      label: Text(type.label),
+                    ),
+                ],
+                selected: {_loadType},
+                onSelectionChanged: (value) =>
+                    setState(() => _loadType = value.single),
+              ),
+              const SizedBox(height: 12),
+            ],
             StepperField(
               label: 'Weight',
               controller: _weight,

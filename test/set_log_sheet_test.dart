@@ -22,7 +22,7 @@ void main() {
       );
 
       expect(
-        find.text('Use 0 kg for bodyweight only, or added load if weighted.'),
+        find.text('Use 0 kg for bodyweight only.'),
         findsOneWidget,
       );
     });
@@ -40,6 +40,7 @@ void main() {
         find.text('Enter assistance weight. Lower is harder.'),
         findsOneWidget,
       );
+      expect(find.text('Assistance'), findsOneWidget);
     });
 
     testWidgets('shows machine helper text', (tester) async {

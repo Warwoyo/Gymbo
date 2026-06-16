@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gymbo/core/enums.dart';
 import 'package:gymbo/features/recommendations/domain/evidence_recommendation_engine.dart';
+import 'package:gymbo/features/workout/domain/workout_set.dart';
 
 void main() {
   const engine = EvidenceRecommendationEngine();
@@ -72,6 +73,22 @@ void main() {
       expect(r.recommendedRepMin, 9);
       expect(r.recommendedRepMax, 10);
     });
+
+    test('loadType assistance progresses by reducing assistance even for bodyweight category', () {
+      final r = run(
+        category: ExerciseCategory.bodyweight,
+        increment: 5.0,
+        current: const LoggedSetInput(
+          weightKg: 30,
+          reps: 12,
+          rpe: 8,
+          loadType: WorkoutSetLoadType.assistance,
+        ),
+      );
+      expect(r.label, RecommendationLabel.increaseDifficulty);
+      expect(r.recommendedWeightKg, 25);
+    });
+
   });
 
   group('Rule C — do not increase after failure', () {
@@ -146,6 +163,22 @@ void main() {
       expect(r.recommendedRepMin, 8);
       expect(r.recommendedRepMax, 10);
     });
+
+    test('loadType assistance progresses by reducing assistance even for bodyweight category', () {
+      final r = run(
+        category: ExerciseCategory.bodyweight,
+        increment: 5.0,
+        current: const LoggedSetInput(
+          weightKg: 30,
+          reps: 12,
+          rpe: 8,
+          loadType: WorkoutSetLoadType.assistance,
+        ),
+      );
+      expect(r.label, RecommendationLabel.increaseDifficulty);
+      expect(r.recommendedWeightKg, 25);
+    });
+
   });
 
   group('Rule G — set guidance', () {

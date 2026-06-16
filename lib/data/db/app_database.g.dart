@@ -3223,6 +3223,15 @@ class $WorkoutSetsTable extends WorkoutSets
   late final GeneratedColumn<int> reps = GeneratedColumn<int>(
       'reps', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _loadTypeMeta = const VerificationMeta('loadType');
+  @override
+  late final GeneratedColumnWithTypeConverter<WorkoutSetLoadType, String>
+      loadType = GeneratedColumn<String>('load_type', aliasedName, false,
+              type: DriftSqlType.string,
+              requiredDuringInsert: false,
+              defaultValue: Constant(WorkoutSetLoadType.externalLoad.name))
+          .withConverter<WorkoutSetLoadType>(
+              $WorkoutSetsTable.$converterloadType);
   static const VerificationMeta _rpeMeta = const VerificationMeta('rpe');
   @override
   late final GeneratedColumn<double> rpe = GeneratedColumn<double>(
@@ -3307,6 +3316,7 @@ class $WorkoutSetsTable extends WorkoutSets
         setNumber,
         weightKg,
         reps,
+        loadType,
         rpe,
         rir,
         isWarmup,
@@ -3360,6 +3370,10 @@ class $WorkoutSetsTable extends WorkoutSets
           _repsMeta, reps.isAcceptableOrUnknown(data['reps']!, _repsMeta));
     } else if (isInserting) {
       context.missing(_repsMeta);
+    }
+    if (data.containsKey('load_type')) {
+      context.handle(_loadTypeMeta,
+          loadType.isAcceptableOrUnknown(data['load_type']!, _loadTypeMeta));
     }
     if (data.containsKey('rpe')) {
       context.handle(
@@ -3440,6 +3454,9 @@ class $WorkoutSetsTable extends WorkoutSets
           .read(DriftSqlType.double, data['${effectivePrefix}weight_kg'])!,
       reps: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}reps'])!,
+      loadType: $WorkoutSetsTable.$converterloadType.fromSql(
+          attachedDatabase.typeMapping.read(
+              DriftSqlType.string, data['${effectivePrefix}load_type'])!),
       rpe: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}rpe']),
       rir: attachedDatabase.typeMapping
@@ -3468,6 +3485,10 @@ class $WorkoutSetsTable extends WorkoutSets
     );
   }
 
+  static JsonTypeConverter2<WorkoutSetLoadType, String, String>
+      $converterloadType = const EnumNameConverter<WorkoutSetLoadType>(
+          WorkoutSetLoadType.values);
+
   @override
   $WorkoutSetsTable createAlias(String alias) {
     return $WorkoutSetsTable(attachedDatabase, alias);
@@ -3480,6 +3501,7 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
   final int setNumber;
   final double weightKg;
   final int reps;
+  final WorkoutSetLoadType loadType;
   final double? rpe;
   final int? rir;
   final bool isWarmup;
@@ -3498,6 +3520,7 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
       required this.setNumber,
       required this.weightKg,
       required this.reps,
+      this.loadType = WorkoutSetLoadType.externalLoad,
       this.rpe,
       this.rir,
       required this.isWarmup,
@@ -3518,6 +3541,8 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
     map['set_number'] = Variable<int>(setNumber);
     map['weight_kg'] = Variable<double>(weightKg);
     map['reps'] = Variable<int>(reps);
+    map['load_type'] = Variable<String>(
+        $WorkoutSetsTable.$converterloadType.toSql(loadType));
     if (!nullToAbsent || rpe != null) {
       map['rpe'] = Variable<double>(rpe);
     }
@@ -3556,6 +3581,7 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
       setNumber: Value(setNumber),
       weightKg: Value(weightKg),
       reps: Value(reps),
+      loadType: Value(loadType),
       rpe: rpe == null && nullToAbsent ? const Value.absent() : Value(rpe),
       rir: rir == null && nullToAbsent ? const Value.absent() : Value(rir),
       isWarmup: Value(isWarmup),
@@ -3591,6 +3617,7 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
       setNumber: serializer.fromJson<int>(json['setNumber']),
       weightKg: serializer.fromJson<double>(json['weightKg']),
       reps: serializer.fromJson<int>(json['reps']),
+      loadType: serializer.fromJson<WorkoutSetLoadType>(json['loadType']),
       rpe: serializer.fromJson<double?>(json['rpe']),
       rir: serializer.fromJson<int?>(json['rir']),
       isWarmup: serializer.fromJson<bool>(json['isWarmup']),
@@ -3617,6 +3644,7 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
       'setNumber': serializer.toJson<int>(setNumber),
       'weightKg': serializer.toJson<double>(weightKg),
       'reps': serializer.toJson<int>(reps),
+      'loadType': serializer.toJson<WorkoutSetLoadType>(loadType),
       'rpe': serializer.toJson<double?>(rpe),
       'rir': serializer.toJson<int?>(rir),
       'isWarmup': serializer.toJson<bool>(isWarmup),
@@ -3638,6 +3666,7 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
           int? setNumber,
           double? weightKg,
           int? reps,
+          WorkoutSetLoadType? loadType,
           Value<double?> rpe = const Value.absent(),
           Value<int?> rir = const Value.absent(),
           bool? isWarmup,
@@ -3656,6 +3685,7 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
         setNumber: setNumber ?? this.setNumber,
         weightKg: weightKg ?? this.weightKg,
         reps: reps ?? this.reps,
+        loadType: loadType ?? this.loadType,
         rpe: rpe.present ? rpe.value : this.rpe,
         rir: rir.present ? rir.value : this.rir,
         isWarmup: isWarmup ?? this.isWarmup,
@@ -3684,6 +3714,7 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
       setNumber: data.setNumber.present ? data.setNumber.value : this.setNumber,
       weightKg: data.weightKg.present ? data.weightKg.value : this.weightKg,
       reps: data.reps.present ? data.reps.value : this.reps,
+      loadType: data.loadType.present ? data.loadType.value : this.loadType,
       rpe: data.rpe.present ? data.rpe.value : this.rpe,
       rir: data.rir.present ? data.rir.value : this.rir,
       isWarmup: data.isWarmup.present ? data.isWarmup.value : this.isWarmup,
@@ -3714,6 +3745,7 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
           ..write('setNumber: $setNumber, ')
           ..write('weightKg: $weightKg, ')
           ..write('reps: $reps, ')
+          ..write('loadType: $loadType, ')
           ..write('rpe: $rpe, ')
           ..write('rir: $rir, ')
           ..write('isWarmup: $isWarmup, ')
@@ -3737,6 +3769,7 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
       setNumber,
       weightKg,
       reps,
+      loadType,
       rpe,
       rir,
       isWarmup,
@@ -3758,6 +3791,7 @@ class WorkoutSetRow extends DataClass implements Insertable<WorkoutSetRow> {
           other.setNumber == this.setNumber &&
           other.weightKg == this.weightKg &&
           other.reps == this.reps &&
+          other.loadType == this.loadType &&
           other.rpe == this.rpe &&
           other.rir == this.rir &&
           other.isWarmup == this.isWarmup &&
@@ -3778,6 +3812,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
   final Value<int> setNumber;
   final Value<double> weightKg;
   final Value<int> reps;
+  final Value<WorkoutSetLoadType> loadType;
   final Value<double?> rpe;
   final Value<int?> rir;
   final Value<bool> isWarmup;
@@ -3797,6 +3832,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
     this.setNumber = const Value.absent(),
     this.weightKg = const Value.absent(),
     this.reps = const Value.absent(),
+    this.loadType = const Value.absent(),
     this.rpe = const Value.absent(),
     this.rir = const Value.absent(),
     this.isWarmup = const Value.absent(),
@@ -3817,6 +3853,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
     required int setNumber,
     required double weightKg,
     required int reps,
+    this.loadType = const Value.absent(),
     this.rpe = const Value.absent(),
     this.rir = const Value.absent(),
     this.isWarmup = const Value.absent(),
@@ -3843,6 +3880,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
     Expression<int>? setNumber,
     Expression<double>? weightKg,
     Expression<int>? reps,
+    Expression<String>? loadType,
     Expression<double>? rpe,
     Expression<int>? rir,
     Expression<bool>? isWarmup,
@@ -3863,6 +3901,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
       if (setNumber != null) 'set_number': setNumber,
       if (weightKg != null) 'weight_kg': weightKg,
       if (reps != null) 'reps': reps,
+      if (loadType != null) 'load_type': loadType,
       if (rpe != null) 'rpe': rpe,
       if (rir != null) 'rir': rir,
       if (isWarmup != null) 'is_warmup': isWarmup,
@@ -3888,6 +3927,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
       Value<int>? setNumber,
       Value<double>? weightKg,
       Value<int>? reps,
+      Value<WorkoutSetLoadType>? loadType,
       Value<double?>? rpe,
       Value<int?>? rir,
       Value<bool>? isWarmup,
@@ -3907,6 +3947,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
       setNumber: setNumber ?? this.setNumber,
       weightKg: weightKg ?? this.weightKg,
       reps: reps ?? this.reps,
+      loadType: loadType ?? this.loadType,
       rpe: rpe ?? this.rpe,
       rir: rir ?? this.rir,
       isWarmup: isWarmup ?? this.isWarmup,
@@ -3940,6 +3981,10 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
     }
     if (reps.present) {
       map['reps'] = Variable<int>(reps.value);
+    }
+    if (loadType.present) {
+      map['load_type'] = Variable<String>(
+          $WorkoutSetsTable.$converterloadType.toSql(loadType.value));
     }
     if (rpe.present) {
       map['rpe'] = Variable<double>(rpe.value);
@@ -3993,6 +4038,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSetRow> {
           ..write('setNumber: $setNumber, ')
           ..write('weightKg: $weightKg, ')
           ..write('reps: $reps, ')
+          ..write('loadType: $loadType, ')
           ..write('rpe: $rpe, ')
           ..write('rir: $rir, ')
           ..write('isWarmup: $isWarmup, ')
@@ -7163,6 +7209,7 @@ typedef $$WorkoutSetsTableUpdateCompanionBuilder = WorkoutSetsCompanion
   Value<int> setNumber,
   Value<double> weightKg,
   Value<int> reps,
+  Value<WorkoutSetLoadType> loadType,
   Value<double?> rpe,
   Value<int?> rir,
   Value<bool> isWarmup,
@@ -7202,6 +7249,11 @@ class $$WorkoutSetsTableFilterComposer
 
   ColumnFilters<int> get reps => $composableBuilder(
       column: $table.reps, builder: (column) => ColumnFilters(column));
+
+  ColumnWithTypeConverterFilters<WorkoutSetLoadType, WorkoutSetLoadType, String>
+      get loadType => $composableBuilder(
+          column: $table.loadType,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
 
   ColumnFilters<double> get rpe => $composableBuilder(
       column: $table.rpe, builder: (column) => ColumnFilters(column));
@@ -7268,6 +7320,9 @@ class $$WorkoutSetsTableOrderingComposer
   ColumnOrderings<int> get reps => $composableBuilder(
       column: $table.reps, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get loadType => $composableBuilder(
+      column: $table.loadType, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<double> get rpe => $composableBuilder(
       column: $table.rpe, builder: (column) => ColumnOrderings(column));
 
@@ -7331,6 +7386,9 @@ class $$WorkoutSetsTableAnnotationComposer
 
   GeneratedColumn<int> get reps =>
       $composableBuilder(column: $table.reps, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<WorkoutSetLoadType, String> get loadType =>
+      $composableBuilder(column: $table.loadType, builder: (column) => column);
 
   GeneratedColumn<double> get rpe =>
       $composableBuilder(column: $table.rpe, builder: (column) => column);
@@ -7400,6 +7458,7 @@ class $$WorkoutSetsTableTableManager extends RootTableManager<
             Value<int> setNumber = const Value.absent(),
             Value<double> weightKg = const Value.absent(),
             Value<int> reps = const Value.absent(),
+            Value<WorkoutSetLoadType> loadType = const Value.absent(),
             Value<double?> rpe = const Value.absent(),
             Value<int?> rir = const Value.absent(),
             Value<bool> isWarmup = const Value.absent(),
@@ -7420,6 +7479,7 @@ class $$WorkoutSetsTableTableManager extends RootTableManager<
             setNumber: setNumber,
             weightKg: weightKg,
             reps: reps,
+            loadType: loadType,
             rpe: rpe,
             rir: rir,
             isWarmup: isWarmup,
@@ -7440,6 +7500,7 @@ class $$WorkoutSetsTableTableManager extends RootTableManager<
             required int setNumber,
             required double weightKg,
             required int reps,
+            Value<WorkoutSetLoadType> loadType = const Value.absent(),
             Value<double?> rpe = const Value.absent(),
             Value<int?> rir = const Value.absent(),
             Value<bool> isWarmup = const Value.absent(),
@@ -7460,6 +7521,7 @@ class $$WorkoutSetsTableTableManager extends RootTableManager<
             setNumber: setNumber,
             weightKg: weightKg,
             reps: reps,
+            loadType: loadType,
             rpe: rpe,
             rir: rir,
             isWarmup: isWarmup,
