@@ -41,11 +41,13 @@ class _TemplateEditorScreenState extends ConsumerState<TemplateEditorScreen> {
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<DayType?>(
-            value: _dayType,
+            initialValue: _dayType,
             decoration: const InputDecoration(labelText: 'Split'),
             items: [
               const DropdownMenuItem(value: null, child: Text('Any split')),
-              ...DayType.values.map((d) => DropdownMenuItem(value: d, child: Text(d.label))),
+              ...DayType.values.map(
+                (d) => DropdownMenuItem(value: d, child: Text(d.label)),
+              ),
             ],
             onChanged: (value) => setState(() => _dayType = value),
           ),

@@ -4,8 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/providers.dart';
 import '../../../core/enums.dart';
-import '../../exercise_catalog/presentation/exercise_list_screen.dart';
 import '../../../core/utils/formatting.dart';
+import '../../exercise_catalog/presentation/exercise_list_screen.dart';
+import '../../muscle/domain/muscle_recovery.dart';
 import '../../muscle/domain/recovery_estimate.dart';
 import '../../muscle/presentation/human_muscle_map.dart';
 import '../../muscle/presentation/muscle_map_color_scale.dart';
