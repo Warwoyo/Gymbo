@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../app/providers.dart';
 import '../../../core/enums.dart';
 import '../../muscle/domain/muscle_recovery.dart';
 import '../../workout/presentation/session_providers.dart';

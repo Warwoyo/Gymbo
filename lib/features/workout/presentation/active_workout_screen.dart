@@ -13,6 +13,7 @@ import '../../recommendations/domain/category_defaults.dart';
 import '../../recommendations/presentation/recommendation_card.dart';
 import '../domain/workout_set.dart';
 import 'rest_timer_widget.dart';
+import 'session_providers.dart';
 import 'set_log_sheet.dart';
 import 'workout_controller.dart';
 

@@ -326,9 +326,9 @@ class _LineChartPainter extends CustomPainter {
     final maxValue = values.fold<double>(0, math.max);
     final minValue = values.fold<double>(maxValue, math.min);
     final range = math.max(maxValue - minValue, maxValue * 0.1);
-    final yMin = math.max(0, minValue - range * 0.15);
+    final yMin = math.max(0.0, minValue - range * 0.15);
     final yMax = maxValue + range * 0.15;
-    final yRange = yMax - yMin == 0 ? 1 : yMax - yMin;
+    final yRange = yMax - yMin == 0 ? 1.0 : yMax - yMin;
 
     final gridPaint = Paint()
       ..color = gridColor
