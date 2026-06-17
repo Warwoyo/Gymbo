@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/providers.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/enums.dart';
 import '../../profile/domain/user_profile.dart';
@@ -215,6 +217,36 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                   ],
                 ),
+
+                ExpansionTile(
+                  leading: const Icon(Icons.privacy_tip_outlined),
+                  title: const Text('Data & Privacy'),
+                  subtitle: const Text('Export, import, or delete local data'),
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.file_upload_outlined),
+                      title: const Text('Export data'),
+                      subtitle:
+                          const Text('Copies a JSON backup to the clipboard'),
+                      onTap: () => _exportData(context, ref),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.file_download_outlined),
+                      title: const Text('Import data'),
+                      subtitle: const Text('Imports JSON from the clipboard'),
+                      onTap: () => _confirmImport(context, ref),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.delete_forever_outlined),
+                      title: const Text('Delete all local data'),
+                      subtitle: const Text(
+                          'Removes profiles, exercises, workouts, and templates'),
+                      textColor: Theme.of(context).colorScheme.error,
+                      iconColor: Theme.of(context).colorScheme.error,
+                      onTap: () => _confirmDelete(context, ref),
+                    ),
+                  ],
+                ),
                 ExpansionTile(
                   leading: const Icon(Icons.info_outline),
                   title: const Text('About & Data'),
@@ -242,6 +274,111 @@ class SettingsScreen extends ConsumerWidget {
               ],
             ),
     );
+  }
+
+  Future<void> _exportData(BuildContext context, WidgetRef ref) async {
+    try {
+      final json = await ref.read(dataExportServiceProvider).exportJson();
+      await Clipboard.setData(ClipboardData(text: json));
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Export JSON copied to clipboard.')),
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      _showError(context, 'Export failed: $error');
+    }
+  }
+
+  Future<void> _confirmImport(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Import data?'),
+        content: const Text(
+          'Gymbo will import a JSON backup from your clipboard. Existing '
+          'items are kept; duplicate IDs are imported with new IDs.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Import'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    try {
+      final clipboard = await Clipboard.getData(Clipboard.kTextPlain);
+      final text = clipboard?.text;
+      if (text == null || text.trim().isEmpty) {
+        throw const FormatException('Clipboard does not contain JSON.');
+      }
+      final result = await ref.read(dataExportServiceProvider).importJson(text);
+      ref.invalidate(activeProfileProvider);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Imported ${result.importedRows} rows. '
+            'Remapped ${result.remappedIds} duplicate IDs.',
+          ),
+        ),
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      _showError(context, 'Import failed: $error');
+    }
+  }
+
+  Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete all local data?'),
+        content: const Text(
+          'This permanently deletes local profiles, custom exercises, workout '
+          'history, sets, templates, and related local data on this device.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
+            ),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    try {
+      await ref.read(dataExportServiceProvider).deleteAllLocalData();
+      ref.invalidate(activeProfileProvider);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('All local data deleted.')),
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      _showError(context, 'Delete failed: $error');
+    }
+  }
+
+  void _showError(BuildContext context, String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   String _styleHint(RecommendationStyle s) {
