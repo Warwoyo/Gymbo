@@ -509,16 +509,19 @@ class _ExerciseCompleteSheet extends StatelessWidget {
               )
             else
               for (final exercise in recommendations)
-                RadioListTile<String>(
+                ListTile(
                   contentPadding: EdgeInsets.zero,
-                  value: exercise.id,
-                  groupValue: recommendations.first.id,
-                  onChanged: (_) => Navigator.pop(
-                    context,
-                    _ExerciseCompleteAction.addRecommended(exercise.id),
+                  leading: Icon(
+                    exercise.id == recommendations.first.id
+                        ? Icons.radio_button_checked
+                        : Icons.radio_button_unchecked,
                   ),
                   title: Text(exercise.name),
                   subtitle: Text(exercise.exerciseCategory.label),
+                  onTap: () => Navigator.pop(
+                    context,
+                    _ExerciseCompleteAction.addRecommended(exercise.id),
+                  ),
                 ),
             const SizedBox(height: 12),
             Row(

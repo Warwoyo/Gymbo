@@ -153,7 +153,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     incrementKg: data.incrementKg,
                     restTimerEnabled: data.restTimerEnabled,
                   );
-              if (context.mounted) context.go('/home');
+              if (!mounted) return;
+              context.go('/home');
             },
           ),
         ),
