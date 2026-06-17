@@ -106,6 +106,8 @@ class _ProfileFormState extends State<ProfileForm> {
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          const _TrainingTermsCard(),
+          const SizedBox(height: 16),
           TextFormField(
             controller: _name,
             textCapitalization: TextCapitalization.words,
@@ -212,6 +214,78 @@ class _ProfileFormState extends State<ProfileForm> {
           FilledButton(onPressed: _submit, child: Text(widget.submitLabel)),
           const SizedBox(height: 32),
         ],
+      ),
+    );
+  }
+}
+
+class _TrainingTermsCard extends StatelessWidget {
+  const _TrainingTermsCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Quick terms',
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
+            const SizedBox(height: 8),
+            const Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _TermChip(
+                  label: 'RPE',
+                  message:
+                      'Rate of Perceived Exertion: how hard a set felt, usually from 1–10.',
+                ),
+                _TermChip(
+                  label: 'RIR',
+                  message:
+                      'Reps in Reserve: how many more good reps you could have done.',
+                ),
+                _TermChip(
+                  label: 'e1RM',
+                  message:
+                      'Estimated one-rep max calculated from your logged weight and reps.',
+                ),
+                _TermChip(
+                  label: 'recovery %',
+                  message:
+                      'An estimate of how ready a muscle is based on recent training fatigue.',
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TermChip extends StatelessWidget {
+  const _TermChip({
+    required this.label,
+    required this.message,
+  });
+
+  final String label;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: message,
+      triggerMode: TooltipTriggerMode.tap,
+      child: Chip(
+        label: Text(label),
+        avatar: const Icon(Icons.info_outline, size: 18),
       ),
     );
   }
