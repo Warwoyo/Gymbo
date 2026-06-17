@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../core/services/data_export_service.dart';
 import '../data/db/app_database.dart';
 import '../features/exercise_catalog/data/exercise_repository_impl.dart';
 import '../features/exercise_catalog/domain/exercise_repository.dart';
@@ -44,10 +45,14 @@ final workoutRepositoryProvider = Provider<WorkoutRepository>((ref) {
   return WorkoutRepositoryImpl(ref.watch(databaseProvider));
 });
 
-
-final workoutTemplateRepositoryProvider = Provider<WorkoutTemplateRepository>((ref) {
+final workoutTemplateRepositoryProvider =
+    Provider<WorkoutTemplateRepository>((ref) {
   return WorkoutTemplateRepositoryImpl(
     ref.watch(databaseProvider),
     ref.watch(workoutRepositoryProvider),
   );
+});
+
+final dataExportServiceProvider = Provider<DataExportService>((ref) {
+  return DataExportService(ref.watch(databaseProvider));
 });
