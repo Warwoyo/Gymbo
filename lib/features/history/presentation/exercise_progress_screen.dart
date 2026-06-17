@@ -213,7 +213,7 @@ class _ProgressChartCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final values = points.map((point) => _valueFor(point, metric)).toList();
-    final latest = values.isEmpty ? 0 : values.last;
+    final latest = values.isEmpty ? 0.0 : values.last;
     final highest = values.fold<double>(0, math.max);
 
     return Card(
