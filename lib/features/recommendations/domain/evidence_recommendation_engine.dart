@@ -143,11 +143,15 @@ class EvidenceRecommendationEngine {
   int _clampInt(int v, int lo, int hi) => v < lo ? lo : (v > hi ? hi : v);
 
   EvidenceRecommendation recommend(RecommendationContext ctx) {
-    final spec = CategoryDefaults.of(ctx.category, ctx.goal);
     final cur = ctx.currentSet;
+    final specCategory = cur.loadType == WorkoutSetLoadType.assistance &&
+            ctx.category == ExerciseCategory.bodyweight
+        ? ExerciseCategory.assistedBodyweight
+        : ctx.category;
+    final spec = CategoryDefaults.of(specCategory, ctx.goal);
     final increment = ctx.incrementKg <= 0 ? 1.0 : ctx.incrementKg;
     final isAssisted = cur.loadType == WorkoutSetLoadType.assistance ||
-        ctx.category.isAssisted;
+        specCategory.isAssisted;
     final isIsolation = ctx.category.isIsolation;
     final e1rm = epleyE1rm(cur.weightKg, cur.reps);
 
